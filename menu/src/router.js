@@ -21,6 +21,7 @@ const routes = [{
     {
         path: '/register',
         component: RegisterComponent,
+
     },
     {
         path: '/negocios',

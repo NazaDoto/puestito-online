@@ -130,10 +130,11 @@ hr{
 
 .tarjetaProducto {
     box-shadow: 0.5px 1px 4px;
-    margin-top: 10px;
+    margin:10px 10px;
     border: 5px;
     background-color: white;
     border-radius: 10px;
+    display: inline-block;
 }
 .descripcion{
     font-style:italic;
@@ -144,7 +145,7 @@ img{
 .imagen{
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
-    width:100%;
+    width:400px;
     height: 200px;
 }
 
@@ -172,6 +173,13 @@ img{
 @media screen and (max-width: 992px) {
     .ancho-busqueda {
         width: 100vw;
+    }
+    .imagen{
+        width: 100%;
+    }
+    .tarjetaProducto{
+        display: block;
+        margin: 10px 0px;
     }
 }
 </style>

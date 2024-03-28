@@ -174,7 +174,6 @@ const upload = multer({ storage: storage });
 app.post('/nuevoProducto', (req, res) => {
     try {
         const { producto } = req.body;
-        console.log(producto)
 
         // Realizar la inserción en la base de datos
         const sql = `
@@ -187,7 +186,6 @@ app.post('/nuevoProducto', (req, res) => {
         `;
 
         if (producto.imagen == null) {
-            console.log('modificando sin imagen')
             const { producto } = req.body;
             connection.query(sqlSinImg, [
                 producto.nombre,
@@ -204,7 +202,6 @@ app.post('/nuevoProducto', (req, res) => {
                 }
             });
         } else {
-            console.log('modificando con imagen')
 
             const { producto } = req.body;
             connection.query(sql, [
@@ -250,7 +247,6 @@ app.post('/nuevaCategoria', (req, res) => {
         categoria_nombre,
         usuario_nombre
     } = req.body;
-    console.log(usuario_nombre);
     const insertQuery = `
       INSERT INTO categorias
       (categoria_nombre, usuario_nombre) VALUES (?, ?)
