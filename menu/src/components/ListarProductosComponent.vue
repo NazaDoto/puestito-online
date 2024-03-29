@@ -37,7 +37,7 @@
                     class="form-check-input" name="" id="productoDisponible"
                     :checked="producto.producto_disponibilidad === 1"></div>
               </td>
-              <td><img :src="producto.producto_imagen" alt=" " style="max-width: 100%; max-height: 100px;"></td>
+              <td ><img class="imagen" :src="producto.producto_imagen" alt=" "></td>
               <td>
                 <button class="btn btn-success" title="Modificar" data-bs-toggle="modal"
                   data-bs-target="#modificarProducto" @click="modificar(producto)">Modificar</button>
@@ -365,7 +365,15 @@ export default {
   display: flex;
   justify-content: space-between;
 }
-
+img{
+    object-fit:cover;
+}
+.imagen{
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    width:400px;
+    height: 200px;
+}
 .ancho {
   min-height: 60vh;
   overflow: auto;
@@ -396,11 +404,16 @@ th {
   display: inline-flex;
   margin-top: auto;
 }
-
+.form-switch {
+    padding-left: 4em;
+}
 @media screen and (max-width: 992px) {
   .ancho-busqueda {
     width: 180px;
   }
+  .imagen{
+        width: 200px;
+    }
 }
 
 /* Agrega estilos CSS según tus preferencias */

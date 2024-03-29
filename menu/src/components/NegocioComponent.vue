@@ -1,39 +1,63 @@
 <template>
     <div>
-
-        <div class="text-center mt-2 titulo">~ {{ nombreNegocio.toUpperCase() }} ~</div>
-        <div class="tarjeta-container">
-            <div class="flex">
-                <div class="izquierda ancho-busqueda">
-                    <input class="form-control" v-model="busqueda" type="text" name="busqueda" id=""
-                        placeholder="Buscar" title="Ingrese una palabra clave...">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container-fluid">
+                <a class="navbar-brand " @click="scrollToInicio" href="#">~ {{ nombreNegocio.toUpperCase() }} ~</a>
+                <button class="navbar-brand navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">Categorías
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item" v-for="(categoria, index) in categoriasConProductosFiltrados" :key="index">
+                            <a class="nav-link" @click="scrollToCategoria(index); collapseNavbar()" href="#">{{
+                    categoria }}</a>
+                        </li>
+                    </ul>
                 </div>
             </div>
-            <div class="ancho">
-                <div class="mt-2" v-for="(categoria, index) in categoriasConProductosFiltrados" :key="index">
-                    <div class="titulo-categoria">{{ categoria }}</div>
-                    <div class="p-2">
-                        <div class="tarjetaProducto" v-for="(producto, i) in filteredProductos(categoria)" :key="i">
-                            <div v-if="producto.producto_imagen">
-                                <img class="imagen" :src="producto.producto_imagen" alt=" ">
-                            </div>
-                            <div class="textoTarjeta">
-                                <div class="flex mt-2 ">
-                                    <h3 class="izquierda">{{ producto.producto_nombre }}</h3>
-                                    <h3 class="derecha">${{ producto.producto_precio }}</h3>
+        </nav>
+
+        <div v-if="productos.length">
+            <div class="tarjeta-container">
+                <div class="ancho">
+                    <div class="mt-2" v-for="(categoria, index) in categoriasConProductosFiltrados" :key="index"
+                        :id="`categoria-${index}`">
+                        <div class="titulo-categoria">{{ categoria }}</div>
+                        <div class="p-2">
+                            <div class="tarjetaProducto" v-for="(producto, i) in filteredProductos(categoria)" :key="i">
+
+                                <div v-if="producto.producto_imagen">
+                                    <img class="imagen" :src="producto.producto_imagen" alt=" ">
                                 </div>
-                                <hr>
-                                <div class="descripcion">
-                                    {{ producto.producto_descripcion }}
-    
+                                <div class="textoTarjeta">
+                                    <div class="flex mt-2 ">
+                                        <h3 class="izquierda">{{ producto.producto_nombre }}</h3>
+                                        <h3 class="derecha">${{ producto.producto_precio }}</h3>
+                                    </div>
+                                    <hr>
+                                    <div class="descripcion">
+                                        {{ producto.producto_descripcion }}
+
+                                    </div>
                                 </div>
+
                             </div>
-    
                         </div>
                     </div>
+                    <div v-if="productosFiltrados.length === 0" class="text-center mt-3">
+                        No se encontraron resultados para esa búsqueda.
+                    </div>
                 </div>
-                <div v-if="productosFiltrados.length === 0" class="text-center mt-3">
-                    No se encontraron resultados para esa búsqueda.
+            </div>
+        </div>
+        <div v-else class="container text-center mt-4 no-negocio">
+            <div class="error-container">
+                <div class="error-content">
+                    <h1 class="display-1 text-danger">404</h1>
+                    <h2 class="display-4">Página no encontrada</h2>
+                    <p class="lead">Lo sentimos, la página que buscas no se encuentra disponible.</p>
                 </div>
             </div>
         </div>
@@ -53,7 +77,6 @@ export default {
     mounted() {
         // Obtener el nombre de usuario de la URL
         this.nombreNegocio = this.$route.params.nombreNegocio;
-
         // Lógica para obtener los productos del negocio con el nombre de usuario dado
         this.fetchProductos();
     },
@@ -79,13 +102,50 @@ export default {
         }
     },
     methods: {
+        scrollToCategoria(categoria) {
+            // Función para desplazarse a la categoría específica con un offset
+            const categoriaElement = document.getElementById(`categoria-${categoria}`);
+            if (categoriaElement) {
+                const navbarHeight = document.querySelector('.navbar').offsetHeight;
+                const categoriaPosition = categoriaElement.getBoundingClientRect().top;
+                window.scrollTo({
+                    top: window.pageYOffset + categoriaPosition - navbarHeight,
+                    behavior: 'smooth'
+                });
+            }
+        },
+        scrollToInicio() {
+            // Función para desplazarse al inicio de la página
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        },
+        collapseNavbar() {
+            // Función para contraer el navbar después de hacer clic en un enlace
+            const navbarToggler = document.querySelector('.navbar-toggler');
+            const navbarCollapse = document.querySelector('.navbar-collapse');
+            if (navbarToggler && navbarCollapse.classList.contains('show')) {
+                navbarToggler.click();
+            }
+        },
         async fetchProductos() {
             try {
                 // Realiza una solicitud HTTP GET para obtener los productos desde el servidor
                 const response = await axios.get(`/productos?usuario=${this.nombreNegocio}`);
 
-                // Actualiza la lista de productos con los datos recibidos
-                this.productos = response.data;
+                // Ordena los productos alfabéticamente por el nombre
+                const productosOrdenados = response.data.sort((a, b) => {
+                    const nombreA = a.producto_nombre.toUpperCase();
+                    const nombreB = b.producto_nombre.toUpperCase();
+                    if (nombreA < nombreB) {
+                        return -1;
+                    }
+                    if (nombreA > nombreB) {
+                        return 1;
+                    }
+                    return 0;
+                });
+
+                // Actualiza la lista de productos con los datos recibidos y ordenados
+                this.productos = productosOrdenados;
             } catch (error) {
                 console.error("Error al cargar los productos:", error);
             }
@@ -98,16 +158,35 @@ export default {
 };
 </script>
 
-<style>
-hr{
+<style scoped>
+nav {
+    position: sticky;
+    top: 0px;
+}
+
+.error-container {
+    height: 80vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.error-content {
+    text-align: center;
+}
+
+hr {
     margin: 0px;
 }
+
 .tarjeta-container {
     padding: 10px;
 }
-.textoTarjeta{
+
+.textoTarjeta {
     padding: 5px 15px;
 }
+
 .categoria-container {
     padding: 5px;
     border: 5px;
@@ -130,22 +209,25 @@ hr{
 
 .tarjetaProducto {
     box-shadow: 0.5px 1px 4px;
-    margin:10px 10px;
+    margin: 10px 10px;
     border: 5px;
     background-color: white;
     border-radius: 10px;
     display: inline-block;
 }
-.descripcion{
-    font-style:italic;
+
+.descripcion {
+    font-style: italic;
 }
-img{
-    object-fit:cover;
+
+img {
+    object-fit: cover;
 }
-.imagen{
+
+.imagen {
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
-    width:400px;
+    width: 400px;
     height: 200px;
 }
 
@@ -174,10 +256,12 @@ img{
     .ancho-busqueda {
         width: 100vw;
     }
-    .imagen{
+
+    .imagen {
         width: 100%;
     }
-    .tarjetaProducto{
+
+    .tarjetaProducto {
         display: block;
         margin: 10px 0px;
     }
