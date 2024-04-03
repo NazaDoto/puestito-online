@@ -1,13 +1,13 @@
-SELECT * FROM laravel.migrations;CREATE DATABASE `menu` /*!40100 DEFAULT CHARACTER SET latin1 */;
 CREATE TABLE `categorias` (
-  `categoria_id` int(11) NOT NULL AUTO_INCREMENT,
+  `categoria_id` int NOT NULL AUTO_INCREMENT,
   `categoria_nombre` varchar(50) DEFAULT NULL,
   `usuario_nombre` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`categoria_id`),
   UNIQUE KEY `categoria_nombre` (`categoria_nombre`)
-) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=latin1;
+
 CREATE TABLE `productos` (
-  `producto_id` int(11) NOT NULL AUTO_INCREMENT,
+  `producto_id` int NOT NULL AUTO_INCREMENT,
   `producto_nombre` varchar(100) NOT NULL,
   `producto_descripcion` text NOT NULL,
   `producto_categoria` varchar(50) DEFAULT NULL,
@@ -17,9 +17,10 @@ CREATE TABLE `productos` (
   `usuario_nombre` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`producto_id`),
   KEY `producto_categoria` (`producto_categoria`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=latin1;
+
 CREATE TABLE `usuarios` (
-  `usuario_id` int(11) NOT NULL AUTO_INCREMENT,
+  `usuario_id` int NOT NULL AUTO_INCREMENT,
   `usuario_nombre` varchar(50) DEFAULT NULL,
   `usuario_contraseña` varchar(100) NOT NULL,
   `usuario_nombre_negocio` varchar(100) NOT NULL,
@@ -27,6 +28,9 @@ CREATE TABLE `usuarios` (
   `usuario_fecha_vencimiento` datetime DEFAULT NULL,
   `usuario_correo` varchar(100) DEFAULT NULL,
   `usuario_telefono` varchar(20) DEFAULT NULL,
+  `usuario_imagen` longtext,
+  `usuario_direccion` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`usuario_id`),
   UNIQUE KEY `usuario_nombre` (`usuario_nombre`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
+
