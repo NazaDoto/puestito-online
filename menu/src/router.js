@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import InicioNegocioComponent from './components/InicioNegocioComponent.vue';
 import InicioComponent from './components/InicioComponent.vue';
 import LoginComponent from './components/LoginComponent.vue';
 import RegisterComponent from './components/RegisterComponent.vue';
@@ -8,12 +9,20 @@ import ListarProductosComponent from './components/ListarProductosComponent.vue'
 import NuevaCategoriaComponent from './components/NuevaCategoriaComponent.vue';
 import ListarCategoriasComponent from './components/ListarCategoriasComponent.vue';
 import NegocioComponent from './components/NegocioComponent.vue';
+import ModificarNegocioComponent from './components/ModificarNegocioComponent.vue';
+
 
 const routes = [{
         path: '/',
         component: InicioComponent,
+        meta: { requiresAuth: false },
+    },
+    {
+        path: '/home',
+        component: InicioNegocioComponent,
         meta: { requiresAuth: true },
     },
+
     {
         path: '/login',
         component: LoginComponent,
@@ -27,6 +36,11 @@ const routes = [{
     {
         path: '/negocios',
         component: ListarNegociosComponent,
+        meta: { requiresAuth: true },
+    },
+    {
+        path: '/modificar',
+        component: ModificarNegocioComponent,
         meta: { requiresAuth: true },
     },
     {

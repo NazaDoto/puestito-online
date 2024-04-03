@@ -2,7 +2,7 @@
     <div class="">
       <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-          <router-link class="navbar-brand" to="/">{{ leerUsuario() }} | </router-link>
+          <router-link class="navbar-brand" to="/home">{{ leerUsuario() }} | </router-link>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDarkDropdown"
             aria-controls="navbarNavDarkDropdown" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -10,7 +10,7 @@
           <div class="collapse navbar-collapse" id="navbarNavDarkDropdown">
             <ul class="navbar-nav">
               <li class="test nav-item">
-                <router-link class="nav-link" to="/">Inicio</router-link>
+                <router-link class="nav-link" to="/home">Inicio</router-link>
               </li>
               <li class="test nav-item">
                 <router-link class="nav-link" to="/register">Nuevo Negocio</router-link>

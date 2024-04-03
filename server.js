@@ -8,7 +8,8 @@ const https = require('https')
 const multer = require('multer');
 
 
-const fs = require('fs')
+const fs = require('fs');
+const { connect } = require('http2');
 const app = express();
 const port = 3500;
 // Middleware
@@ -64,21 +65,7 @@ function generarToken(usuarioId) {
     return jwt.sign(payload, secretKey, { expiresIn: '1h' }); // Token expira en 1 hora
 }
 
-// Función para verificar si un usuario está autenticado mediante token JWT
-function usuarioAutenticado(token) {
-    //const token = req.headers.authorization;
 
-    if (token) {
-        return false;
-    }
-
-    try {
-        const decoded = jwt.verify(token, secretKey);
-        return true;
-    } catch (error) {
-        return false;
-    }
-}
 
 
 
@@ -88,7 +75,7 @@ function usuarioAutenticado(token) {
 
 
 app.post('/register', (req, res) => {
-    const { usuario, contraseña, nombre, fechaVence, email, telefono } = req.body;
+    const { usuario, contraseña, nombre, fechaVence, email, imagen, direccion, telefono } = req.body;
 
     // Hashea la contraseña antes de almacenarla en la base de datos
     bcrypt.hash(contraseña, saltRounds, (err, hash) => {
@@ -97,8 +84,8 @@ app.post('/register', (req, res) => {
             res.status(500).json({ message: 'Error al registrar usuario' });
         } else {
             // Guarda el hash en la base de datos junto con el usuario
-            const query = 'INSERT INTO usuarios (usuario_nombre, usuario_contraseña, usuario_nombre_negocio, usuario_fecha_vencimiento, usuario_correo, usuario_telefono) VALUES (?, ?, ?, ?, ?, ?)';
-            connection.query(query, [usuario, hash, nombre, fechaVence, email, telefono], (err, result) => {
+            const query = 'INSERT INTO usuarios (usuario_nombre, usuario_contraseña, usuario_nombre_negocio, usuario_fecha_vencimiento, usuario_correo, usuario_imagen, usuario_direccion, usuario_telefono) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+            connection.query(query, [usuario, hash, nombre, fechaVence, email, imagen, direccion, telefono], (err, result) => {
                 if (err) {
                     console.error('Error al registrar usuario:', err);
                     res.status(500).json({ message: 'Error al registrar usuario' });
@@ -150,7 +137,6 @@ app.post('/login', (req, res) => {
 
 
 
-//Cargar PRODUCTO
 
 const uploadPath = './negocios';
 const storage = multer.diskStorage({
@@ -171,6 +157,89 @@ const storage = multer.diskStorage({
     }
 });
 const upload = multer({ storage: storage });
+app.get('/negocios', async(req, res) => {
+    try {
+        // Consultar la base de datos para obtener la información de los negocios
+        const query = 'SELECT usuario_nombre_negocio, usuario_direccion, usuario_correo, usuario_telefono FROM usuarios';
+        connection.query(query, async(error, results) => {
+            if (error) {
+                console.error('Error al obtener los negocios de la base de datos:', error);
+                res.status(500).json({ error: 'Error al obtener los negocios de la base de datos' });
+            } else {
+                // Convertir direcciones a coordenadas geográficas
+                const negociosPromises = results.map(async negocio => {
+                    const direccion = negocio.usuario_direccion;
+                    const response = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(direccion)}&format=json&limit=1`);
+                    const data = await response.json();
+                    if (data && data.length > 0) {
+                        return {
+                            nombre: negocio.usuario_nombre_negocio,
+                            direccion: negocio.usuario_direccion,
+                            correo: negocio.usuario_correo,
+                            telefono: negocio.usuario_telefono,
+                            latitud: parseFloat(data[0].lat),
+                            longitud: parseFloat(data[0].lon)
+                        };
+                    } else {
+                        console.error("No se encontraron resultados para la dirección especificada:", direccion);
+                        return null;
+                    }
+                });
+
+                // Esperar a que todas las conversiones de direcciones a coordenadas geográficas se completen
+                const negocios = await Promise.all(negociosPromises);
+
+                // Filtrar resultados nulos (sin coordenadas geográficas)
+                const negociosValidos = negocios.filter(negocio => negocio !== null);
+
+                res.json(negociosValidos);
+            }
+        });
+    } catch (error) {
+        console.error("Error al obtener los negocios:", error);
+        res.status(500).json({ error: 'Error al obtener los negocios' });
+    }
+});
+app.get('/miNegocio', (req, res) => {
+    // Consulta SQL para obtener la información del negocio
+    const usuario = req.query.usuario;
+    const query = "SELECT usuario_nombre_negocio,  usuario_correo, usuario_telefono, usuario_imagen, usuario_direccion FROM usuarios WHERE usuario_nombre = ?";
+    // Ejecutar la consulta
+    connection.query(query, usuario, (error, results) => {
+        if (error) {
+            console.error('Error al obtener la información del negocio:', error);
+            res.status(500).json({ error: 'Error al obtener la información del negocio' });
+            return;
+        }
+
+        if (results.length === 0) {
+            res.status(404).json({ error: 'No se encontró información del negocio' });
+            return;
+        }
+        res.json({
+            usuario: usuario,
+            nombre: results[0].usuario_nombre_negocio,
+            correo: results[0].usuario_correo,
+            telefono: results[0].usuario_telefono,
+            direccion: results[0].usuario_direccion,
+            imagen: results[0].usuario_imagen
+        });
+    });
+});
+
+app.put('/modificarPerfil', (req, res) => {
+    const { negocio } = req.body;
+    query = 'UPDATE usuarios SET usuario_nombre_negocio = ?, usuario_correo = ?, usuario_telefono = ?, usuario_imagen = ?, usuario_direccion = ? WHERE usuario_nombre = ?';
+    connection.query(query, [negocio.nombre, negocio.correo, negocio.telefono, negocio.imagen, negocio.direccion, negocio.usuario], (err, result) => {
+        if (err) {
+            console.error('Error al modificar producto:', err);
+            res.status(500).json({ message: 'Error al modificar producto' });
+        } else {
+            res.status(200).json({ message: 'Producto modificado exitosamente' });
+        }
+    });
+});
+
 
 app.post('/nuevoProducto', (req, res) => {
     try {

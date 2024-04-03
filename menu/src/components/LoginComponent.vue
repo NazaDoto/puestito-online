@@ -4,7 +4,7 @@
       <div class="total">
   
         <div class="fondo">
-          <h1 class="titulo text-center">Sistema Menú</h1>
+          <h1 class="titulo text-center">Menute</h1>
           <form class="row g-3 text-center" @submit.prevent="login">
             <div class="width-size">
               <label for="usuario">Usuario</label>
@@ -17,6 +17,7 @@
             <div class="text-center col-md-8">
               <button type="submit" class="btn btn-entrar">Iniciar sesión</button>
             </div>
+            <a href="/">Volver</a>
           </form>
         </div>
         <div class="derecha">
@@ -41,7 +42,7 @@
       checkAuthentication() {
         const isAuthenticated = !!localStorage.getItem("token");/* Agrega aquí tu lógica para verificar si el usuario está autenticado */
         if (isAuthenticated) {
-          this.$router.push("/");
+          this.$router.push("/home");
         }
       },
       async login() {
@@ -59,7 +60,7 @@
             localStorage.setItem("nombre", response.data.nombre);
             localStorage.setItem("usuario", response.data.nomUsuario);
             // Redirige al usuario a la página de inicio (por ejemplo, /home)
-            this.$router.push("/");
+            this.$router.push("/home");
             const Toast = Swal.mixin({
               toast: true,
               position: 'bottom-end',
