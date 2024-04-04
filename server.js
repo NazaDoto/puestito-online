@@ -75,7 +75,7 @@ function generarToken(usuarioId) {
 
 
 app.post('/register', (req, res) => {
-    const { usuario, contraseña, nombre, fechaVence, email, imagen, direccion, telefono } = req.body;
+    const { usuario, contraseña, nombre, fechaVence, email, imagen, direccion, telefono, descripcion } = req.body;
 
     // Hashea la contraseña antes de almacenarla en la base de datos
     bcrypt.hash(contraseña, saltRounds, (err, hash) => {
@@ -84,8 +84,8 @@ app.post('/register', (req, res) => {
             res.status(500).json({ message: 'Error al registrar usuario' });
         } else {
             // Guarda el hash en la base de datos junto con el usuario
-            const query = 'INSERT INTO usuarios (usuario_nombre, usuario_contraseña, usuario_nombre_negocio, usuario_fecha_vencimiento, usuario_correo, usuario_imagen, usuario_direccion, usuario_telefono) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
-            connection.query(query, [usuario, hash, nombre, fechaVence, email, imagen, direccion, telefono], (err, result) => {
+            const query = 'INSERT INTO usuarios (usuario_nombre, usuario_contraseña, usuario_nombre_negocio, usuario_fecha_vencimiento, usuario_correo, usuario_imagen, usuario_direccion, usuario_telefono, usuario_descripcion) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
+            connection.query(query, [usuario, hash, nombre, fechaVence, email, imagen, direccion, telefono, descripcion], (err, result) => {
                 if (err) {
                     console.error('Error al registrar usuario:', err);
                     res.status(500).json({ message: 'Error al registrar usuario' });
@@ -160,12 +160,13 @@ const upload = multer({ storage: storage });
 app.get('/negocios', async(req, res) => {
     try {
         // Consultar la base de datos para obtener la información de los negocios
-        const query = 'SELECT usuario_nombre_negocio, usuario_direccion, usuario_correo, usuario_telefono FROM usuarios';
+        const query = "SELECT usuario_nombre, usuario_nombre_negocio, usuario_direccion, usuario_correo, usuario_telefono, usuario_descripcion, usuario_imagen FROM usuarios WHERE usuario_nombre != 'admin'";
         connection.query(query, async(error, results) => {
             if (error) {
                 console.error('Error al obtener los negocios de la base de datos:', error);
                 res.status(500).json({ error: 'Error al obtener los negocios de la base de datos' });
             } else {
+
                 // Convertir direcciones a coordenadas geográficas
                 const negociosPromises = results.map(async negocio => {
                     const direccion = negocio.usuario_direccion;
@@ -173,10 +174,13 @@ app.get('/negocios', async(req, res) => {
                     const data = await response.json();
                     if (data && data.length > 0) {
                         return {
+                            usuario: negocio.usuario_nombre,
                             nombre: negocio.usuario_nombre_negocio,
                             direccion: negocio.usuario_direccion,
                             correo: negocio.usuario_correo,
                             telefono: negocio.usuario_telefono,
+                            descripcion: negocio.usuario_descripcion,
+                            imagen: negocio.usuario_imagen,
                             latitud: parseFloat(data[0].lat),
                             longitud: parseFloat(data[0].lon)
                         };
@@ -203,7 +207,7 @@ app.get('/negocios', async(req, res) => {
 app.get('/miNegocio', (req, res) => {
     // Consulta SQL para obtener la información del negocio
     const usuario = req.query.usuario;
-    const query = "SELECT usuario_nombre_negocio,  usuario_correo, usuario_telefono, usuario_imagen, usuario_direccion FROM usuarios WHERE usuario_nombre = ?";
+    const query = "SELECT usuario_nombre_negocio,  usuario_correo, usuario_telefono, usuario_descripcion, usuario_imagen, usuario_direccion FROM usuarios WHERE usuario_nombre = ?";
     // Ejecutar la consulta
     connection.query(query, usuario, (error, results) => {
         if (error) {
@@ -222,6 +226,7 @@ app.get('/miNegocio', (req, res) => {
             correo: results[0].usuario_correo,
             telefono: results[0].usuario_telefono,
             direccion: results[0].usuario_direccion,
+            descripcion: results[0].usuario_descripcion,
             imagen: results[0].usuario_imagen
         });
     });
@@ -229,8 +234,8 @@ app.get('/miNegocio', (req, res) => {
 
 app.put('/modificarPerfil', (req, res) => {
     const { negocio } = req.body;
-    query = 'UPDATE usuarios SET usuario_nombre_negocio = ?, usuario_correo = ?, usuario_telefono = ?, usuario_imagen = ?, usuario_direccion = ? WHERE usuario_nombre = ?';
-    connection.query(query, [negocio.nombre, negocio.correo, negocio.telefono, negocio.imagen, negocio.direccion, negocio.usuario], (err, result) => {
+    query = 'UPDATE usuarios SET usuario_nombre_negocio = ?, usuario_correo = ?, usuario_telefono = ?, usuario_descripcion = ?, usuario_imagen = ?, usuario_direccion = ? WHERE usuario_nombre = ?';
+    connection.query(query, [negocio.nombre, negocio.correo, negocio.telefono, negocio.descripcion, negocio.imagen, negocio.direccion, negocio.usuario], (err, result) => {
         if (err) {
             console.error('Error al modificar producto:', err);
             res.status(500).json({ message: 'Error al modificar producto' });

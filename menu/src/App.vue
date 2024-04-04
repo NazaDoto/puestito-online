@@ -1,5 +1,5 @@
 <template>
-  <div class="color-fondo">
+  <div>
     <router-view></router-view>
     <PieComponent />
 

@@ -40,6 +40,10 @@
             <div class="col-md-6">
               <input class="form-control" type="number" id="telefono" v-model="negocio.telefono" placeholder="Teléfono">
             </div>
+            <div class="col-md-6">
+              <input class="form-control" type="text" id="descripcion" v-model="negocio.descripcion"
+                placeholder="Descripción">
+            </div>
           </div>
 
           <div>
@@ -70,6 +74,7 @@ export default {
         imagen: '',
         direccion:'',
         telefono: '',
+        descripcion: '',
       },
     };
   },
@@ -95,6 +100,7 @@ export default {
       this.negocio.imagen = '';
       this.negocio.direccion = '';
       this.negocio.telefono = '';
+      this.negocio.direccion ='';
     },
     registrarNegocio() {
       // Realizar una solicitud HTTP POST al servidor Express
@@ -128,7 +134,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 input.date {
   height: 45px;
 }

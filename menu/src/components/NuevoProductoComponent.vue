@@ -148,8 +148,8 @@ export default {
                     });
                     this.modalAbierto = true;
                     setTimeout(function () {
-                window.location.reload(1);
-            }, 2000);
+                        window.location.reload(1);
+                    }, 2000);
                 })
                 .catch(() => {
                     Swal.fire({
@@ -157,7 +157,7 @@ export default {
                         text: 'No se pudo agregar el producto.',
                     });
                 });
-            
+
         },
 
         agregarCategoria() {
@@ -200,7 +200,7 @@ export default {
 </script>
 
 
-<style>
+<style scoped>
 textarea {
     margin: auto !important;
 }

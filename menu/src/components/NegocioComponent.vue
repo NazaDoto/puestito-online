@@ -1,16 +1,16 @@
 <template>
     <div>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <div class="container-fluid">
-                <a class="navbar-brand " @click="scrollToInicio" href="#">~ {{ nombreNegocio.toUpperCase() }} ~</a>
+                <a class="navbar-brand" @click="scrollToInicio" href="#">~ {{ nombreNegocio.toUpperCase() }} ~</a>
                 <button class="navbar-brand navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">Categorías
+                    aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        <li class="nav-item" v-for="(categoria, index) in categoriasConProductosFiltrados" :key="index">
+                        <li class="nav-item" v-for="(categoria, index) in categoriasOrdenadas" :key="index">
                             <a class="nav-link" @click="scrollToCategoria(index); collapseNavbar()" href="#">{{
                     categoria }}</a>
                         </li>
@@ -20,29 +20,41 @@
         </nav>
 
         <div v-if="productos.length">
+            <div class="presentacion">
+                <!-- Imagen del negocio con texto superpuesto -->
+                <div class="imagen-container">
+                    <img :src="negocio.imagen" alt="" class="img-negocio">
+                    <div class="texto-superpuesto">BIENVENIDOS</div>
+                    <div class="texto-superpuesto2">"{{ negocio.descripcion }}"</div>
+                </div>
+            </div>
             <div class="tarjeta-container">
                 <div class="ancho">
-                    <div class="mt-2" v-for="(categoria, index) in categoriasConProductosFiltrados" :key="index"
+                    <div class="mt-2" v-for="(categoria, index) in categoriasOrdenadas" :key="index"
                         :id="`categoria-${index}`">
                         <div class="titulo-categoria">{{ categoria }}</div>
                         <div class="p-2">
-                            <div class="tarjetaProducto" v-for="(producto, i) in filteredProductos(categoria)" :key="i">
-
-                                <div v-if="producto.producto_imagen">
-                                    <img class="imagen" :src="producto.producto_imagen" alt=" ">
-                                </div>
-                                <div class="textoTarjeta">
-                                    <div class="flex mt-2 ">
-                                        <h3 class="izquierda">{{ producto.producto_nombre }}</h3>
-                                        <h3 class="derecha">${{ producto.producto_precio }}</h3>
-                                    </div>
-                                    <hr>
-                                    <div class="descripcion">
-                                        {{ producto.producto_descripcion }}
-
+                            <div class="item-container mt-2" v-for="(producto, index) in filteredProductos(categoria)"
+                                :key="index">
+                                <div class="item-imagen" v-if="producto.producto_imagen">
+                                    <div >                                    
+                                        <img class="imagen" :src="producto.producto_imagen" alt=" ">
                                     </div>
                                 </div>
-
+                                <!-- Nombre del producto -->
+                                <div class="item-texto">
+                                    <div class="item-texto-block">
+                                        <div class="item-nombre">
+                                            {{ producto.producto_nombre }}
+                                        </div>
+                                        <div class="item-precio">
+                                            ${{ producto.producto_precio }}
+                                        </div>
+                                        <div class="item-descripcion" v-if="producto.producto_descripcion">
+                                            "{{ producto.producto_descripcion }}"
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -72,6 +84,15 @@ export default {
             nombreNegocio: '', // Variable para almacenar el nombre de usuario del negocio
             productos: [],      // Array para almacenar los productos del negocio
             busqueda: '',
+            negocio: {
+                usuario: '',
+                nombre: '',
+                correo: '',
+                telefono: '',
+                direccion: '',
+                descripcion: '',
+                imagen: ''
+            },
         };
     },
     mounted() {
@@ -79,8 +100,13 @@ export default {
         this.nombreNegocio = this.$route.params.nombreNegocio;
         // Lógica para obtener los productos del negocio con el nombre de usuario dado
         this.fetchProductos();
+        this.obtenerInformacionNegocio();
     },
     computed: {
+        categoriasOrdenadas() {
+            // Obtiene las categorías únicas de los productos filtrados y las ordena alfabéticamente
+            return [...new Set(this.productosFiltrados.map(producto => producto.producto_categoria))].sort();
+        },
         productosFiltrados() {
             // Filtra los productos basándose en el valor de busqueda y producto_disponibilidad = 1
             return this.productos.filter(producto => {
@@ -102,6 +128,17 @@ export default {
         }
     },
     methods: {
+        async obtenerInformacionNegocio() {
+            try {
+                // Realiza una solicitud HTTP GET para obtener los informes desde el servidor
+                const response = await axios.get(`/miNegocio?usuario=${localStorage.getItem('usuario')}`);
+                // Actualiza la lista de informes con los datos recibidos
+                this.negocio = response.data;
+            } catch (error) {
+                console.error("Error al cargar los productos:", error);
+            }
+
+        },
         scrollToCategoria(categoria) {
             // Función para desplazarse a la categoría específica con un offset
             const categoriaElement = document.getElementById(`categoria-${categoria}`);
@@ -109,7 +146,7 @@ export default {
                 const navbarHeight = document.querySelector('.navbar').offsetHeight;
                 const categoriaPosition = categoriaElement.getBoundingClientRect().top;
                 window.scrollTo({
-                    top: window.pageYOffset + categoriaPosition - navbarHeight,
+                    top: window.scrollY + categoriaPosition - navbarHeight,
                     behavior: 'smooth'
                 });
             }
@@ -159,7 +196,54 @@ export default {
 </script>
 
 <style scoped>
+.navbar-brand {
+    font-weight: bold;
+}
+
+.presentacion {
+    height: calc(100vh - 56px);
+    z-index: 0;
+    position: relative;
+}
+
+.imagen-container {
+    position: relative;
+    height: 100%;
+}
+
+.img-negocio {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: blur(6px);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+}
+
+.texto-superpuesto {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 3rem;
+    font-weight: bold;
+    color: white;
+    text-align: center;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.texto-superpuesto2 {
+    position: absolute;
+    top: 57%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 20px;
+    color: white;
+    text-align: center;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
 nav {
+    z-index: 1;
     position: sticky;
     top: 0px;
 }
@@ -175,11 +259,8 @@ nav {
     text-align: center;
 }
 
-hr {
-    margin: 0px;
-}
-
 .tarjeta-container {
+    margin: 0 20vw;
     padding: 10px;
 }
 
@@ -205,11 +286,13 @@ hr {
     font-weight: bold;
     font-size: 30px;
     font-style: italic;
+    background-color: rgb(253, 255, 119);
+    width: 100%;
+    margin: 0px;
+    padding: 5px 10px;
 }
 
 .tarjetaProducto {
-    box-shadow: 0.5px 1px 4px;
-    margin: 10px 10px;
     border: 5px;
     background-color: white;
     border-radius: 10px;
@@ -221,14 +304,17 @@ hr {
 }
 
 img {
-    object-fit: cover;
+    object-fit: contain;
 }
 
 .imagen {
+    height: 100px;
+    width: 100px;
+    /* Ajustamos el tamaño de la imagen */
+    margin-right: 20px;
+    /* Añadimos un margen a la derecha */
     border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
-    width: 400px;
-    height: 200px;
+    border-bottom-left-radius: 10px;
 }
 
 
@@ -252,18 +338,67 @@ img {
     margin-top: auto;
 }
 
+ul {
+    padding: 0;
+}
+
+.item-imagen {
+    width: 100px;
+    margin-right: 10px;
+}
+
+.item-container {
+    display: flex;
+    /* Utilizamos flexbox para posicionar los elementos */
+    align-items: center;
+    border-bottom: solid rgba(0,0,0,0.2) 1px;
+    padding-bottom: 5px;
+}
+
+.item-texto-block {
+    flex-grow: 1;
+    /* Hacemos que este bloque ocupe el espacio disponible */
+}
+
+.item-precio {
+    font-size: 24px;
+    font-weight: bold;
+}
+.item-nombre {
+    font-size: 20px;
+}
+
+.item-descripcion {
+    font-size: 16px;
+    font-style: italic;
+}
+
+.item-texto-block-end {
+    text-decoration: none;
+    padding: 5px 10px;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    background-color: #28a745;
+    color: white;
+}
+
+.item-texto-block-end:hover {
+    background-color: #218838;
+}
+
 @media screen and (max-width: 992px) {
+    .presentacion {
+        height: calc(100vh - 100px);
+    }
+
     .ancho-busqueda {
         width: 100vw;
     }
 
-    .imagen {
-        width: 100%;
-    }
 
-    .tarjetaProducto {
-        display: block;
-        margin: 10px 0px;
+
+    .tarjeta-container {
+        margin: auto;
     }
 }
 </style>

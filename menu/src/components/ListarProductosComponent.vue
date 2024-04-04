@@ -11,7 +11,7 @@
         </div>
       </div>
       <div class="ancho border border-2 mt-2">
-        <table class="table table-dark table-striped text-center" id="informe-table">
+        <table class="table table-light table-striped text-center" id="informe-table">
           <thead>
             <tr>
               <th>Nombre del Producto</th>
@@ -37,7 +37,10 @@
                     class="form-check-input" name="" id="productoDisponible"
                     :checked="producto.producto_disponibilidad === 1"></div>
               </td>
-              <td ><img class="imagen" :src="producto.producto_imagen" alt=" "></td>
+              <td ><img class="imagen" v-if="producto.producto_imagen" :src="producto.producto_imagen" alt="">
+              <div v-else>
+                <img class="imagen" src="/recursos/missing-img.png" alt="">
+              </div></td>
               <td>
                 <button class="btn btn-success" title="Modificar" data-bs-toggle="modal"
                   data-bs-target="#modificarProducto" @click="modificar(producto)">Modificar</button>
@@ -355,7 +358,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .mauto {
   margin: auto !important;
   vertical-align: middle;
@@ -366,13 +369,10 @@ export default {
   justify-content: space-between;
 }
 img{
-    object-fit:cover;
+    object-fit:contain;
 }
 .imagen{
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
-    width:400px;
-    height: 200px;
+    height: 100px;
 }
 .ancho {
   min-height: 60vh;
@@ -411,9 +411,6 @@ th {
   .ancho-busqueda {
     width: 180px;
   }
-  .imagen{
-        width: 200px;
-    }
 }
 
 /* Agrega estilos CSS según tus preferencias */

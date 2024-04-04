@@ -1,10 +1,19 @@
-CREATE TABLE `categorias` (
-  `categoria_id` int NOT NULL AUTO_INCREMENT,
-  `categoria_nombre` varchar(50) DEFAULT NULL,
+CREATE TABLE `usuarios` (
+  `usuario_id` int NOT NULL AUTO_INCREMENT,
   `usuario_nombre` varchar(50) DEFAULT NULL,
-  PRIMARY KEY (`categoria_id`),
-  UNIQUE KEY `categoria_nombre` (`categoria_nombre`)
-) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=latin1;
+  `usuario_contraseña` varchar(100) NOT NULL,
+  `usuario_nombre_negocio` varchar(100) NOT NULL,
+  `usuario_fecha_alta` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `usuario_fecha_vencimiento` datetime DEFAULT NULL,
+  `usuario_correo` varchar(100) DEFAULT NULL,
+  `usuario_telefono` varchar(20) DEFAULT NULL,
+  `usuario_imagen` longtext,
+  `usuario_direccion` varchar(255) DEFAULT NULL,
+  `usuario_descripcion` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`usuario_id`),
+  UNIQUE KEY `usuario_nombre` (`usuario_nombre`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
+
 
 CREATE TABLE `productos` (
   `producto_id` int NOT NULL AUTO_INCREMENT,
@@ -19,18 +28,10 @@ CREATE TABLE `productos` (
   KEY `producto_categoria` (`producto_categoria`)
 ) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=latin1;
 
-CREATE TABLE `usuarios` (
-  `usuario_id` int NOT NULL AUTO_INCREMENT,
+CREATE TABLE `categorias` (
+  `categoria_id` int NOT NULL AUTO_INCREMENT,
+  `categoria_nombre` varchar(50) DEFAULT NULL,
   `usuario_nombre` varchar(50) DEFAULT NULL,
-  `usuario_contraseña` varchar(100) NOT NULL,
-  `usuario_nombre_negocio` varchar(100) NOT NULL,
-  `usuario_fecha_alta` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `usuario_fecha_vencimiento` datetime DEFAULT NULL,
-  `usuario_correo` varchar(100) DEFAULT NULL,
-  `usuario_telefono` varchar(20) DEFAULT NULL,
-  `usuario_imagen` longtext,
-  `usuario_direccion` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`usuario_id`),
-  UNIQUE KEY `usuario_nombre` (`usuario_nombre`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
-
+  PRIMARY KEY (`categoria_id`),
+  UNIQUE KEY `categoria_nombre` (`categoria_nombre`)
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=latin1;

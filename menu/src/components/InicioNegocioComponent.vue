@@ -17,7 +17,7 @@
         <div class="row g-3 div-forms border">
           <div class="col-md-6">
             <h2 class="titulo-div-forms mb-2">Perfil</h2>
-            <router-link class="btn btn-success" to="/modificar">Modificar Información</router-link>
+            <router-link class="btn btn-success" to="/modificar">Ver Información</router-link>
           </div>
         </div>
         <div class="row g-3 div-forms border mt-2">

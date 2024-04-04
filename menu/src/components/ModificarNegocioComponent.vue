@@ -16,20 +16,21 @@
                                     <div class="flex mt-2 ">
                                         <h3 class="izquierda">{{ negocio.nombre }}</h3>
                                         <button class="btn btn-success derecha" title="Modificar" data-bs-toggle="modal"
-                    data-bs-target="#modificarProducto">Modificar</button>
+                                            data-bs-target="#modificarProducto">Modificar</button>
                                     </div>
                                     <hr>
                                     <div class="descripcion">
-                                        <strong>Correo:</strong>  {{ negocio.correo }} <br>
+                                        <strong>Correo:</strong> {{ negocio.correo }} <br>
                                         <strong>Teléfono:</strong> {{ negocio.telefono }} <br>
-                                        <strong>Dirección:</strong> {{ negocio.direccion }}
+                                        <strong>Dirección:</strong> {{ negocio.direccion }} <br>
+                                        <strong>Descripción:</strong> {{ negocio.descripcion }}
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                
+
 
                 <!-- MODAL MODIFICAR-->
                 <div class="modal fade" id="modificarProducto" tabindex="-1" aria-labelledby="modificarProductoLabel"
@@ -60,6 +61,10 @@
                                         <div>
                                             <input class="form-control" type="text" id="direccion"
                                                 v-model="negocio.direccion" placeholder="Dirección" required>
+                                        </div>
+                                        <div>
+                                            <input class="form-control" type="text" id="descripcion"
+                                                v-model="negocio.descripcion" placeholder="Descripción">
                                         </div>
                                         <div>
                                             <label class="form-label mr-2" for="imagen">Imagen (JPG)</label>
@@ -100,6 +105,7 @@ export default {
                 correo: '',
                 telefono: '',
                 direccion: '',
+                descripcion: '',
                 imagen: ''
             },
         };
@@ -113,6 +119,7 @@ export default {
     methods: {
         modificarPerfil(negocio) {
             axios.put('/modificarPerfil', { negocio: negocio }).then(() => {
+                localStorage.setItem('nombre', this.negocio.nombre);
                 const Toast = Swal.mixin({
                     toast: true,
                     position: 'bottom-end',
@@ -128,7 +135,10 @@ export default {
                 Toast.fire({
                     icon: 'success',
                     title: 'Datos modificados.'
-                })
+                });
+                setTimeout(function () {
+                        window.location.reload(1);
+                    }, 2000);
             })
                 .catch((error) => {
                     console.error('Error al actualizar la información en la base de datos:', error);
@@ -161,8 +171,7 @@ export default {
 };
 </script>
 
-<style scoped> 
-
+<style scoped>
 hr {
     margin: 0px;
 }
@@ -203,10 +212,11 @@ hr {
 }
 
 img {
-    object-fit: cover;
+    object-fit: contain;
 }
 
 .imagen {
+    margin-top: 10px;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
     width: 400px;
@@ -224,7 +234,7 @@ img {
 
 
 @media screen and (max-width: 992px) {
-    
+
     .imagen {
         width: 100%;
     }
