@@ -1,5 +1,5 @@
-CREATE TABLE `usuarios` (
-  `usuario_id` int NOT NULL AUTO_INCREMENT,
+SELECT * FROM menu.usuarios;CREATE TABLE `usuarios` (
+  `usuario_id` int(11) NOT NULL AUTO_INCREMENT,
   `usuario_nombre` varchar(50) DEFAULT NULL,
   `usuario_contraseña` varchar(100) NOT NULL,
   `usuario_nombre_negocio` varchar(100) NOT NULL,
@@ -10,9 +10,12 @@ CREATE TABLE `usuarios` (
   `usuario_imagen` longtext,
   `usuario_direccion` varchar(255) DEFAULT NULL,
   `usuario_descripcion` varchar(255) DEFAULT NULL,
+  `usuario_instagram` varchar(255) DEFAULT NULL,
+  `usuario_facebook` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`usuario_id`),
   UNIQUE KEY `usuario_nombre` (`usuario_nombre`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+
 
 
 CREATE TABLE `productos` (
