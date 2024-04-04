@@ -7,7 +7,7 @@
                 <div class="tarjeta-container">
                     <div>
                         <div class="titulo-categoria">Mi Perfil</div>
-                        <div class="p-2">
+                        <div class="p-2 text-center">
                             <div class="tarjetaProducto">
                                 <div v-if="negocio.imagen">
                                     <img class="imagen" :src="negocio.imagen" alt=" ">
@@ -15,16 +15,22 @@
                                 <div class="textoTarjeta">
                                     <div class="flex mt-2 ">
                                         <h3 class="izquierda">{{ negocio.nombre }}</h3>
-                                        <button class="btn btn-success derecha" title="Modificar" data-bs-toggle="modal"
-                                            data-bs-target="#modificarProducto">Modificar</button>
+
                                     </div>
-                                    <hr>
-                                    <div class="descripcion">
+                                    <hr class="mt-2 mb-2">
+                                    <div class="descripcion text-start">
                                         <strong>Correo:</strong> {{ negocio.correo }} <br>
                                         <strong>Teléfono:</strong> {{ negocio.telefono }} <br>
                                         <strong>Dirección:</strong> {{ negocio.direccion }} <br>
-                                        <strong>Descripción:</strong> {{ negocio.descripcion }}
+                                        <strong>Descripción:</strong> {{ negocio.descripcion }} <br>
+                                        <div class="socials text-center">
+                                            <a class="mauto" :href="negocio.instagram"><img width='40' src="/recursos/instagram.png">
+                                            </a>
+                                            <a class="mauto" :href="negocio.facebook"><img width='36' src="/recursos/facebook.png"></a>
+                                        </div>
                                     </div>
+                                    <button class="btn btn-success derecha mt-2 mb-2" title="Modificar"
+                                        data-bs-toggle="modal" data-bs-target="#modificarProducto">Modificar</button>
                                 </div>
                             </div>
                         </div>
@@ -67,6 +73,14 @@
                                                 v-model="negocio.descripcion" placeholder="Descripción">
                                         </div>
                                         <div>
+                                            <input class="form-control" type="text" id="instagram"
+                                                v-model="negocio.instagram" placeholder="Instagram">
+                                        </div>
+                                        <div>
+                                            <input class="form-control" type="text" id="facebook"
+                                                v-model="negocio.facebook" placeholder="Facebook">
+                                        </div>
+                                        <div>
                                             <label class="form-label mr-2" for="imagen">Imagen (JPG)</label>
                                             <input class="form-control" type="file" name="imagen" id="imagen"
                                                 accept=".jpg" @change="imagenSeleccionada">
@@ -106,7 +120,9 @@ export default {
                 telefono: '',
                 direccion: '',
                 descripcion: '',
-                imagen: ''
+                imagen: '',
+                instagram: '',
+                facebook: ''
             },
         };
     },
@@ -137,8 +153,8 @@ export default {
                     title: 'Datos modificados.'
                 });
                 setTimeout(function () {
-                        window.location.reload(1);
-                    }, 2000);
+                    window.location.reload(1);
+                }, 2000);
             })
                 .catch((error) => {
                     console.error('Error al actualizar la información en la base de datos:', error);
@@ -172,6 +188,12 @@ export default {
 </script>
 
 <style scoped>
+.mauto{
+    margin: 10px;
+}
+.socials-ico{
+    margin: 30px;
+}
 hr {
     margin: 0px;
 }
@@ -223,13 +245,15 @@ img {
     height: 200px;
 }
 
+.izquierda {
+    margin: auto;
+}
 
 .derecha {
     display: inline-flex;
     justify-content: center;
     gap: 15px;
-    margin-right: 10px;
-    margin-bottom: 10px;
+    margin: auto;
 }
 
 
@@ -242,6 +266,10 @@ img {
     .tarjetaProducto {
         display: block;
         margin: 10px 0px;
+    }
+
+    .tarjeta-container {
+        margin: auto;
     }
 }
 </style>

@@ -33,6 +33,14 @@
                 placeholder="Dirección">
             </div>
             <div class="col-md-6">
+              <input class="form-control" type="text" id="instagram" v-model="negocio.instagram"
+                placeholder="Instagram">
+            </div>
+            <div class="col-md-6">
+              <input class="form-control" type="text" id="facebook" v-model="negocio.facebook"
+                placeholder="Facebook">
+            </div>
+            <div class="col-md-6">
               <label class="form-label mr-2" for="imagen">Foto de perfil (JPG)</label>
               <input class="form-control" type="file" name="imagen" id="imagen" accept=".jpg"
                 @change="imagenSeleccionada($event)" required/>
@@ -75,6 +83,8 @@ export default {
         direccion:'',
         telefono: '',
         descripcion: '',
+        instagram: '',
+        facebook: '',
       },
     };
   },
@@ -101,6 +111,8 @@ export default {
       this.negocio.direccion = '';
       this.negocio.telefono = '';
       this.negocio.direccion ='';
+      this.negocio.instagram = '';
+      this.negocio.facebook = '';
     },
     registrarNegocio() {
       // Realizar una solicitud HTTP POST al servidor Express

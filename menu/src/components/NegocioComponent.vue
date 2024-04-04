@@ -1,75 +1,96 @@
 <template>
     <div>
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <div class="container-fluid">
-                <a class="navbar-brand" @click="scrollToInicio" href="#">~ {{ nombreNegocio.toUpperCase() }} ~</a>
-                <button class="navbar-brand navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        <li class="nav-item" v-for="(categoria, index) in categoriasOrdenadas" :key="index">
-                            <a class="nav-link" @click="scrollToCategoria(index); collapseNavbar()" href="#">{{
-                    categoria }}</a>
-                        </li>
-                    </ul>
+        <div v-if="cargando" class="pantalla-carga text-center">
+            <div class="logo-carga">
+                    <img class="logo-img" src="/favicon.ico" width="50"  alt="">
+                    <div class="texto-carga">
+                        Cargando productos
+                    </div>
                 </div>
-            </div>
-        </nav>
+        </div>
+        <div v-else>
 
-        <div v-if="productos.length">
-            <div class="presentacion">
-                <!-- Imagen del negocio con texto superpuesto -->
-                <div class="imagen-container">
-                    <img :src="negocio.imagen" alt="" class="img-negocio">
-                    <div class="texto-superpuesto">BIENVENIDOS</div>
-                    <div class="texto-superpuesto2">"{{ negocio.descripcion }}"</div>
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                <div class="container-fluid">
+                    <a class="navbar-brand" @click="scrollToInicio" href="#">~ {{ nombreNegocio.toUpperCase() }} ~</a>
+                    <button class="navbar-brand navbar-toggler" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                            <div v-for="(categoria, index) in categoriasOrdenadas" :key="index">
+                                <li v-if="categoriasConProductosFiltrados.includes(categoria)" class="nav-item">
+                                    <a class="nav-link" @click="scrollToCategoria(categoria); collapseNavbar()">{{ categoria
+                                        }}</a>
+                                </li>
+                            </div>
+                        </ul>
+                    </div>
                 </div>
-            </div>
-            <div class="tarjeta-container">
-                <div class="ancho">
-                    <div class="mt-2" v-for="(categoria, index) in categoriasOrdenadas" :key="index"
-                        :id="`categoria-${index}`">
-                        <div class="titulo-categoria">{{ categoria }}</div>
-                        <div class="p-2">
-                            <div class="item-container mt-2" v-for="(producto, index) in filteredProductos(categoria)"
-                                :key="index">
-                                <div class="item-imagen" v-if="producto.producto_imagen">
-                                    <div >                                    
-                                        <img class="imagen" :src="producto.producto_imagen" alt=" ">
-                                    </div>
-                                </div>
-                                <!-- Nombre del producto -->
-                                <div class="item-texto">
-                                    <div class="item-texto-block">
-                                        <div class="item-nombre">
-                                            {{ producto.producto_nombre }}
+            </nav>
+    
+            <div v-if="productos.length">
+                <div class="presentacion">
+                    <!-- Imagen del negocio con texto superpuesto -->
+                    <div class="imagen-container">
+                        <img :src="negocio.imagen" alt="" class="img-negocio">
+                        <div class="texto-superpuesto">BIENVENIDOS
+                            <div class="texto-superpuesto2">"{{ negocio.descripcion }}"</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tarjeta-container">
+                    
+                    <div class="ancho">
+                        <div class="izquierda ancho-busqueda">
+                        <input class="form-control" v-model="busqueda" type="text" name="busqueda" id=""
+                            placeholder="Buscar" title="Ingrese una palabra clave...">
+                    </div>
+                        <div class="mt-2" v-for="(categoria, index) in categoriasOrdenadas" :key="index" :id="categoria">
+                            <div v-if="filteredProductos(categoria)">
+    
+                                <div class="titulo-categoria">{{ categoria }}</div>
+                                <div class="p-2">
+                                    <div class="item-container mt-2"
+                                        v-for="(producto, index) in filteredProductos(categoria)" :key="index">
+                                        <div class="item-imagen" v-if="producto.producto_imagen">
+                                            <div>
+                                                <img class="imagen" :src="producto.producto_imagen" alt=" ">
+                                            </div>
                                         </div>
-                                        <div class="item-precio">
-                                            ${{ producto.producto_precio }}
-                                        </div>
-                                        <div class="item-descripcion" v-if="producto.producto_descripcion">
-                                            "{{ producto.producto_descripcion }}"
+                                        <!-- Nombre del producto -->
+                                        <div class="item-texto">
+                                            <div class="item-texto-block">
+                                                <div class="item-nombre">
+                                                    {{ producto.producto_nombre }}
+                                                </div>
+                                                <div class="item-precio">
+                                                    ${{ producto.producto_precio }}
+                                                </div>
+                                                <div class="item-descripcion" v-if="producto.producto_descripcion">
+                                                    "{{ producto.producto_descripcion }}"
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div v-if="productosFiltrados.length === 0" class="text-center mt-3">
-                        No se encontraron resultados para esa búsqueda.
+                        <div v-if="productosFiltrados.length === 0" class="text-center mt-3">
+                            No se encontraron resultados para esa búsqueda.
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div v-else class="container text-center mt-4 no-negocio">
-            <div class="error-container">
-                <div class="error-content">
-                    <h1 class="display-1 text-danger">404</h1>
-                    <h2 class="display-4">Página no encontrada</h2>
-                    <p class="lead">Lo sentimos, la página que buscas no se encuentra disponible.</p>
+            <div v-else class="container text-center mt-4 no-negocio">
+                <div class="error-container">
+                    <div class="error-content">
+                        <h1 class="display-1 text-danger">404</h1>
+                        <h2 class="display-4">Página no encontrada</h2>
+                        <p class="lead">Lo sentimos, la página que buscas no se encuentra disponible.</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -93,14 +114,15 @@ export default {
                 descripcion: '',
                 imagen: ''
             },
+            cargando: true,
         };
     },
     mounted() {
         // Obtener el nombre de usuario de la URL
         this.nombreNegocio = this.$route.params.nombreNegocio;
         // Lógica para obtener los productos del negocio con el nombre de usuario dado
-        this.fetchProductos();
         this.obtenerInformacionNegocio();
+        
     },
     computed: {
         categoriasOrdenadas() {
@@ -131,17 +153,20 @@ export default {
         async obtenerInformacionNegocio() {
             try {
                 // Realiza una solicitud HTTP GET para obtener los informes desde el servidor
-                const response = await axios.get(`/miNegocio?usuario=${localStorage.getItem('usuario')}`);
+                const response = await axios.get(`/miNegocio?usuario=${this.nombreNegocio}`);
                 // Actualiza la lista de informes con los datos recibidos
                 this.negocio = response.data;
+                this.fetchProductos();
             } catch (error) {
                 console.error("Error al cargar los productos:", error);
+            } finally {
+                this.cargando = false; // Indicar que la carga ha terminado, independientemente del resultado
             }
 
         },
         scrollToCategoria(categoria) {
             // Función para desplazarse a la categoría específica con un offset
-            const categoriaElement = document.getElementById(`categoria-${categoria}`);
+            const categoriaElement = document.getElementById(categoria);
             if (categoriaElement) {
                 const navbarHeight = document.querySelector('.navbar').offsetHeight;
                 const categoriaPosition = categoriaElement.getBoundingClientRect().top;
@@ -167,9 +192,9 @@ export default {
             try {
                 // Realiza una solicitud HTTP GET para obtener los productos desde el servidor
                 const response = await axios.get(`/productos?usuario=${this.nombreNegocio}`);
-
+                const productosFiltradosDisponibles = response.data.filter(producto => producto.producto_disponibilidad);
                 // Ordena los productos alfabéticamente por el nombre
-                const productosOrdenados = response.data.sort((a, b) => {
+                const productosOrdenados = productosFiltradosDisponibles.sort((a, b) => {
                     const nombreA = a.producto_nombre.toUpperCase();
                     const nombreB = b.producto_nombre.toUpperCase();
                     if (nombreA < nombreB) {
@@ -185,6 +210,8 @@ export default {
                 this.productos = productosOrdenados;
             } catch (error) {
                 console.error("Error al cargar los productos:", error);
+            }finally {
+                this.cargando = false; // Indicar que la carga ha terminado, independientemente del resultado
             }
         },
         filteredProductos(categoria) {
@@ -196,6 +223,28 @@ export default {
 </script>
 
 <style scoped>
+.texto-carga{
+    font-style: italic;
+    margin: 20px;
+    color:grey;
+}
+.logo-carga{
+    margin-top:-10vh;    
+}
+.logo-img{
+    animation: l2 2s infinite;
+}
+.pantalla-carga{
+    z-index: 2;
+    position:absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: calc(100vh - 100px);
+    background-color:white;
+    align-content: center;
+}
+@keyframes l2 {to{transform: rotate(1turn)}}
 .navbar-brand {
     font-weight: bold;
 }
@@ -214,7 +263,7 @@ export default {
 .img-negocio {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
     filter: blur(6px);
     clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
 }
@@ -232,10 +281,6 @@ export default {
 }
 
 .texto-superpuesto2 {
-    position: absolute;
-    top: 57%;
-    left: 50%;
-    transform: translate(-50%, -50%);
     font-size: 20px;
     color: white;
     text-align: center;
@@ -246,6 +291,10 @@ nav {
     z-index: 1;
     position: sticky;
     top: 0px;
+}
+
+.nav-link {
+    cursor: pointer;
 }
 
 .error-container {
@@ -283,10 +332,8 @@ nav {
 }
 
 .titulo-categoria {
-    font-weight: bold;
     font-size: 30px;
-    font-style: italic;
-    background-color: rgb(253, 255, 119);
+    background-color: rgb(254, 255, 174);
     width: 100%;
     margin: 0px;
     padding: 5px 10px;
@@ -351,7 +398,7 @@ ul {
     display: flex;
     /* Utilizamos flexbox para posicionar los elementos */
     align-items: center;
-    border-bottom: solid rgba(0,0,0,0.2) 1px;
+    border-bottom: solid rgba(0, 0, 0, 0.2) 1px;
     padding-bottom: 5px;
 }
 
@@ -364,6 +411,7 @@ ul {
     font-size: 24px;
     font-weight: bold;
 }
+
 .item-nombre {
     font-size: 20px;
 }
@@ -387,6 +435,11 @@ ul {
 }
 
 @media screen and (max-width: 992px) {
+    .img-negocio {
+        object-fit: cover;
+        height: 100%;
+    }
+
     .presentacion {
         height: calc(100vh - 100px);
     }
