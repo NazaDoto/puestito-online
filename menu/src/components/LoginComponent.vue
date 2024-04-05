@@ -18,7 +18,7 @@
             <div class="col-md-8">
               <button type="submit" class="btn btn-entrar">Iniciar sesión</button>
             </div>
-            <a href="/planes">¿Registrar negocio?</a>
+            <a href="/planes">Registrar negocio</a>
             <a href="/">Volver</a>
           </form>
         </div>

@@ -16,6 +16,7 @@ const port = 3500;
 // Middleware
 
 
+
 const env = "dev";
 
 
@@ -73,7 +74,38 @@ function generarToken(usuarioId) {
 
 // Ruta para registrar un usuario
 
+app.post('/procesar_pago', async(req, res) => {
+    try {
+        const { token, issuer_id, payment_method_id, amount, installments, email, identificationType, identificationNumber } = req.body;
+        console.log(req.body);
+        const response = await axios.post("https://api.mercadopago.com/v1/payments", {
+            transaction_amount: Number(amount),
+            token,
+            description: "Descripción del producto",
+            installments: Number(installments),
+            payment_method_id,
+            issuer_id,
+            payer: {
+                email,
+                identification: {
+                    type: identificationType,
+                    number: identificationNumber
+                }
+            }
+        }, {
+            headers: {
+                "Content-Type": "application/json",
+                'X-Idempotency-Key': 'SOME_UNIQUE_VALUE',
+                "Authorization": "Bearer TEST-3974731186843034-040421-b2b9db436a8f5db87508f73cdfead3c9-232808230" // Agrega tu access token aquí
+            }
+        });
 
+        res.json(response.data); // Enviar la respuesta del MercadoPago al cliente
+    } catch (error) {
+        console.error("Error al procesar el pago:", error);
+        res.status(500).json({ error: 'Error al procesar el pago' });
+    }
+});
 
 app.post('/register', (req, res) => {
     const { usuario, contraseña, nombre, fechaVence, email, imagen, direccion, telefono, descripcion, instagram, facebook } = req.body;
