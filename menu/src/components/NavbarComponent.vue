@@ -73,7 +73,7 @@ export default {
       return localStorage.getItem("nombre");
     },
     cerrarSesion() {
-      localStorage.removeItem("token"); // Elimina el token del almacenamiento local
+      localStorage.clear(); // Elimina el token del almacenamiento local
       location.reload(); // Redirige a la página de inicio de sesión
     },
   },

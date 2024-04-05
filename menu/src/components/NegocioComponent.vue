@@ -2,11 +2,11 @@
     <div>
         <div v-if="cargando" class="pantalla-carga text-center">
             <div class="logo-carga">
-                    <img class="logo-img" src="/favicon.ico" width="50"  alt="">
-                    <div class="texto-carga">
-                        Cargando productos
-                    </div>
+                <img class="logo-img" src="/favicon.ico" width="50" alt="">
+                <div class="texto-carga">
+                    Cargando productos
                 </div>
+            </div>
         </div>
         <div v-else>
 
@@ -22,15 +22,16 @@
                         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                             <div v-for="(categoria, index) in categoriasOrdenadas" :key="index">
                                 <li v-if="categoriasConProductosFiltrados.includes(categoria)" class="nav-item">
-                                    <a class="nav-link" @click="scrollToCategoria(categoria); collapseNavbar()">{{ categoria
-                                        }}</a>
+                                    <a class="nav-link" @click="scrollToCategoria(categoria); collapseNavbar()">{{
+            categoria
+        }}</a>
                                 </li>
                             </div>
                         </ul>
                     </div>
                 </div>
             </nav>
-    
+
             <div v-if="productos.length">
                 <div class="presentacion">
                     <!-- Imagen del negocio con texto superpuesto -->
@@ -38,19 +39,26 @@
                         <img :src="negocio.imagen" alt="" class="img-negocio">
                         <div class="texto-superpuesto">BIENVENIDOS
                             <div class="texto-superpuesto2">"{{ negocio.descripcion }}"</div>
+                            <div class="text-center">
+                                <a v-if="negocio.instagram" class="mauto" :href="negocio.instagram" target="blank"><img
+                                        width='40' src="/recursos/instagram.png"></a>
+                                <a v-if="negocio.facebook" class="mauto" :href="negocio.facebook" target="blank"><img
+                                        width='36' src="/recursos/facebook.png"></a>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="tarjeta-container">
-                    
+
                     <div class="ancho">
                         <div class="izquierda ancho-busqueda">
-                        <input class="form-control" v-model="busqueda" type="text" name="busqueda" id=""
-                            placeholder="Buscar" title="Ingrese una palabra clave...">
-                    </div>
-                        <div class="mt-2" v-for="(categoria, index) in categoriasOrdenadas" :key="index" :id="categoria">
+                            <input class="form-control" v-model="busqueda" type="text" name="busqueda" id=""
+                                placeholder="Buscar" title="Ingrese una palabra clave...">
+                        </div>
+                        <div class="mt-2" v-for="(categoria, index) in categoriasOrdenadas" :key="index"
+                            :id="categoria">
                             <div v-if="filteredProductos(categoria)">
-    
+
                                 <div class="titulo-categoria">{{ categoria }}</div>
                                 <div class="p-2">
                                     <div class="item-container mt-2"
@@ -122,7 +130,7 @@ export default {
         this.nombreNegocio = this.$route.params.nombreNegocio;
         // Lógica para obtener los productos del negocio con el nombre de usuario dado
         this.obtenerInformacionNegocio();
-        
+
     },
     computed: {
         categoriasOrdenadas() {
@@ -153,7 +161,7 @@ export default {
         async obtenerInformacionNegocio() {
             try {
                 // Realiza una solicitud HTTP GET para obtener los informes desde el servidor
-                const response = await axios.get(`/miNegocio?usuario=${this.nombreNegocio}`);
+                const response = await axios.get(`/negocio?usuario=${this.nombreNegocio}`);
                 // Actualiza la lista de informes con los datos recibidos
                 this.negocio = response.data;
                 this.fetchProductos();
@@ -210,7 +218,7 @@ export default {
                 this.productos = productosOrdenados;
             } catch (error) {
                 console.error("Error al cargar los productos:", error);
-            }finally {
+            } finally {
                 this.cargando = false; // Indicar que la carga ha terminado, independientemente del resultado
             }
         },
@@ -223,28 +231,37 @@ export default {
 </script>
 
 <style scoped>
-.texto-carga{
+.texto-carga {
     font-style: italic;
     margin: 20px;
-    color:grey;
+    color: grey;
 }
-.logo-carga{
-    margin-top:-10vh;    
+
+.logo-carga {
+    margin-top: -10vh;
 }
-.logo-img{
+
+.logo-img {
     animation: l2 2s infinite;
 }
-.pantalla-carga{
+
+.pantalla-carga {
     z-index: 2;
-    position:absolute;
+    position: absolute;
     top: 0;
     left: 0;
     width: 100vw;
     height: calc(100vh - 100px);
-    background-color:white;
+    background-color: white;
     align-content: center;
 }
-@keyframes l2 {to{transform: rotate(1turn)}}
+
+@keyframes l2 {
+    to {
+        transform: rotate(1turn)
+    }
+}
+
 .navbar-brand {
     font-weight: bold;
 }
@@ -330,7 +347,9 @@ nav {
     background-color: black;
     color: white;
 }
-
+.mauto{
+    margin: 10px;
+}
 .titulo-categoria {
     font-size: 30px;
     background-color: rgb(254, 255, 174);

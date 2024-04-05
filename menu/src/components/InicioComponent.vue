@@ -1,18 +1,10 @@
 <template>
     <div>
-        <nav class="navbar navbar-light bg-light">
-            <!-- Logo -->
-            <a class="navbar-brand" href="#">
-                <img src="/favicon.ico" width="30" height="30" class="d-inline-block align-top" alt="">
-                Menute
-            </a>
-            <!-- Botón de login -->
-            <a class="link-login" href="./login">Login</a>
-        </nav>
+        <NavbarPublicoComponent></NavbarPublicoComponent>
         <div class="container2 mt-4">
             <div v-if="cargando" class="pantalla-carga text-center">
                 <div class="logo-carga">
-                    <img class="logo-img" src="/favicon.ico" width="50"  alt="">
+                    <img class="logo-img" src="/favicon.ico" width="50" alt="">
                     <div class="texto-carga">
                         Buscando negocios
                     </div>
@@ -25,7 +17,8 @@
                         <input class="form-control" v-model="busqueda" type="text" name="busqueda" id=""
                             placeholder="Buscar" title="Ingrese una palabra clave...">
                     </div>
-                    <button class="btn btn-success derecha" @click="mostrarMapa">{{ !mapaMostrado2 ? 'Ver Mapa' : `Ocultar
+                    <button class="btn btn-success derecha" @click="mostrarMapa">{{ !mapaMostrado2 ? 'Ver Mapa' :
+                `Ocultar
                         Mapa`}}</button>
                 </div>
                 <div class="negocios-body">
@@ -52,7 +45,7 @@
                             </div>
                             <!-- Botón para dirigirse al menú -->
                             <div class="item-btn">
-                                <a class="item-texto-block-end" :href="'http://192.168.1.235:8080/' + negocio.usuario"
+                                <a class="item-texto-block-end" :href="'http://192.168.0.7:8080/' + negocio.usuario"
                                     target="_blank"><img src="/favicon.ico" width="30" alt=""></a>
                             </div>
                         </li>
@@ -70,8 +63,12 @@
 <script>
 import L from 'leaflet';
 import axios from 'axios';
+import NavbarPublicoComponent from './NavbarPublicoComponent.vue';
 
 export default {
+    components:{
+NavbarPublicoComponent,
+    },
     name: 'MapaComponent',
     data() {
         return {
@@ -84,16 +81,17 @@ export default {
     },
     created() {
         this.fetchNegocios();
+
     },
     computed: {
         negociosFiltrados() {
             // Filtra los informes basándose en el valor de busqueda
             return this.negocios.filter(negocio => {
                 const nombre = negocio.nombre || '';
-                const direccion = negocio.direccion || '';
+                const descripcion = negocio.descripcion || '';
                 return (
                     nombre.toLowerCase().includes(this.busqueda.toLowerCase()) ||
-                    direccion.toLowerCase().includes(this.busqueda.toLowerCase())
+                    descripcion.toLowerCase().includes(this.busqueda.toLowerCase())
                     // Agrega más condiciones de búsqueda según tus necesidades
                 );
             });
@@ -110,8 +108,10 @@ export default {
                 this.cargando = false; // Indicar que la carga ha terminado, independientemente del resultado
             }
         },
+
         async inicializarMapa() {
             const map = L.map('map');
+
 
             // Añade un mapa base
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -120,8 +120,22 @@ export default {
                 attribution: '&copy; <a href="https://linkedin.com/in/nazadoto">Nazareno Navarrete</a>'
             }).addTo(map);
 
+            if (!navigator.geolocation) {
+                console.log('No funciona geolocation.')
+            } else {
+                
+                navigator.geolocation.getCurrentPosition((position) => {
+                    const latitud = position.coords.latitude;
+                    const longitud = position.coords.longitude;
+                    map.setView([latitud, longitud], 14);
+                    L.marker([latitud, longitud]).addTo(map).bindPopup(`Estás aquí.`).bindTooltip(`<b>Estás aquí</b>`, { direction: 'bottom', offset: L.point(-15, 30) });
+                }, (error) => {
+                    map.setView([-27.7876, -64.2596], 14);
+                    console.log('Error al geolocalizar. Inicializando en Plaza Libertad. ', error)
+                });
+            }
             // Centra el mapa en las coordenadas proporcionadas
-            map.setView([-27.7876, -64.2596], 14);
+           
 
             const myIcon = L.icon({
                 iconUrl: '/recursos/pin.png',
@@ -140,15 +154,15 @@ export default {
                     L.marker([punto.latitud, punto.longitud], { icon: myIcon }).addTo(map)
                         .bindPopup(`<div style="max-width: 150px;">
                 <b style="font-size:20px;">${punto.nombre}</b><br>
-                <a style="text-decoration:none;color:white;font-size:12px;padding:4px 6px;" href="http://192.168.1.235:8080/${punto.usuario}" target="_blank"><img src="/favicon.ico" width="20" alt=""></a>
+                <a style="text-decoration:none;color:white;font-size:12px;padding:4px 6px;" href="http://192.168.0.7:8080/${punto.usuario}" target="_blank"><img src="/favicon.ico" width="20" alt=""></a>
                 <p style="margin:5px 0px"><b>Dirección:</b> ${punto.direccion}</p>
                 <p style="margin:5px 0px"><b>Correo:</b> ${punto.correo}</p>
                 <p style="margin:5px 0px"><b>Teléfono:</b> ${punto.telefono}</p>
                 <p style="text-align:center;margin:7px 0px">"${punto.descripcion}"</p>
                 <div style="text-align:center;">
-                <a href="${punto.instagram}"><img style="margin:0px 10px" width='20' src="/recursos/instagram.png"></a>
-                <a href="${punto.facebook}"><img style="margin:0px 10px" width='16' src="/recursos/facebook.png"></a> </div>
-                </div>`, { className: 'custom-popup' }).bindTooltip(`<b>${punto.nombre}</b>`, { direction: 'bottom', offset: L.point(0, 10) });
+                <a href="${punto.instagram}" target="blank"><img style="margin:0px 10px" width='20' src="/recursos/instagram.png"></a>
+                <a href="${punto.facebook}" target="blank"><img style="margin:0px 10px" width='20' src="/recursos/facebook.png"></a> </div>
+                </div>`).bindTooltip(`<b>${punto.nombre}</b>`, { direction: 'bottom', offset: L.point(0, 10) });
                 });
                 document.getElementById('map').classList.add('show');
 
@@ -176,28 +190,37 @@ export default {
 </script>
 
 <style scoped>
-.texto-carga{
+.texto-carga {
     font-style: italic;
     margin: 20px;
-    color:grey;
+    color: grey;
 }
-.logo-carga{
-    margin-top:-10vh;    
+
+.logo-carga {
+    margin-top: -10vh;
 }
-.logo-img{
+
+.logo-img {
     animation: l2 2s infinite;
 }
-.pantalla-carga{
+
+.pantalla-carga {
     z-index: 2;
-    position:absolute;
+    position: absolute;
     top: 0;
     left: 0;
     width: 100vw;
-    height: calc(100vh - 100px);
-    background-color:white;
+    height: calc(100vh);
+    background-color: white;
     align-content: center;
 }
-@keyframes l2 {to{transform: rotate(1turn)}}
+
+@keyframes l2 {
+    to {
+        transform: rotate(1turn)
+    }
+}
+
 .ancho-busqueda {
     width: 400px;
     height: 50px;
@@ -206,17 +229,14 @@ export default {
 }
 
 .container2 {
-    margin: 0px 10px;
+    margin: 0px 20vw;
+    min-height: calc(100vh - 200px);
 }
 
 .navbar-brand {
     font-style: italic;
 }
 
-.navbar {
-    padding-left: 20px;
-    padding-right: 20px;
-}
 
 .link-login {
     text-decoration: none;
@@ -299,13 +319,18 @@ ul {
 }
 
 .item-texto-block-end:hover {
-    cursor:pointer;
+    cursor: pointer;
 }
 
 
 @media screen and (max-width: 992px) {
     .ancho-busqueda {
         width: 200px;
+    }
+
+    .container2 {
+        min-height: calc(100vh - 200px);
+        margin: 0px 10px;
     }
 }
 </style>

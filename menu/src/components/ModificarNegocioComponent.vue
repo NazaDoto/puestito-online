@@ -23,10 +23,11 @@
                                         <strong>Teléfono:</strong> {{ negocio.telefono }} <br>
                                         <strong>Dirección:</strong> {{ negocio.direccion }} <br>
                                         <strong>Descripción:</strong> {{ negocio.descripcion }} <br>
-                                        <div class="socials text-center">
-                                            <a class="mauto" :href="negocio.instagram"><img width='40' src="/recursos/instagram.png">
-                                            </a>
-                                            <a class="mauto" :href="negocio.facebook"><img width='36' src="/recursos/facebook.png"></a>
+                                        <div class="text-center">
+                                            <a v-if="negocio.instagram" class="mauto" :href="negocio.instagram" target="blank"><img width='40' src="/recursos/instagram.png"></a>
+                                            <div v-else>Sin Instagram</div>
+                                            <a v-if="negocio.facebook" class="mauto" :href="negocio.facebook" target="blank"><img width='36' src="/recursos/facebook.png"></a>
+                                            <div v-else>Sin Facebook</div>
                                         </div>
                                     </div>
                                     <button class="btn btn-success derecha mt-2 mb-2" title="Modificar"

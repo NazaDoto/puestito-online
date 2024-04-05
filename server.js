@@ -215,6 +215,34 @@ app.get('/negocios', async(req, res) => {
     }
 });
 app.get('/miNegocio', (req, res) => {
+    const usuario = req.query.usuario;
+    const query = "SELECT usuario_nombre_negocio,  usuario_correo, usuario_telefono, usuario_descripcion, usuario_imagen, usuario_direccion, usuario_instagram, usuario_facebook FROM usuarios WHERE usuario_nombre = ?";
+    // Ejecutar la consulta
+    connection.query(query, usuario, (error, results) => {
+        if (error) {
+            console.error('Error al obtener la información del negocio:', error);
+            res.status(500).json({ error: 'Error al obtener la información del negocio' });
+            return;
+        }
+
+        if (results.length === 0) {
+            res.status(404).json({ error: 'No se encontró información del negocio' });
+            return;
+        }
+        res.json({
+            usuario: usuario,
+            nombre: results[0].usuario_nombre_negocio,
+            correo: results[0].usuario_correo,
+            telefono: results[0].usuario_telefono,
+            direccion: results[0].usuario_direccion,
+            descripcion: results[0].usuario_descripcion,
+            imagen: results[0].usuario_imagen,
+            instagram: results[0].usuario_instagram,
+            facebook: results[0].usuario_facebook,
+        });
+    });
+});
+app.get('/negocio', (req, res) => {
     // Consulta SQL para obtener la información del negocio
     const usuario = req.query.usuario;
     const queryCheck = "SELECT usuario_fecha_vencimiento FROM usuarios WHERE usuario_nombre = ?";

@@ -3,9 +3,10 @@
   
       <div class="total">
   
-        <div class="fondo">
-          <h1 class="titulo text-center">Menute</h1>
-          <form class="row g-3 text-center" @submit.prevent="login">
+        <div class="fondo text-center">
+          <img src="/favicon.ico" width="100" alt="logo" class="mb-4">
+          <h1 class="titulo">Chusmeando</h1>
+          <form class="row g-3" @submit.prevent="login">
             <div class="width-size">
               <label for="usuario">Usuario</label>
               <input class="form-control mb-3" type="text" v-model="usuario" required />
@@ -14,9 +15,10 @@
               <label for="contraseña">Contraseña</label>
               <input class="form-control mb-4" type="password" v-model="contraseña" required />
             </div>
-            <div class="text-center col-md-8">
+            <div class="col-md-8">
               <button type="submit" class="btn btn-entrar">Iniciar sesión</button>
             </div>
+            <a href="/planes">¿Registrar negocio?</a>
             <a href="/">Volver</a>
           </form>
         </div>
@@ -93,25 +95,28 @@
   </script>
   
   <style scoped>
+  a{
+    text-decoration: none;
+  }
   .btn-entrar {
-    color: white;
-    width: 80%;
+    color: black;
+    width: 50%;
     height: 60px;
-    background-color: #e5d599;
+    background-color: #fdb172;
     font-size: large;
   }
   
   .btn-entrar:hover {
-    background-color: #e4cb70;
+    background-color: #fdc08e;
   }
   
   h1.titulo {
     display: block;
-    color: white;
+    color: black;
   }
   
   label {
-    color: white;
+    color: black;
   }
   
   .total {
@@ -121,9 +126,9 @@
   .fondo {
     position: absolute;
     z-index: 1;
-    height: 90vh;
+    height: calc(100vh - 56px);
     width: 30vw;
-    background-color: #ea804c;
+    background-color: #8cfbff;
     display: block;
     justify-content: center;
     padding-top: 10vh;
@@ -137,7 +142,7 @@
   .derecha {
     position: relative;
     z-index: 0;
-    height: 90vh;
+    height: calc(100vh - 56px);
     width: 80vw;
     margin-left: 20vw;
     /*background-image: url(../assets/imagen-fondo.jpg);*/
@@ -153,7 +158,7 @@
   }
   
   .width-size {
-    width: 25vw;
+    width: 20vw;
   }
   
   @media screen and (max-width: 992px) {
@@ -163,11 +168,11 @@
   
     .fondo {
       width: 100vw;
-      height: 85vh;
+      height: calc(100vh - 115px);
     }
   
     .derecha {
-      height: 85vh;
+      height: calc(100vh - 115px);
     }
   }
   </style>

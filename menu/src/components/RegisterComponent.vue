@@ -1,13 +1,13 @@
 <template>
   <div>
-    <NavbarAdminComponent></NavbarAdminComponent>
+    <NavbarAdminComponent v-if="usuario == 'admin'"></NavbarAdminComponent>
+    <NavbarPublicoComponent v-else></NavbarPublicoComponent>
     <div class="container mt-4 mb-2">
 
-      <div class="row g-3 mt-4 div-forms border">
-        <h1 class="text-center">Registro de Negocio</h1>
+      <div class="row g-3 mt-4 border">
         <form @submit.prevent="registrarNegocio">
-          <div class="row g-3 div-forms border">
-            <h4 class="titulo-div-forms mb-2">Datos</h4>
+          <div class="row g-3  border">
+            <h4 class="titulo- mb-2">Información de acceso</h4>
             <div class="col-md-6">
               <input class="form-control" type="text" id="username" v-model="negocio.usuario"
                 placeholder="Nombre de Usuario" required>
@@ -16,15 +16,12 @@
               <input class="form-control" type="password" id="password" v-model="negocio.contraseña"
                 placeholder="Contraseña" required>
             </div>
+            <h4 class="titulo- mb-2">Información del negocio</h4>
             <div class="col-md-6">
               <input class="form-control" type="text" id="nombre" v-model="negocio.nombre"
                 placeholder="Nombre del Negocio" required>
             </div>
-            <div class="col-md-6">
-              <label class="form-label fnac" for="fechaVence">Fecha de Vencimiento</label>
-              <input class="form-control date" type="date" id="fechaVence" v-model="negocio.fechaVence"
-                placeholder="Fecha de Vencimiento" required>
-            </div>
+
             <div class="col-md-6">
               <input class="form-control" type="email" id="email" v-model="negocio.email" placeholder="Correo" required>
             </div>
@@ -37,13 +34,12 @@
                 placeholder="Instagram">
             </div>
             <div class="col-md-6">
-              <input class="form-control" type="text" id="facebook" v-model="negocio.facebook"
-                placeholder="Facebook">
+              <input class="form-control" type="text" id="facebook" v-model="negocio.facebook" placeholder="Facebook">
             </div>
             <div class="col-md-6">
-              <label class="form-label mr-2" for="imagen">Foto de perfil (JPG)</label>
+              <label class="form-label text-center" for="imagen">Foto (JPG)</label>
               <input class="form-control" type="file" name="imagen" id="imagen" accept=".jpg"
-                @change="imagenSeleccionada($event)" required/>
+                @change="imagenSeleccionada($event)" required />
             </div>
             <div class="col-md-6">
               <input class="form-control" type="number" id="telefono" v-model="negocio.telefono" placeholder="Teléfono">
@@ -67,12 +63,16 @@
 import axios from "axios";
 import NavbarAdminComponent from './NavbarAdminComponent.vue';
 import Swal from 'sweetalert2';
+import NavbarPublicoComponent from "./NavbarPublicoComponent.vue";
+import router from "@/router";
 export default {
   components: {
     NavbarAdminComponent,
+    NavbarPublicoComponent,
   },
   data() {
     return {
+      plan: null,
       negocio: {
         usuario: '',
         contraseña: '',
@@ -80,7 +80,7 @@ export default {
         fechaVence: '',
         email: '',
         imagen: '',
-        direccion:'',
+        direccion: '',
         telefono: '',
         descripcion: '',
         instagram: '',
@@ -90,17 +90,17 @@ export default {
   },
   methods: {
     imagenSeleccionada(event) {
-            const file = event.target.files[0];
-            if (file) {
-                // Utiliza FileReader para leer el contenido de la imagen como una URL de datos
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    // Al cargar la imagen, asigna la URL de datos a producto.imagen
-                    this.negocio.imagen = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-        },
+      const file = event.target.files[0];
+      if (file) {
+        // Utiliza FileReader para leer el contenido de la imagen como una URL de datos
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          // Al cargar la imagen, asigna la URL de datos a producto.imagen
+          this.negocio.imagen = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    },
     resetForm() {
       this.negocio.usuario = '';
       this.negocio.contraseña = '';
@@ -110,12 +110,16 @@ export default {
       this.negocio.imagen = '';
       this.negocio.direccion = '';
       this.negocio.telefono = '';
-      this.negocio.direccion ='';
+      this.negocio.direccion = '';
       this.negocio.instagram = '';
       this.negocio.facebook = '';
     },
     registrarNegocio() {
       // Realizar una solicitud HTTP POST al servidor Express
+      let fechaActual = new Date();
+    const plan = this.plan - 1
+    fechaActual.setMonth(fechaActual.getMonth() + plan);
+    this.negocio.fechaVence = fechaActual.toISOString().slice(0, 19).replace('T', ' ');
       axios.post('/register', this.negocio)
         .then(response => {
           this.mensaje = response.data.message;
@@ -134,14 +138,17 @@ export default {
           this.mensaje = 'Error al registrar usuario';
         });
     },
-    esAdmin() {
-      if (localStorage.getItem("usuario") != "admin") {
-        this.$router.push("/");
+    verificarPlan() {
+      if (localStorage.getItem('plan')) {
+        this.plan = localStorage.getItem('plan');
+      } else {
+        router.push('/planes');
+
       }
     }
   },
   mounted() {
-    this.esAdmin();
+    this.verificarPlan();
   },
 };
 </script>
@@ -159,13 +166,6 @@ input.date {
   align-items: center !important;
 }
 
-.div-forms {
-  margin: auto;
-  padding: 20px;
-  border-color: black !important;
-  border-radius: 5px !important;
-  justify-content: center !important;
-}
 
 .botones {
   width: 40%;

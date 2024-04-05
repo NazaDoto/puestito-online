@@ -10,6 +10,7 @@ import NuevaCategoriaComponent from './components/NuevaCategoriaComponent.vue';
 import ListarCategoriasComponent from './components/ListarCategoriasComponent.vue';
 import NegocioComponent from './components/NegocioComponent.vue';
 import ModificarNegocioComponent from './components/ModificarNegocioComponent.vue';
+import PlanesComponent from './components/PlanesComponent.vue';
 
 
 const routes = [{
@@ -30,7 +31,13 @@ const routes = [{
     {
         path: '/register',
         component: RegisterComponent,
-        meta: { requiresAuth: true },
+        meta: { requiresAuth: false },
+
+    },
+    {
+        path: '/planes',
+        component: PlanesComponent,
+        meta: { requiresAuth: false },
 
     },
     {

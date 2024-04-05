@@ -4,13 +4,13 @@
         <div class="container mt-4 mb-2">
             <h1 class="text-center">Nuevo Producto</h1>
             <form @submit.prevent="nuevoProducto(this.producto)" enctype="multipart/form-data">
-                <div class="row g-3 div-forms border">
+                <div class="row g-3 div-forms border mt-2">
                     <h4 class="titulo-div-forms mb-2">Información del Producto</h4>
                     <div class="col-md-6">
                         <input class="form-control" type="text" id="nombre" v-model="producto.nombre"
                             placeholder="Nombre del Producto" required />
                     </div>
-                    <div class="col-md-12">
+                    <div class="col-md-12 mt-3">
                         <textarea class="form-control" type="text" id="descripcion" v-model="producto.descripcion"
                             placeholder="Descripción"></textarea>
                     </div>
