@@ -23,8 +23,7 @@
                             <div v-for="(categoria, index) in categoriasOrdenadas" :key="index">
                                 <li v-if="categoriasConProductosFiltrados.includes(categoria)" class="nav-item">
                                     <a class="nav-link" @click="scrollToCategoria(categoria); collapseNavbar()">{{
-            categoria
-        }}</a>
+            categoria }}</a>
                                 </li>
                             </div>
                         </ul>
@@ -53,7 +52,7 @@
                     <div class="ancho">
                         <div class="izquierda ancho-busqueda">
                             <input class="form-control" v-model="busqueda" type="text" name="busqueda" id=""
-                                placeholder="Buscar" title="Ingrese una palabra clave...">
+                                placeholder="Buscar producto" title="Ingrese una palabra clave...">
                         </div>
                         <div class="mt-2" v-for="(categoria, index) in categoriasOrdenadas" :key="index"
                             :id="categoria">
@@ -69,8 +68,8 @@
                                             </div>
                                         </div>
                                         <!-- Nombre del producto -->
-                                        <div class="item-texto">
-                                            <div class="item-texto-block">
+                                        <div class="item-texto-block">
+                                            <div class="item-texto-block-start">
                                                 <div class="item-nombre">
                                                     {{ producto.producto_nombre }}
                                                 </div>
@@ -82,9 +81,25 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <div class="item-texto-block-end">
+                                            <button class="btn-mas" @click="agregarAlCarrito(producto)">
+                                                +
+                                            </button>
+                                            <div class="cantidad">
+                                                {{ producto.cantidadSeleccionada }}
+                                            </div>
+                                            <button class="btn-menos" @click="quitarDelCarrito(producto)"
+                                                :disabled="!producto.cantidadSeleccionada">
+                                                -
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                        <div class="ver-carrito-btn" v-if="carrito.length > 0">
+                            <button data-bs-toggle="modal" data-bs-target="#modalCarrito">Ver Carrito ${{ total
+                                }}</button>
                         </div>
                         <div v-if="productosFiltrados.length === 0" class="text-center mt-3">
                             No se encontraron resultados para esa búsqueda.
@@ -102,6 +117,84 @@
                 </div>
             </div>
         </div>
+
+        <div class="modal fade" id="modalCarrito" tabindex="-1" aria-labelledby="modalCarritoLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">¿Todo listo para encargar?</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="item-container mt-2" v-for="(producto, index) in carrito" :key="index">
+                            <div class="item-imagen" v-if="producto.producto_imagen">
+                                <div>
+                                    <img class="imagen" :src="producto.producto_imagen" alt=" ">
+                                </div>
+                            </div>
+                            <!-- Nombre del producto -->
+                            <div class="item-texto-block">
+                                <div class="item-texto-block-start">
+                                    <div class="item-nombre">
+                                        {{ producto.producto_nombre }}
+                                    </div>
+                                    <div class="item-precio">
+                                        ${{ producto.producto_precio }}
+                                    </div>
+                                    <div class="item-descripcion" v-if="producto.producto_descripcion">
+                                        "{{ producto.producto_descripcion }}"
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="item-texto-block-end">
+                                <button class="btn-mas" @click="agregarAlCarrito(producto)">
+                                    +
+                                </button>
+                                <div class="cantidad">
+                                    {{ producto.cantidadSeleccionada }}
+                                </div>
+                                <button class="btn-menos" @click="quitarDelCarrito(producto)"
+                                    :disabled="!producto.cantidadSeleccionada">
+                                    -
+                                </button>
+                            </div>
+                        </div>
+                        <h4 class="text-end mt-4">Total: ${{ total }}</h4>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" :disabled="!carrito.length > 0"
+                            data-bs-toggle="modal" data-bs-target="#modalPedido">Realizar pedido</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalPedido" tabindex="-1" aria-labelledby="modalPedidoLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Datos del comprador</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form @submit.prevent="realizarPedido">
+                            <input type="text" class="form-control" placeholder="Nombre y Apellido" v-model="pedido.nombre"
+                            required>
+                            <select class="form-control form-select mt-4" id="" v-model="pedido.medio" required>
+                                <option value="Transferencia">Transferencia</option>
+                                <option value="Efectivo">Efectivo</option>
+                            </select>
+                            <input type="text" class="form-control mt-4" placeholder="Dirección" v-model="pedido.direccion"
+                            required>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary" 
+                                :disabled="!carrito.length > 0" data-bs-dismiss="modal">Realizar pedido</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -110,6 +203,7 @@ import axios from 'axios';
 export default {
     data() {
         return {
+            mostrarModal: true,
             nombreNegocio: '', // Variable para almacenar el nombre de usuario del negocio
             productos: [],      // Array para almacenar los productos del negocio
             busqueda: '',
@@ -123,6 +217,13 @@ export default {
                 imagen: ''
             },
             cargando: true,
+            carrito: [],
+            total: 0,
+            pedido: {
+                nombre: '',
+                medio: 'Transferencia',
+                direccion: '',
+            }
         };
     },
     mounted() {
@@ -130,7 +231,6 @@ export default {
         this.nombreNegocio = this.$route.params.nombreNegocio;
         // Lógica para obtener los productos del negocio con el nombre de usuario dado
         this.obtenerInformacionNegocio();
-
     },
     computed: {
         categoriasOrdenadas() {
@@ -158,6 +258,74 @@ export default {
         }
     },
     methods: {
+        async obtenerCarrito() {
+            if (sessionStorage.getItem('carrito') !== null) {
+                this.carrito = JSON.parse(sessionStorage.getItem('carrito'));
+                this.total = parseFloat(sessionStorage.getItem('total')); // Asumiendo que 'total' es un número, no una cadena
+                for (const producto of this.productos) {
+                    const index = this.carrito.findIndex(item => item.producto_id === producto.producto_id);
+                    if (index !== -1) {
+                        // Agregar la propiedad cantidadSeleccionada al producto
+                        producto.cantidadSeleccionada = this.carrito[index].cantidadSeleccionada;
+                    }
+                }
+            } 
+            if (localStorage.getItem('pedido') !== null){
+                this.pedido = JSON.parse(localStorage.getItem('pedido'));
+            }
+        },
+        // Método para realizar el pedido
+        realizarPedido() {
+            // Agrega aquí la lógica para enviar el mensaje por WhatsApp
+
+            // Aquí debes obtener la información del carrito y formatearla como desees
+
+            localStorage.setItem('pedido', JSON.stringify(this.pedido));
+
+            const mensaje = `¡Hola *${this.negocio.nombre}*! Quiero realizar un pedido:\n`;
+            const productos = this.carrito.map(producto => `*${producto.producto_nombre}:* $${producto.producto_precio} (${producto.cantidadSeleccionada})\n\n`);
+            const total = `*Total: $${this.total}*\n\n`;
+            const datos = `*Nombre:* ${this.pedido.nombre}\n*Medio de pago:* ${this.pedido.medio}\n*Dirección:* ${this.pedido.direccion}\n\n¡Muchas gracias!`;
+
+            // Concatenamos el mensaje con la lista de productos y el total
+            const mensajeCompleto = mensaje + productos.join('') + total + datos;
+
+            // Aquí debes reemplazar 'tu_numero_de_whatsapp' por el número de teléfono de tu negocio
+            const numeroWhatsapp = `whatsapp://send?phone=${this.negocio.telefono}&text=${encodeURIComponent(mensajeCompleto)}`;
+            
+            sessionStorage.clear();
+            location.reload();
+            // Finalmente, abrimos una nueva ventana del navegador con el enlace generado
+            window.open(numeroWhatsapp);
+        },
+        agregarAlCarrito(producto) {
+            const index = this.carrito.findIndex(item => item.producto_id === producto.producto_id);
+            if (index !== -1) {
+                producto.cantidadSeleccionada++;
+                this.carrito[index].cantidadSeleccionada = producto.cantidadSeleccionada;
+                this.total += Number(producto.producto_precio);
+            } else {
+                // Agregamos la cantidadSeleccionada al producto
+                producto.cantidadSeleccionada = 1;
+                this.carrito.push(producto);
+                this.total += Number(producto.producto_precio);
+            }
+            sessionStorage.setItem('carrito', JSON.stringify(this.carrito));
+            sessionStorage.setItem('total', JSON.stringify(this.total));
+        },
+        quitarDelCarrito(producto) {
+            const index = this.carrito.findIndex(item => item.producto_id === producto.producto_id);
+            if (index !== -1) {
+                producto.cantidadSeleccionada--;
+                this.carrito[index].cantidadSeleccionada = producto.cantidadSeleccionada;
+                this.total -= Number(producto.producto_precio);
+                if (this.carrito[index].cantidadSeleccionada === 0) {
+                    this.carrito.splice(index, 1);
+                }
+            }
+            sessionStorage.setItem('carrito', JSON.stringify(this.carrito));
+            sessionStorage.setItem('total', JSON.stringify(this.total));
+        },
         async obtenerInformacionNegocio() {
             try {
                 // Realiza una solicitud HTTP GET para obtener los informes desde el servidor
@@ -214,8 +382,14 @@ export default {
                     return 0;
                 });
 
+                productosOrdenados.forEach(producto => {
+                    producto.cantidadSeleccionada = 0;
+                });
+
                 // Actualiza la lista de productos con los datos recibidos y ordenados
                 this.productos = productosOrdenados;
+                this.obtenerCarrito();
+
             } catch (error) {
                 console.error("Error al cargar los productos:", error);
             } finally {
@@ -231,6 +405,54 @@ export default {
 </script>
 
 <style scoped>
+.cantidad {
+    vertical-align: middle;
+    font-size: 20px;
+}
+
+.btn-mas {
+    height: 40px;
+    border-radius: 4px;
+    width: 40px;
+    font-weight: bold;
+    border: none;
+}
+
+.btn-mas:hover {
+    cursor: pointer;
+    background-color: lightgrey;
+}
+
+.btn-menos {
+    height: 40px;
+    border-radius: 4px;
+    width: 40px;
+    font-weight: bold;
+    border: none;
+}
+
+.btn-menos:hover {
+    cursor: pointer;
+}
+
+.ver-carrito-btn button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 2;
+    background-color: blue;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.ver-carrito-btn button:hover {
+    background-color: rgb(2, 2, 216);
+
+}
+
 .texto-carga {
     font-style: italic;
     margin: 20px;
@@ -347,9 +569,11 @@ nav {
     background-color: black;
     color: white;
 }
-.mauto{
+
+.mauto {
     margin: 10px;
 }
+
 .titulo-categoria {
     font-size: 30px;
     background-color: rgb(254, 255, 174);
@@ -422,7 +646,12 @@ ul {
 }
 
 .item-texto-block {
-    flex-grow: 1;
+    width: 100%;
+    /* Hacemos que este bloque ocupe el espacio disponible */
+}
+
+.item-texto-block-start {
+    width: 80%;
     /* Hacemos que este bloque ocupe el espacio disponible */
 }
 
@@ -441,16 +670,8 @@ ul {
 }
 
 .item-texto-block-end {
-    text-decoration: none;
-    padding: 5px 10px;
-    border: 1px solid transparent;
-    border-radius: 5px;
-    background-color: #28a745;
-    color: white;
-}
-
-.item-texto-block-end:hover {
-    background-color: #218838;
+    text-align: center;
+    margin: auto;
 }
 
 @media screen and (max-width: 992px) {
@@ -464,7 +685,7 @@ ul {
     }
 
     .ancho-busqueda {
-        width: 100vw;
+        width: 100%;
     }
 
 

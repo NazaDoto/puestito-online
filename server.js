@@ -196,7 +196,7 @@ const upload = multer({ storage: storage });
 app.get('/negocios', async(req, res) => {
     try {
         // Consultar la base de datos para obtener la información de los negocios
-        const query = "SELECT usuario_nombre, usuario_nombre_negocio, usuario_direccion, usuario_correo, usuario_telefono, usuario_descripcion, usuario_imagen, usuario_instagram, usuario_facebook FROM usuarios WHERE usuario_nombre != 'admin'";
+        const query = "SELECT usuario_nombre, usuario_nombre_negocio, usuario_fecha_vencimiento, usuario_direccion, usuario_correo, usuario_telefono, usuario_descripcion, usuario_imagen, usuario_instagram, usuario_facebook FROM usuarios WHERE usuario_nombre != 'admin'";
         connection.query(query, async(error, results) => {
             if (error) {
                 console.error('Error al obtener los negocios de la base de datos:', error);
@@ -205,30 +205,37 @@ app.get('/negocios', async(req, res) => {
 
                 // Convertir direcciones a coordenadas geográficas
                 const negociosPromises = results.map(async negocio => {
-                    const direccion = negocio.usuario_direccion;
-                    try {
-                        const response = await axios.get(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(direccion)}&format=json&limit=1`);
-                        const data = response.data;
-                        if (data && data.length > 0) {
-                            return {
-                                usuario: negocio.usuario_nombre,
-                                nombre: negocio.usuario_nombre_negocio,
-                                direccion: negocio.usuario_direccion,
-                                correo: negocio.usuario_correo,
-                                telefono: negocio.usuario_telefono,
-                                descripcion: negocio.usuario_descripcion,
-                                imagen: negocio.usuario_imagen,
-                                instagram: negocio.usuario_instagram,
-                                facebook: negocio.usuario_facebook,
-                                latitud: parseFloat(data[0].lat),
-                                longitud: parseFloat(data[0].lon)
-                            };
-                        } else {
-                            console.error("No se encontraron resultados para la dirección especificada:", direccion);
-                            return null;
+                    const fechaHoy = new Date();
+                    const fechaVence = new Date(negocio.usuario_fecha_vencimiento);
+                    if (fechaVence >= fechaHoy) {
+
+                        const direccion = negocio.usuario_direccion;
+                        try {
+                            const response = await axios.get(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(direccion)}&format=json&limit=1`);
+                            const data = response.data;
+                            if (data && data.length > 0) {
+                                return {
+                                    usuario: negocio.usuario_nombre,
+                                    nombre: negocio.usuario_nombre_negocio,
+                                    direccion: negocio.usuario_direccion,
+                                    correo: negocio.usuario_correo,
+                                    telefono: negocio.usuario_telefono,
+                                    descripcion: negocio.usuario_descripcion,
+                                    imagen: negocio.usuario_imagen,
+                                    instagram: negocio.usuario_instagram,
+                                    facebook: negocio.usuario_facebook,
+                                    latitud: parseFloat(data[0].lat),
+                                    longitud: parseFloat(data[0].lon)
+                                };
+                            } else {
+                                console.error("No se encontraron resultados para la dirección especificada:", direccion);
+                                return null;
+                            }
+                        } catch (error) {
+                            console.log('Error: ' + error);
                         }
-                    } catch (error) {
-                        console.log('Error: ' + error);
+                    } else {
+                        return null;
                     }
                 });
 

@@ -31,7 +31,7 @@
           <div class="col-md-6">
             <h2 class="titulo-div-forms mb-2">Tu código QR</h2>
             (Click para ver el menú)
-            <a ref="qrcode" :href="'http://192.168.1.235:8080/' + nombreUsuario" target="_blank"></a><br>
+            <a ref="qrcode" :href="'http://192.168.0.7:8080/' + nombreUsuario" target="_blank"></a><br>
             
             <button @click="descargarQR" class="btn btn-success margenbtn">Descargar QR</button>
           </div>
