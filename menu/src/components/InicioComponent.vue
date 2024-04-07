@@ -14,11 +14,11 @@
                 <div class="mt-2">
                     <h1>¿Qué estás buscando?</h1>
                     <div class="izquierda ancho-busqueda">
-                        <input class="form-control" v-model="busqueda" type="text" name="busqueda" id=""
+                        <input class="form-control barra-busqueda" v-model="busqueda" type="text" name="busqueda" id=""
                             placeholder="Buscar" title="Ingrese una palabra clave...">
                     </div>
                     <button class="btn btn-success derecha" @click="mostrarMapa">{{ !mapaMostrado2 ? 'Ver Mapa' :
-                `Ocultar
+                        `Ocultar
                         Mapa`}}</button>
                 </div>
                 <div class="negocios-body">
@@ -33,14 +33,14 @@
                                 </div>
                             </div>
                             <!-- Nombre del negocio -->
-                                <div class="item-texto-block">
-                                    <div class="item-nombre">
-                                        {{ negocio.nombre }}
-                                    </div>
-                                    <div class="item-descripcion" v-if="negocio.descripcion">
-                                        "{{ negocio.descripcion }}"
-                                    </div>
+                            <div class="item-texto-block">
+                                <div class="item-nombre">
+                                    {{ negocio.nombre }}
                                 </div>
+                                <div class="item-descripcion" v-if="negocio.descripcion">
+                                    "{{ negocio.descripcion }}"
+                                </div>
+                            </div>
                             <!-- Botón para dirigirse al menú -->
                             <div class="item-btn">
                                 <a class="item-texto-block-end" :href="'http://192.168.0.7:8080/' + negocio.usuario"
@@ -64,8 +64,8 @@ import axios from 'axios';
 import NavbarPublicoComponent from './NavbarPublicoComponent.vue';
 
 export default {
-    components:{
-NavbarPublicoComponent,
+    components: {
+        NavbarPublicoComponent,
     },
     name: 'MapaComponent',
     data() {
@@ -121,7 +121,7 @@ NavbarPublicoComponent,
             if (!navigator.geolocation) {
                 console.log('No funciona geolocation.')
             } else {
-                
+
                 navigator.geolocation.getCurrentPosition((position) => {
                     const latitud = position.coords.latitude;
                     const longitud = position.coords.longitude;
@@ -133,7 +133,7 @@ NavbarPublicoComponent,
                 });
             }
             // Centra el mapa en las coordenadas proporcionadas
-           
+
 
             const myIcon = L.icon({
                 iconUrl: '/recursos/pin.png',
@@ -157,9 +157,8 @@ NavbarPublicoComponent,
                 <p style="margin:5px 0px"><b>Correo:</b> ${punto.correo}</p>
                 <p style="margin:5px 0px"><b>Teléfono:</b> ${punto.telefono}</p>
                 <p style="text-align:center;margin:7px 0px">"${punto.descripcion}"</p>
-                <div style="text-align:center;">
-                <a href="${punto.instagram}" target="blank"><img style="margin:0px 10px" width='20' src="/recursos/instagram.png"></a>
-                <a href="${punto.facebook}" target="blank"><img style="margin:0px 10px" width='20' src="/recursos/facebook.png"></a> </div>
+                <div style="text-align:center;"> ${punto.instagram  ? `<a href="${punto.instagram}" target="blank"><img style="margin:0px 10px" width='20' src="/recursos/instagram.png"></a>` : ''}
+                            ${ punto.facebook ? `<a href="${punto.facebook}" target="blank"><img style="margin:0px 10px" width='20' src="/recursos/facebook.png"></a>` : '' }</div>
                 </div>`).bindTooltip(`<b>${punto.nombre}</b>`, { direction: 'bottom', offset: L.point(0, 10) });
                 });
                 document.getElementById('map').classList.add('show');
@@ -213,6 +212,10 @@ NavbarPublicoComponent,
     align-content: center;
 }
 
+.pantalla-carga:hover {
+    cursor: wait;
+}
+
 @keyframes l2 {
     to {
         transform: rotate(1turn)
@@ -227,7 +230,7 @@ NavbarPublicoComponent,
 }
 
 .container2 {
-    margin: 0px 20vw;
+    margin: 0px 30vw;
     min-height: calc(100vh - 200px);
 }
 

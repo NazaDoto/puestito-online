@@ -214,7 +214,10 @@ textarea {
 }
 
 .btn-agregar {
-    background-color: rgb(252, 190, 109);
+    background: linear-gradient( rgb(255, 251, 234), rgb(255, 240, 155)) !important;
+    box-shadow:0.2px 0.2px 2px white;
+    border:none;
+    border-radius: 1px;
 }
 
 .modal-footer {
@@ -222,7 +225,7 @@ textarea {
 }
 
 .btn-agregar:hover {
-    background-color: rgb(244, 174, 83);
+    background: linear-gradient( rgb(253, 247, 217), rgb(255, 236, 128)) !important;
 }
 
 .mr-2 {

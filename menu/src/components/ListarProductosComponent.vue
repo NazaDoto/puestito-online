@@ -6,7 +6,7 @@
       <div class="flex">
 
         <div class="izquierda ancho-busqueda">
-          <input class="form-control" v-model="busqueda" type="text" name="busqueda" id="" placeholder="Buscar"
+          <input class="form-control barra-busqueda" v-model="busqueda" type="text" name="busqueda" id="" placeholder="Buscar"
             title="Ingrese una palabra clave...">
         </div>
       </div>

@@ -32,7 +32,7 @@
             <h2 class="titulo-div-forms mb-2">Tu código QR</h2>
             (Click para ver el menú)
             <a ref="qrcode" :href="'http://192.168.0.7:8080/' + nombreUsuario" target="_blank"></a><br>
-            
+
             <button @click="descargarQR" class="btn btn-success margenbtn">Descargar QR</button>
           </div>
 
@@ -63,8 +63,9 @@ export default {
   },
   mounted() {
     this.leerUsuario();
-    if(this.nombreUsuario != 'admin'){
-      this.generarQR();}
+    if (this.nombreUsuario != 'admin') {
+      this.generarQR();
+    }
   },
   methods: {
     generarQR() {
@@ -91,7 +92,11 @@ export default {
     },
     renderQRCode(qrCodeImageTag) {
       // Renderiza la imagen del código QR en el div con ref="qrcode"
-      this.$refs.qrcode.innerHTML = qrCodeImageTag;
+      // Obtener el elemento al que deseas agregar la clase
+      const qrcodeElement = this.$refs.qrcode;
+
+      // Agregar la clase al elemento
+      qrcodeElement.innerHTML = qrCodeImageTag;
 
     },
     leerUsuario() {

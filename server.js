@@ -171,27 +171,36 @@ app.post('/login', (req, res) => {
 
 
 
-const uploadPath = './negocios';
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        console.log(req.body);
-        const usuario = req.body.usuario;
 
-        if (!usuario) {
-            return cb(new Error('Usuario no especificado en el producto'), null);
-        }
 
-        const negocioFolder = `${uploadPath}/${usuario}`;
-        fs.mkdirSync(negocioFolder, { recursive: true });
-        cb(null, negocioFolder);
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + '-' + file.originalname);
+app.get('/listarNegocios', async(req, res) => {
+    try {
+        const query = "SELECT * from usuarios WHERE usuario_nombre != 'admin'";
+        connection.query(query, async(error, results) => {
+            if (error) {
+                console.error('Erro al obtener los negocios de la base de datos:', error);
+            } else {
+                const negocios = results.map(negocio => {
+                    return {
+                        usuario: negocio.usuario_nombre,
+                        nombre: negocio.usuario_nombre_negocio,
+                        fechaVence: negocio.usuario_fecha_vencimiento,
+                        direccion: negocio.usuario_direccion,
+                        correo: negocio.usuario_correo,
+                        telefono: negocio.usuario_telefono,
+                        descripcion: negocio.usuario_descripcion,
+                        imagen: negocio.usuario_imagen,
+                        instagram: negocio.usuario_instagram,
+                        facebook: negocio.usuario_facebook,
+                    }
+                });
+                res.json(negocios);
+            }
+        })
+    } catch (error) {
+        console.error('Error al obtener negocios. ', error);
     }
-});
-const upload = multer({ storage: storage });
-
-
+})
 
 app.get('/negocios', async(req, res) => {
     try {
@@ -206,7 +215,15 @@ app.get('/negocios', async(req, res) => {
                 // Convertir direcciones a coordenadas geográficas
                 const negociosPromises = results.map(async negocio => {
                     const fechaHoy = new Date();
+                    // Establecer la hora, los minutos, los segundos y los milisegundos a cero
+                    fechaHoy.setHours(0, 0, 0, 0);
+
                     const fechaVence = new Date(negocio.usuario_fecha_vencimiento);
+                    // Establecer la hora, los minutos, los segundos y los milisegundos a cero
+                    fechaVence.setHours(0, 0, 0, 0);
+
+
+                    // Comparar las fechas sin tener en cuenta la hora
                     if (fechaVence >= fechaHoy) {
 
                         const direccion = negocio.usuario_direccion;
@@ -296,7 +313,15 @@ app.get('/negocio', (req, res) => {
             return;
         }
         const fechaHoy = new Date();
+        // Establecer la hora, los minutos, los segundos y los milisegundos a cero
+        fechaHoy.setHours(0, 0, 0, 0);
+
         const fechaVence = new Date(results[0].usuario_fecha_vencimiento);
+        // Establecer la hora, los minutos, los segundos y los milisegundos a cero
+        fechaVence.setHours(0, 0, 0, 0);
+
+
+        // Comparar las fechas sin tener en cuenta la hora
         if (fechaVence >= fechaHoy) {
             const query = "SELECT usuario_nombre_negocio,  usuario_correo, usuario_telefono, usuario_descripcion, usuario_imagen, usuario_direccion, usuario_instagram, usuario_facebook FROM usuarios WHERE usuario_nombre = ?";
             // Ejecutar la consulta
@@ -342,7 +367,41 @@ app.put('/modificarPerfil', (req, res) => {
         }
     });
 });
+app.put('/modificarPerfilAdmin', (req, res) => {
+    const { negocio } = req.body;
+    query = 'UPDATE usuarios SET usuario_nombre = ?, usuario_contraseña = ?, usuario_nombre_negocio = ?, usuario_fecha_vencimiento = ?, usuario_correo = ?, usuario_telefono = ?, usuario_descripcion = ?, usuario_imagen = ?, usuario_direccion = ?, usuario_instagram = ?, usuario_facebook = ? WHERE usuario_nombre = ?';
 
+    if (negocio.contraseña) {
+        const bcrypt = require('bcrypt');
+        bcrypt.hash(negocio.contraseña, saltRounds, (err, hash) => {
+
+            if (err) {
+                console.log(err)
+            } else {
+
+                connection.query(query, [negocio.usuario, hash, negocio.nombre, negocio.fechaVence, negocio.correo, negocio.telefono, negocio.descripcion, negocio.imagen, negocio.direccion, negocio.instagram, negocio.facebook, negocio.usuario], (err, result) => {
+                    if (err) {
+                        console.error('Error al modificar producto:', err);
+                        res.status(500).json({ message: 'Error al modificar producto' });
+                    } else {
+                        res.status(200).json({ message: 'Producto modificado exitosamente' });
+                    }
+                });
+            }
+        });
+    } else {
+        query = 'UPDATE usuarios SET usuario_nombre = ?, usuario_nombre_negocio = ?, usuario_fecha_vencimiento = ?, usuario_correo = ?, usuario_telefono = ?, usuario_descripcion = ?, usuario_imagen = ?, usuario_direccion = ?, usuario_instagram = ?, usuario_facebook = ? WHERE usuario_nombre = ?';
+        connection.query(query, [negocio.usuario, negocio.nombre, negocio.fechaVence, negocio.correo, negocio.telefono, negocio.descripcion, negocio.imagen, negocio.direccion, negocio.instagram, negocio.facebook, negocio.usuario], (err, result) => {
+            if (err) {
+                console.error('Error al modificar producto:', err);
+                res.status(500).json({ message: 'Error al modificar producto' });
+            } else {
+                res.status(200).json({ message: 'Producto modificado exitosamente' });
+            }
+        });
+    }
+
+});
 
 app.post('/nuevoProducto', (req, res) => {
     try {
@@ -475,7 +534,6 @@ app.put('/modificarProducto', (req, res) => {
     const sql = `UPDATE productos SET producto_nombre = ?, producto_descripcion = ?, producto_categoria = ?, producto_precio = ?, producto_imagen = ? WHERE producto_id = ?`;
 
     if (producto.producto_imagen == null) {
-        console.log('modificando sin imagen')
         const { producto } = req.body;
         connection.query(sqlSinImg, [
             producto.producto_nombre,
@@ -492,7 +550,6 @@ app.put('/modificarProducto', (req, res) => {
             }
         });
     } else {
-        console.log('modificando con imagen')
 
         const { producto } = req.body;
         connection.query(sql, [
@@ -533,13 +590,6 @@ if (env == 'dev') {
         console.log(`Servidor funcionando en el puerto ${port}`);
     })
 } else {
-
-
-
-
-
-
-
     // Inicia el servidor
     const privateKey = fs.readFileSync('clave.pem', 'utf8');
     const certificate = fs.readFileSync('certificado.pem', 'utf8');

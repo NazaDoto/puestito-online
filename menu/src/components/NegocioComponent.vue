@@ -9,7 +9,6 @@
             </div>
         </div>
         <div v-else>
-
             <nav class="navbar navbar-expand-lg navbar-light bg-light">
                 <div class="container-fluid">
                     <a class="navbar-brand" @click="scrollToInicio" href="#">~ {{ nombreNegocio.toUpperCase() }} ~</a>
@@ -23,96 +22,98 @@
                             <div v-for="(categoria, index) in categoriasOrdenadas" :key="index">
                                 <li v-if="categoriasConProductosFiltrados.includes(categoria)" class="nav-item">
                                     <a class="nav-link" @click="scrollToCategoria(categoria); collapseNavbar()">{{
-            categoria }}</a>
+                                        categoria }}</a>
                                 </li>
                             </div>
                         </ul>
                     </div>
                 </div>
             </nav>
-
-            <div v-if="productos.length">
-                <div class="presentacion">
-                    <!-- Imagen del negocio con texto superpuesto -->
-                    <div class="imagen-container">
-                        <img :src="negocio.imagen" alt="" class="img-negocio">
-                        <div class="texto-superpuesto">BIENVENIDOS
-                            <div class="texto-superpuesto2">"{{ negocio.descripcion }}"</div>
-                            <div class="text-center">
-                                <a v-if="negocio.instagram" class="mauto" :href="negocio.instagram" target="blank"><img
-                                        width='40' src="/recursos/instagram.png"></a>
-                                <a v-if="negocio.facebook" class="mauto" :href="negocio.facebook" target="blank"><img
-                                        width='36' src="/recursos/facebook.png"></a>
+            <div class="container2">
+                <div v-if="productos.length">
+                    <div class="presentacion">
+                        <!-- Imagen del negocio con texto superpuesto -->
+                        <div class="imagen-container">
+                            <img :src="negocio.imagen" alt="" class="img-negocio">
+                            <div class="texto-superpuesto">BIENVENIDOS
+                                <div class="texto-superpuesto2">"{{ negocio.descripcion }}"</div>
+                                <div class="text-center">
+                                    <a v-if="negocio.instagram" class="mauto" :href="negocio.instagram"
+                                        target="blank"><img width='40' src="/recursos/instagram.png"></a>
+                                    <a v-if="negocio.facebook" class="mauto" :href="negocio.facebook"
+                                        target="blank"><img width='36' src="/recursos/facebook.png"></a>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="tarjeta-container">
+                    <div class="tarjeta-container">
 
-                    <div class="ancho">
-                        <div class="izquierda ancho-busqueda">
-                            <input class="form-control" v-model="busqueda" type="text" name="busqueda" id=""
-                                placeholder="Buscar producto" title="Ingrese una palabra clave...">
-                        </div>
-                        <div class="mt-2" v-for="(categoria, index) in categoriasOrdenadas" :key="index"
-                            :id="categoria">
-                            <div v-if="filteredProductos(categoria)">
+                        <div class="ancho">
+                            <div class="izquierda ancho-busqueda">
+                                <input class="form-control barra-busqueda" v-model="busqueda" type="text"
+                                    name="busqueda" id="" placeholder="Buscar producto"
+                                    title="Ingrese una palabra clave...">
+                            </div>
+                            <div class="mt-2" v-for="(categoria, index) in categoriasOrdenadas" :key="index"
+                                :id="categoria">
+                                <div v-if="filteredProductos(categoria)">
 
-                                <div class="titulo-categoria">{{ categoria }}</div>
-                                <div class="p-2">
-                                    <div class="item-container mt-2"
-                                        v-for="(producto, index) in filteredProductos(categoria)" :key="index">
-                                        <div class="item-imagen" v-if="producto.producto_imagen">
-                                            <div>
-                                                <img class="imagen" :src="producto.producto_imagen" alt=" ">
-                                            </div>
-                                        </div>
-                                        <!-- Nombre del producto -->
-                                        <div class="item-texto-block">
-                                            <div class="item-texto-block-start">
-                                                <div class="item-nombre">
-                                                    {{ producto.producto_nombre }}
-                                                </div>
-                                                <div class="item-precio">
-                                                    ${{ producto.producto_precio }}
-                                                </div>
-                                                <div class="item-descripcion" v-if="producto.producto_descripcion">
-                                                    "{{ producto.producto_descripcion }}"
+                                    <div class="titulo-categoria">{{ categoria }}</div>
+                                    <div class="p-2">
+                                        <div class="item-container mt-2"
+                                            v-for="(producto, index) in filteredProductos(categoria)" :key="index">
+                                            <div class="item-imagen" v-if="producto.producto_imagen">
+                                                <div>
+                                                    <img class="imagen" :src="producto.producto_imagen" alt=" ">
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="item-texto-block-end">
-                                            <button class="btn-mas" @click="agregarAlCarrito(producto)">
-                                                +
-                                            </button>
-                                            <div class="cantidad">
-                                                {{ producto.cantidadSeleccionada }}
+                                            <!-- Nombre del producto -->
+                                            <div class="item-texto-block">
+                                                <div class="item-texto-block-start">
+                                                    <div class="item-nombre">
+                                                        {{ producto.producto_nombre }}
+                                                    </div>
+                                                    <div class="item-precio">
+                                                        ${{ producto.producto_precio }}
+                                                    </div>
+                                                    <div class="item-descripcion" v-if="producto.producto_descripcion">
+                                                        "{{ producto.producto_descripcion }}"
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <button class="btn-menos" @click="quitarDelCarrito(producto)"
-                                                :disabled="!producto.cantidadSeleccionada">
-                                                -
-                                            </button>
+                                            <div class="item-texto-block-end">
+                                                <button class="btn-mas" @click="agregarAlCarrito(producto)">
+                                                    +
+                                                </button>
+                                                <div class="cantidad">
+                                                    {{ producto.cantidadSeleccionada }}
+                                                </div>
+                                                <button class="btn-menos" @click="quitarDelCarrito(producto)"
+                                                    :disabled="!producto.cantidadSeleccionada">
+                                                    -
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="ver-carrito-btn" v-if="carrito.length > 0">
-                            <button data-bs-toggle="modal" data-bs-target="#modalCarrito">Ver Carrito ${{ total
-                                }}</button>
-                        </div>
-                        <div v-if="productosFiltrados.length === 0" class="text-center mt-3">
-                            No se encontraron resultados para esa búsqueda.
+                            <div class="ver-carrito-btn" v-if="carrito.length > 0">
+                                <button data-bs-toggle="modal" data-bs-target="#modalCarrito">Ver Carrito ${{ total
+                                    }}</button>
+                            </div>
+                            <div v-if="productosFiltrados.length === 0" class="text-center mt-3">
+                                No se encontraron resultados para esa búsqueda.
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div v-else class="container text-center mt-4 no-negocio">
-                <div class="error-container">
-                    <div class="error-content">
-                        <h1 class="display-1 text-danger">404</h1>
-                        <h2 class="display-4">Página no encontrada</h2>
-                        <p class="lead">Lo sentimos, la página que buscas no se encuentra disponible.</p>
+                <div v-else class="container text-center mt-4 no-negocio">
+                    <div class="error-container">
+                        <div class="error-content">
+                            <h1 class="display-1 text-danger">404</h1>
+                            <h2 class="display-4">Página no encontrada</h2>
+                            <p class="lead">Lo sentimos, la página que buscas no se encuentra disponible.</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -162,7 +163,7 @@
                         <h4 class="text-end mt-4">Total: ${{ total }}</h4>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" :disabled="!carrito.length > 0"
+                        <button type="button" class="ver-carrito-btn2" :disabled="!carrito.length > 0"
                             data-bs-toggle="modal" data-bs-target="#modalPedido">Realizar pedido</button>
                     </div>
                 </div>
@@ -173,25 +174,27 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Datos del comprador</h5>
+                        <h5 class="modal-title">Tus datos</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body">
-                        <form @submit.prevent="realizarPedido">
-                            <input type="text" class="form-control" placeholder="Nombre y Apellido" v-model="pedido.nombre"
-                            required>
+                    <form @submit.prevent="realizarPedido">
+                        <div class="modal-body">
+                            <input type="text" class="form-control" placeholder="Nombre y Apellido"
+                                v-model="pedido.nombre" required>
                             <select class="form-control form-select mt-4" id="" v-model="pedido.medio" required>
                                 <option value="Transferencia">Transferencia</option>
                                 <option value="Efectivo">Efectivo</option>
                             </select>
-                            <input type="text" class="form-control mt-4" placeholder="Dirección" v-model="pedido.direccion"
-                            required>
-                            <div class="modal-footer">
-                                <button type="submit" class="btn btn-primary" 
-                                :disabled="!carrito.length > 0" data-bs-dismiss="modal">Realizar pedido</button>
-                            </div>
-                        </form>
-                    </div>
+                            <input type="text" class="form-control mt-4" placeholder="Dirección"
+                                v-model="pedido.direccion" required>
+                            <input type="text" class="form-control mt-4" placeholder="Detalle del pedido"
+                                v-model="pedido.detalle">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="ver-carrito-btn2" :disabled="!carrito.length > 0"
+                                data-bs-dismiss="modal">Realizar pedido</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -223,6 +226,7 @@ export default {
                 nombre: '',
                 medio: 'Transferencia',
                 direccion: '',
+                detalle: '',
             }
         };
     },
@@ -269,8 +273,8 @@ export default {
                         producto.cantidadSeleccionada = this.carrito[index].cantidadSeleccionada;
                     }
                 }
-            } 
-            if (localStorage.getItem('pedido') !== null){
+            }
+            if (localStorage.getItem('pedido') !== null) {
                 this.pedido = JSON.parse(localStorage.getItem('pedido'));
             }
         },
@@ -285,14 +289,24 @@ export default {
             const mensaje = `¡Hola *${this.negocio.nombre}*! Quiero realizar un pedido:\n`;
             const productos = this.carrito.map(producto => `*${producto.producto_nombre}:* $${producto.producto_precio} (${producto.cantidadSeleccionada})\n\n`);
             const total = `*Total: $${this.total}*\n\n`;
-            const datos = `*Nombre:* ${this.pedido.nombre}\n*Medio de pago:* ${this.pedido.medio}\n*Dirección:* ${this.pedido.direccion}\n\n¡Muchas gracias!`;
+            let datos = `*Nombre:* ${this.pedido.nombre}\n*Medio de pago:* ${this.pedido.medio}\n*Dirección:* ${this.pedido.direccion}\n`;
+            this.pedido.detalle ? datos += `*Detalle:* ${this.pedido.detalle}\n\n¡Muchas gracias!` : datos += `\n¡Muchas gracias!`;
 
             // Concatenamos el mensaje con la lista de productos y el total
             const mensajeCompleto = mensaje + productos.join('') + total + datos;
 
             // Aquí debes reemplazar 'tu_numero_de_whatsapp' por el número de teléfono de tu negocio
-            const numeroWhatsapp = `whatsapp://send?phone=${this.negocio.telefono}&text=${encodeURIComponent(mensajeCompleto)}`;
-            
+            // Obtener el agente del usuario para verificar si está en un dispositivo móvil
+            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+            // Verificar si el usuario está en un dispositivo móvil
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+
+            // Definir el enlace base según si es móvil o no
+            let baseLink = isMobile ? 'whatsapp://send' : 'https://web.whatsapp.com/send';
+
+            // Construir el enlace completo
+            const numeroWhatsapp = `${baseLink}?phone=${this.negocio.telefono}&text=${encodeURIComponent(mensajeCompleto)}`;
             sessionStorage.clear();
             location.reload();
             // Finalmente, abrimos una nueva ventana del navegador con el enlace generado
@@ -416,11 +430,14 @@ export default {
     width: 40px;
     font-weight: bold;
     border: none;
+    box-shadow: 0.2px 0.2px 2px;
+    border-radius: 1px;
+    background-color: white;
 }
 
 .btn-mas:hover {
     cursor: pointer;
-    background-color: lightgrey;
+    background-color: rgb(238, 238, 238);
 }
 
 .btn-menos {
@@ -429,6 +446,9 @@ export default {
     width: 40px;
     font-weight: bold;
     border: none;
+    box-shadow: 0.2px 0.2px 2px;
+    border-radius: 1px;
+    background-color: white;
 }
 
 .btn-menos:hover {
@@ -440,16 +460,32 @@ export default {
     bottom: 20px;
     right: 20px;
     z-index: 2;
-    background-color: blue;
+    background: linear-gradient(rgb(148, 193, 252), rgb(0, 90, 207)) !important;
     color: white;
     padding: 10px 20px;
     border: none;
-    border-radius: 5px;
+    box-shadow: 0.2px 0.2px 2px black !important;
+    border-radius: 1px;
     cursor: pointer;
 }
 
 .ver-carrito-btn button:hover {
-    background-color: rgb(2, 2, 216);
+    background: linear-gradient(rgb(148, 193, 252), rgb(0, 87, 168)) !important;
+
+}
+
+.ver-carrito-btn2 {
+    background: linear-gradient(rgb(148, 193, 252), rgb(0, 90, 207)) !important;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    box-shadow: 0.2px 0.2px 2px black !important;
+    border-radius: 1px;
+    cursor: pointer;
+}
+
+.ver-carrito-btn2:hover {
+    background: linear-gradient(rgb(148, 193, 252), rgb(0, 87, 168)) !important;
 
 }
 
@@ -478,6 +514,10 @@ export default {
     align-content: center;
 }
 
+.pantalla-carga:hover {
+    cursor: wait;
+}
+
 @keyframes l2 {
     to {
         transform: rotate(1turn)
@@ -488,11 +528,6 @@ export default {
     font-weight: bold;
 }
 
-.presentacion {
-    height: calc(100vh - 56px);
-    z-index: 0;
-    position: relative;
-}
 
 .imagen-container {
     position: relative;
@@ -547,10 +582,6 @@ nav {
     text-align: center;
 }
 
-.tarjeta-container {
-    margin: 0 20vw;
-    padding: 10px;
-}
 
 .textoTarjeta {
     padding: 5px 15px;
@@ -576,7 +607,7 @@ nav {
 
 .titulo-categoria {
     font-size: 30px;
-    background-color: rgb(254, 255, 174);
+    background: linear-gradient(to right, rgb(254, 255, 174), #ffffff);
     width: 100%;
     margin: 0px;
     padding: 5px 10px;
@@ -622,10 +653,11 @@ img {
 
 
 .ancho-busqueda {
-    width: 400px;
+    width:100%;
     height: 50px;
     display: inline-flex;
-    margin-top: auto;
+    margin-top: 20px;
+    padding: 1px;
 }
 
 ul {
@@ -674,6 +706,10 @@ ul {
     margin: auto;
 }
 
+.container2 {
+    margin: 0px 30vw;
+}
+
 @media screen and (max-width: 992px) {
     .img-negocio {
         object-fit: cover;
@@ -684,14 +720,11 @@ ul {
         height: calc(100vh - 100px);
     }
 
-    .ancho-busqueda {
-        width: 100%;
+
+    .container2 {
+        min-height: calc(100vh - 200px);
+        margin: 0px 10px;
     }
 
-
-
-    .tarjeta-container {
-        margin: auto;
-    }
 }
 </style>
