@@ -1,45 +1,72 @@
 <template>
     <div>
         <NavbarPublicoComponent></NavbarPublicoComponent>
-        <div class="contenedor border text-center">
+        <div class="contenedor">
             <div class="mt-4 mb-4">
                 <h1 class="text-center">¡Potenciá tu negocio!</h1>
-                <div class="ancho-descripcion">
-                    <p class="text-center">Ofrecemos
-                        visualización en nuestra
-                        plataforma, menú online autoadministrable, pedidos por WhatsApp y códigos QR. Simplificá la
-                        experiencia
-                        de tus clientes y destacá en el mundo digital con nuestra ayuda. <br>¡Unite ahora y hacé que tu
-                        negocio
-                        brille!</p>
+                <hr>
+                <div class="row justify-content-center text-center mb-4">
+                    <div class="col-md-6">
+                        <div class="titulo-plan">
+                            <h3>Plan Básico</h3>
+                        </div>
+                        <div class="border mt-2 p-2 text-center">
+                            <div class="titulo-plan">
+                                Gratis
+                            </div>
+                            <ul class="text-start">
+                                <li>✅Menú online autoadministrable.</li>
+                                <li>❌Visualización en nuestra plataforma.</li>
+                                <li>❌Carrito y pedidos por WhatsApp.</li>
+                                <li>❌Código QR para el menú.</li>
+                            </ul>
+                            <button class="btn btn-success" @click="elegirPlan(0)">REGISTRAR</button>
+                        </div>
+                    </div>
                 </div>
-                <div class="planes">
-                    <div class="ancho-plan g-3 border mt-2">
+                <hr>
+                <div class="row justify-content-center text-center">
+                    <div class="col-md-12">
                         <div class="titulo-plan">
-                            1 Mes
+                            <h3>Plan Completo</h3>
                         </div>
-                        <div class="precio-plan">
-                            $1500
+                        <div class="border mt-2 p-2 text-center">
+                            <ul class="text-start">
+                                <li>✅Menú online autoadministrable.</li>
+                                <li>✅Visualización en nuestra plataforma.</li>
+                                <li>✅Carrito y pedidos por WhatsApp.</li>
+                                <li>✅Código QR para el menú.</li>
+                            </ul>
+                            <div class="row justify-content-center text-center">
+                                <div class="border p-2 m-2 col-md-3">
+                                    <div class="titulo-plan">
+                                        1 Mes
+                                    </div>
+                                    <div class="precio-plan">
+                                        $1500
+                                    </div>
+                                    <button class="btn btn-success" @click="elegirPlan(1)">CONTRATAR</button>
+                                </div>
+                                <div class="border p-2 m-2 col-md-3">
+                                    <div class="titulo-plan">
+                                        6 Meses
+                                    </div>
+                                    <div class="precio-plan">
+                                        $7500
+                                    </div>
+                                    <button class="btn btn-success" @click="elegirPlan(6)">CONTRATAR</button>
+                                </div>
+                                <div class="border p-2 m-2 col-md-3">
+                                    <div class="titulo-plan">
+                                        12 Meses
+                                    </div>
+                                    <div class="precio-plan">
+                                        $15000
+                                    </div>
+                                    <button class="btn btn-success" @click="elegirPlan(12)">CONTRATAR</button>
+                                </div>
+                            </div>
                         </div>
-                        <button class="btn btn-success" @click="elegirPlan(1)">CONTRATAR</button>
-                    </div>
-                    <div class="ancho-plan g-3 border mt-2">
-                        <div class="titulo-plan">
-                            6 Meses
-                        </div>
-                        <div class="precio-plan">
-                            $7500
-                        </div>
-                        <button class="btn btn-success" @click="elegirPlan(6)">CONTRATAR</button>
-                    </div>
-                    <div class="ancho-plan g-3 border mt-2">
-                        <div class="titulo-plan">
-                            12 Meses
-                        </div>
-                        <div class="precio-plan">
-                            $15000
-                        </div>
-                        <button class="btn btn-success" @click="elegirPlan(12)">CONTRATAR</button>
                     </div>
                 </div>
             </div>
@@ -51,22 +78,27 @@
 import router from '@/router';
 import NavbarPublicoComponent from './NavbarPublicoComponent.vue'
 export default {
-components:{
-    NavbarPublicoComponent,
-},
-methods:{
-    elegirPlan(id){
-        localStorage.setItem('plan', id);
-        router.push('/register');
+    components: {
+        NavbarPublicoComponent,
     },
-}
+    methods: {
+        elegirPlan(id) {
+            localStorage.setItem('plan', id);
+            router.push('/register');
+        },
+    }
 }
 </script>
 
 <style scoped>
+li {
+    list-style-type: none;
+}
+
 .contenedor {
     width: 60vw;
     margin: 20px auto;
+    align-content: center;
 }
 
 .titulo-plan {
@@ -82,6 +114,7 @@ methods:{
 }
 
 .ancho-plan {
+    text-align: center;
     margin: 0px 0.4vw;
     width: 17vw;
     height: 30vh;
@@ -92,19 +125,39 @@ methods:{
     box-shadow: 1px 1px 10px 1px;
 }
 
+.ancho-plan-gratis {
+    text-align: center;
+    width: calc(17vw * 3 + 0.5vw * 3);
+}
+
+.col-md-3:hover {
+    box-shadow: 1px 1px 10px 1px;
+}
+
+
 .planes {
     display: inline-flex;
 }
 
+.plan-gratis {
+    display: block;
+}
 
 
 @media screen and (max-width: 992px) {
-    .contenedor{
+    .contenedor {
         width: 90vw;
     }
-    .ancho-plan {
+
+    .col-md-3 {
+        width: 80vw;
+        padding: 10px;
+    }
+
+    .ancho-plan-gratis {
         width: 80vw;
         margin: auto;
+        padding: 10px !important;
     }
 
     .ancho-descripcion {
