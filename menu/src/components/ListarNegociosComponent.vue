@@ -4,8 +4,8 @@
     <div class="container mt-4 mb-2">
       <h1>Negocios</h1>
       <div class="izquierda ancho-busqueda">
-        <input class="form-control barra-busqueda" v-model="busqueda" type="text" name="busqueda" id="" placeholder="Buscar"
-          title="Ingrese una palabra clave...">
+        <input class="form-control barra-busqueda" v-model="busqueda" type="text" name="busqueda" id=""
+          placeholder="Buscar" title="Ingrese una palabra clave...">
       </div>
       <ul>
         <li class="item-container mt-2" v-for="(negocio, index) in negociosFiltrados" :key="index">
@@ -40,8 +40,9 @@
           </div>
           <!-- Botón para dirigirse al menú -->
           <div class="item-btn">
-            <a class="item-texto-block-end" :href="'http://192.168.0.7:8080/' + negocio.usuario" target="_blank"><img
-                src="/favicon.ico" width="30" alt=""></a>
+            <router-link class="item-texto-block-end" :to="'/' + negocio.usuario">
+              <img src="/favicon.ico" width="30" alt="">
+            </router-link>
           </div>
 
         </li>
@@ -67,7 +68,7 @@
                 </div>
                 <div>
                   <input class="form-control" type="password" id="nombre" v-model="negocioModificar.contraseña"
-                    placeholder="Contraseña" >
+                    placeholder="Contraseña">
                 </div>
                 <h4 class="titulo-div-forms mb-2">Información del Negocio</h4>
                 <div>
@@ -109,8 +110,7 @@
                 </div>
               </div>
               <div class="text-end">
-                <button class="btn btn-success botones mt-3" type="submit" 
-                  aria-label="Close">Modificar</button>
+                <button class="btn btn-success botones mt-3" type="submit" aria-label="Close">Modificar</button>
               </div>
             </form>
           </div>
@@ -136,17 +136,17 @@ export default {
       negocios: [],
       busqueda: '',
       negocioModificar: {
-        usuario:'',
-        contraseña:'',
-        nombre:'',
-        descripcion:'',
-        correo:'',
-        direccion:'',
-        telefono:'',
-        instagram:'',
-        facebook:'',
-        imagen:'',
-        fechaVence:'',
+        usuario: '',
+        contraseña: '',
+        nombre: '',
+        descripcion: '',
+        correo: '',
+        direccion: '',
+        telefono: '',
+        instagram: '',
+        facebook: '',
+        imagen: '',
+        fechaVence: '',
       },
     }
   },

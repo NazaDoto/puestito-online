@@ -1,12 +1,12 @@
 <template>
   <nav class="navbar navbar-light bg-light">
             <!-- Logo -->
-            <a class="navbar-brand" href="/">
+            <router-link class="navbar-brand" to="/">
                 <img src="/favicon.ico" width="30" height="30" class="d-inline-block align-top" alt="">
-                Chusmeando
-            </a>
+                Puestito Online
+            </router-link>
             <!-- Botón de login -->
-            <a class="link-login" href="./login">Login</a>
+            <router-link  to="/login">Login </router-link>
         </nav>
 </template>
 

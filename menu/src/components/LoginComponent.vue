@@ -5,7 +5,7 @@
 
       <div class="fondo text-center">
         <img src="/favicon.ico" width="100" alt="logo" class="mb-4">
-        <h1 class="titulo">Chusmeando</h1>
+        <h1 class="titulo">Puestito Online</h1>
         <form class="row g-3" @submit.prevent="login">
           <div class="width-size">
             <label for="usuario">Usuario</label>
@@ -18,8 +18,8 @@
           <div class="col-md-8">
             <button type="submit" class="btn btn-entrar">Entrar</button>
           </div>
-          <a href="/planes">Registrar negocio</a>
-          <a href="/">Volver</a>
+          <router-link  to="/planes">Registrar Negocio</router-link>
+          <router-link  to="/">Volver</router-link>
         </form>
       </div>
       <div class="derecha">

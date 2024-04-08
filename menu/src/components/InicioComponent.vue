@@ -43,8 +43,9 @@
                             </div>
                             <!-- Botón para dirigirse al menú -->
                             <div class="item-btn">
-                                <a class="item-texto-block-end" :href="'http://192.168.0.7:8080/' + negocio.usuario"
-                                    target="_blank"><img src="/favicon.ico" width="30" alt=""></a>
+                                <router-link class="item-texto-block-end" :to="'/' + negocio.usuario">
+                                    <img src="/favicon.ico" width="30" alt="">
+                                </router-link>
                             </div>
                         </li>
                     </ul>
@@ -152,7 +153,7 @@ export default {
                     L.marker([punto.latitud, punto.longitud], { icon: myIcon }).addTo(map)
                         .bindPopup(`<div style="max-width: 150px;">
                 <b style="font-size:20px;">${punto.nombre}</b><br>
-                <a style="text-decoration:none;color:white;font-size:12px;padding:4px 6px;" href="http://192.168.0.7:8080/${punto.usuario}" target="_blank"><img src="/favicon.ico" width="20" alt=""></a>
+                <a style="text-decoration:none;color:white;font-size:12px;padding:4px 6px;" href="https://nazadoto.com:8080/${punto.usuario}" target="_blank"><img src="/favicon.ico" width="20" alt=""></a>
                 <p style="margin:5px 0px"><b>Dirección:</b> ${punto.direccion}</p>
                 <p style="margin:5px 0px"><b>Correo:</b> ${punto.correo}</p>
                 <p style="margin:5px 0px"><b>Teléfono:</b> ${punto.telefono}</p>
