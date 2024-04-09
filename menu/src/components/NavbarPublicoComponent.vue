@@ -6,7 +6,8 @@
                 Puestito Online
             </router-link>
             <!-- Botón de login -->
-            <router-link  to="/login">Login </router-link>
+            <router-link v-if="localStorage.getItem('usuario')">Mi Negocio</router-link>
+            <router-link v-else to="/login">Login</router-link>
         </nav>
 </template>
 

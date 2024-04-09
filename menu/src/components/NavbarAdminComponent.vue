@@ -34,7 +34,7 @@
                       </div>
                       <div class="modal-footer text-center">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
-                        <button type="button" class="btn btn-danger" @click="cerrarSesion">Sí, cerrar sesión</button>
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @click="cerrarSesion">Sí, cerrar sesión</button>
                       </div>
                     </div>
                   </div>
