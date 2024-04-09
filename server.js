@@ -610,7 +610,7 @@ if (env == 'dev') {
         console.log(`Servidor funcionando en el puerto ${port}`);
     })
 } else {
-    const httpsServer = https.createServer(options);
+    const httpsServer = https.createServer(options, app);
     httpsServer.listen(3500);
     console.log('Servidor funcionando en puerto 3500');
 }
