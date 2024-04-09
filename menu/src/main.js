@@ -3,10 +3,10 @@ import { createApp } from 'vue';
 import App from './App.vue';
 import router from './router';
 
-const env = 'dev';
+const env = 'prod';
 
 if (env == 'dev') {
-    axios.defaults.baseURL = 'http://vps-4028484-x.dattaweb.com:3500';
+    axios.defaults.baseURL = 'http://192.168.1.235:3500';
 } else {
 
     axios.defaults.baseURL = 'https://nazadoto.com:3500';

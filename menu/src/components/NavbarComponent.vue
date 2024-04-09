@@ -54,7 +54,7 @@
     
 <script>
 import { RouterLink } from "vue-router"; // Asegúrate de tener la importación correcta
-
+import router from "@/router";
 export default {
   mounted() {
   },
@@ -74,7 +74,7 @@ export default {
     },
     cerrarSesion() {
       localStorage.clear(); // Elimina el token del almacenamiento local
-      location.reload(); // Redirige a la página de inicio de sesión
+      router.push('/');
     },
   },
   components: {
