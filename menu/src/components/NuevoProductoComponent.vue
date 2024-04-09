@@ -73,6 +73,7 @@
 </template>
 
 <script>
+import router from '@/router';
 import NavbarComponent from './NavbarComponent.vue';
 import axios from 'axios';
 import Swal from 'sweetalert2';
@@ -148,7 +149,7 @@ export default {
                     });
                     this.modalAbierto = true;
                     setTimeout(function () {
-                        window.location.reload(1);
+                        router.push('/nuevoProducto');
                     }, 2000);
                 })
                 .catch(() => {

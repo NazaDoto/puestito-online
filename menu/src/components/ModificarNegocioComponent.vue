@@ -104,6 +104,7 @@
 </template>
 
 <script>
+import router from '@/router';
 import NavbarComponent from './NavbarComponent.vue';
 import axios from 'axios';
 import Swal from 'sweetalert2';
@@ -154,7 +155,7 @@ export default {
                     title: 'Datos modificados.'
                 });
                 setTimeout(function () {
-                    window.location.reload(1);
+                    router.push('/productos');
                 }, 2000);
             })
                 .catch((error) => {

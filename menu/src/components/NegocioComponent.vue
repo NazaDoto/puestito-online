@@ -202,6 +202,7 @@
 </template>
 
 <script>
+import router from '@/router';
 import axios from 'axios';
 export default {
     data() {
@@ -309,9 +310,9 @@ export default {
             // Construir el enlace completo
             const numeroWhatsapp = `${baseLink}?phone=${this.negocio.telefono}&text=${encodeURIComponent(mensajeCompleto)}`;
             sessionStorage.clear();
-            location.reload();
             // Finalmente, abrimos una nueva ventana del navegador con el enlace generado
             window.open(numeroWhatsapp);
+            router.push('/' + this.negocio.usuario);
         },
         agregarAlCarrito(producto) {
             const index = this.carrito.findIndex(item => item.producto_id === producto.producto_id);

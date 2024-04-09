@@ -123,6 +123,7 @@
 </template>
 
 <script>
+import router from '@/router';
 import NavbarAdminComponent from './NavbarAdminComponent.vue';
 import axios from 'axios';
 import { format } from 'date-fns';
@@ -175,7 +176,7 @@ export default {
           title: 'Datos modificados.'
         });
         setTimeout(function () {
-          window.location.reload(1);
+          router.push('/negocios');
         }, 2000);
       })
         .catch((error) => {
