@@ -107,6 +107,19 @@ app.post('/procesar_pago', async(req, res) => {
     }
 });
 
+app.put('/modificarVencimiento', (req, res) => {
+    const { usuario, fechaVence } = req.body;
+    query = 'UPDATE usuarios SET usuario_fecha_vencimiento = ? WHERE usuario_nombre = ?';
+    connection.query(query, [fechaVence, usuario], (err, result) => {
+        if (err) {
+            console.error('Error al modificar producto:', err);
+            res.status(500).json({ message: 'Error al modificar producto' });
+        } else {
+            res.status(200).json({ message: 'Producto modificado exitosamente' });
+        }
+    });
+});
+
 app.post('/register', (req, res) => {
     const { usuario, contraseña, nombre, fechaVence, email, imagen, direccion, telefono, descripcion, instagram, facebook } = req.body;
 
@@ -146,6 +159,7 @@ app.post('/login', (req, res) => {
                 const usuarioId = result[0].usuario_id; // Cambia esto a la columna adecuada en tu tabla de usuarios
                 const nombre = result[0].usuario_nombre_negocio; // Campo de nombre personal
                 const nomUsuario = result[0].usuario_nombre;
+                const fechaVence = result[0].usuario_fecha_vencimiento;
 
                 // Compara la contraseña ingresada con el hash almacenado
                 bcrypt.compare(contraseña, storedHash, (err, result) => {
@@ -155,7 +169,7 @@ app.post('/login', (req, res) => {
                     } else {
                         if (result) {
                             const token = generarToken(usuarioId); // Modifica la función generarToken para aceptar el nombre personal
-                            res.status(200).json({ message: 'Inicio de sesión exitoso', token, nombre, nomUsuario });
+                            res.status(200).json({ message: 'Inicio de sesión exitoso', token, nombre, nomUsuario, fechaVence });
                         } else {
                             res.status(401).json({ message: 'Credenciales inválidas' });
                         }
@@ -346,6 +360,7 @@ app.get('/negocio', (req, res) => {
                     imagen: results[0].usuario_imagen,
                     instagram: results[0].usuario_instagram,
                     facebook: results[0].usuario_facebook,
+                    fechaVence: fechaVence.getFullYear(),
                 });
             });
         } else {

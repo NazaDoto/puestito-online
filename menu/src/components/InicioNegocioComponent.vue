@@ -29,13 +29,18 @@
         </div>
         <div class="row g-3 div-forms border mt-2">
           <div class="col-md-6">
+            <h2 class="titulo-div-forms mb-2">
+              Tu link
+            </h2>
+            <a :href="'http://192.168.0.7:8080/' + nombreUsuario" target="_blank">http://192.168.0.7:8080/{{ nombreUsuario }}</a><br>
+          </div>
+        </div>
+        <div v-if="fechaVence !== '2100'" class="row g-3 div-forms border mt-2">
+          <div class="col-md-6">
             <h2 class="titulo-div-forms mb-2">Tu código QR</h2>
-            (Click para ver el menú)
-            <a ref="qrcode" :href="'http://192.168.0.7:8080/' + nombreUsuario" target="_blank"></a><br>
-
+            <a ref="qrcode" :href="'http://192.168.0.7:8080/' + nombreUsuario" target="_blank"></a><br>            
             <button @click="descargarQR" class="btn btn-success margenbtn">Descargar QR</button>
           </div>
-
         </div>
       </div>
     </div>
@@ -54,6 +59,7 @@ export default {
     return {
       nombreUsuario: '',
       nombreNegocio: '',
+      fechaVence: '',
     }
   },
   components: {
@@ -102,6 +108,7 @@ export default {
     leerUsuario() {
       this.nombreUsuario = localStorage.getItem("usuario");
       this.nombreNegocio = localStorage.getItem("nombre");
+      this.fechaVence = localStorage.getItem("año");
     },
     esAdmin() {
       return (localStorage.getItem("usuario") == "admin");

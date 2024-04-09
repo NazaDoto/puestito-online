@@ -20,51 +20,55 @@
                                 <li>❌Carrito y pedidos por WhatsApp.</li>
                                 <li>❌Código QR para el menú.</li>
                             </ul>
-                            <button class="btn btn-success" @click="elegirPlan(0)">REGISTRAR</button>
+                            <router-link class="btn btn-success" to="/registrar">
+                                REGISTRAR
+                            </router-link>
                         </div>
                     </div>
                 </div>
                 <hr>
                 <div class="row justify-content-center text-center">
-                    <div class="col-md-12">
+                    <div class="col-md-6">
                         <div class="titulo-plan">
                             <h3>Plan Completo</h3>
                         </div>
-                        <div class="border mt-2 p-2 text-center">
+                        <div class="mt-2 p-2 text-center">
                             <ul class="text-start">
                                 <li>✅Menú online autoadministrable.</li>
                                 <li>✅Visualización en nuestra plataforma.</li>
                                 <li>✅Carrito y pedidos por WhatsApp.</li>
                                 <li>✅Código QR para el menú.</li>
                             </ul>
-                            <div class="row justify-content-center text-center">
-                                <div class="border p-2 m-2 col-md-3">
-                                    <div class="titulo-plan">
-                                        1 Mes
-                                    </div>
-                                    <div class="precio-plan">
-                                        $1500
-                                    </div>
-                                    <button class="btn btn-success" @click="elegirPlan(1)">CONTRATAR</button>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="mt-2 text-center">
+                            <div class="border p-2 m-2 col-md-3">
+                                <div class="titulo-plan">
+                                    1 Mes
                                 </div>
-                                <div class="border p-2 m-2 col-md-3">
-                                    <div class="titulo-plan">
-                                        6 Meses
-                                    </div>
-                                    <div class="precio-plan">
-                                        $7500
-                                    </div>
-                                    <button class="btn btn-success" @click="elegirPlan(6)">CONTRATAR</button>
+                                <div class="precio-plan">
+                                    $1500
                                 </div>
-                                <div class="border p-2 m-2 col-md-3">
-                                    <div class="titulo-plan">
-                                        12 Meses
-                                    </div>
-                                    <div class="precio-plan">
-                                        $15000
-                                    </div>
-                                    <button class="btn btn-success" @click="elegirPlan(12)">CONTRATAR</button>
+                                <button class="btn btn-success" @click="elegirPlan(1)">CONTRATAR</button>
+                            </div>
+                            <div class="border p-2 m-2 col-md-3">
+                                <div class="titulo-plan">
+                                    6 Meses
                                 </div>
+                                <div class="precio-plan">
+                                    $7500
+                                </div>
+                                <button class="btn btn-success" @click="elegirPlan(6)">CONTRATAR</button>
+                            </div>
+                            <div class="border p-2 m-2 col-md-3">
+                                <div class="titulo-plan">
+                                    12 Meses
+                                </div>
+                                <div class="precio-plan">
+                                    $15000
+                                </div>
+                                <button class="btn btn-success" @click="elegirPlan(12)">CONTRATAR</button>
                             </div>
                         </div>
                     </div>
@@ -83,8 +87,9 @@ export default {
     },
     methods: {
         elegirPlan(id) {
-            localStorage.setItem('plan', id);
-            router.push('/register');
+            localStorage.setItem("plan", id);
+            console.log("PlanesComponent: ",localStorage.getItem("plan"))
+            router.push('/registrar');
         },
     }
 }
@@ -130,10 +135,13 @@ li {
     width: calc(17vw * 3 + 0.5vw * 3);
 }
 
-.col-md-3:hover {
-    box-shadow: 1px 1px 10px 1px;
+.col-md-3 {
+    display: inline-block;
 }
 
+.border:hover {
+    box-shadow: 1px 1px 10px 1px;
+}
 
 .planes {
     display: inline-flex;
@@ -150,6 +158,7 @@ li {
     }
 
     .col-md-3 {
+        display: block;
         width: 80vw;
         padding: 10px;
     }

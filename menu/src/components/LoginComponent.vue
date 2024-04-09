@@ -61,6 +61,9 @@ export default {
           localStorage.setItem("token", response.data.token);
           localStorage.setItem("nombre", response.data.nombre);
           localStorage.setItem("usuario", response.data.nomUsuario);
+          const fechaVence = new Date(response.data.fechaVence);
+          
+          localStorage.setItem("año", fechaVence.getFullYear());
           // Redirige al usuario a la página de inicio (por ejemplo, /home)
           this.$router.push("/home");
           const Toast = Swal.mixin({

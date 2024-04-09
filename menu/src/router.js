@@ -2,7 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router';
 import InicioNegocioComponent from './components/InicioNegocioComponent.vue';
 import InicioComponent from './components/InicioComponent.vue';
 import LoginComponent from './components/LoginComponent.vue';
-import RegisterComponent from './components/RegisterComponent.vue';
+import FacturarComponent from './components/FacturarComponent.vue';
+import RegistrarComponent from './components/RegistrarComponent.vue';
 import ListarNegociosComponent from './components/ListarNegociosComponent.vue';
 import NuevoProductoComponent from './components/NuevoProductoComponent.vue';
 import ListarProductosComponent from './components/ListarProductosComponent.vue';
@@ -29,8 +30,14 @@ const routes = [{
         component: LoginComponent,
     },
     {
-        path: '/register',
-        component: RegisterComponent,
+        path: '/facturar',
+        component: FacturarComponent,
+        meta: { requiresAuth: false },
+
+    },
+    {
+        path: '/registrar',
+        component: RegistrarComponent,
         meta: { requiresAuth: false },
 
     },

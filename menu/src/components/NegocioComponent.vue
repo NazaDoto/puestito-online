@@ -81,7 +81,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="item-texto-block-end">
+                                            <div v-if="negocio.fechaVence !== 2100" class="item-texto-block-end">
                                                 <button class="btn-mas" @click="agregarAlCarrito(producto)">
                                                     +
                                                 </button>
@@ -217,7 +217,8 @@ export default {
                 telefono: '',
                 direccion: '',
                 descripcion: '',
-                imagen: ''
+                imagen: '',
+                fechaVence: '',
             },
             cargando: true,
             carrito: [],
