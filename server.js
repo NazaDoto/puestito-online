@@ -600,22 +600,6 @@ app.delete('/eliminarProducto', (req, res) => {
 });
 // ... Otras rutas y configuraciones
 
-if (env == 'dev') {
-    app.listen(port, () => {
-        console.log(`Servidor funcionando en el puerto ${port}`);
-    })
-} else {
-    // Inicia el servidor
-    const privateKey = fs.readFileSync('clave.pem', 'utf8');
-    const certificate = fs.readFileSync('certificado.pem', 'utf8');
-
-    const credentials = { key: privateKey, cert: certificate };
-
-    // Crea el servidor HTTPS
-    const httpsServer = https.createServer(credentials, app);
-
-    // Escucha en el puerto HTTPS (por ejemplo, el puerto 3500)
-    httpsServer.listen(port, () => {
-        console.log(`Servidor en funcionamiento en el puerto ${port} (HTTPS)`);
-    });
-}
+app.listen(port, () => {
+    console.log(`Servidor funcionando en el puerto ${port}`);
+})
