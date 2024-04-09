@@ -6,7 +6,7 @@
             Puestito Online
         </router-link>
         <!-- Botón de login -->
-        <router-link v-if="usuario !== ''">Mi Negocio</router-link>
+        <router-link v-if="usuario != ''">Mi Negocio</router-link>
         <router-link v-else to="/login">Login</router-link>
     </nav>
 </template>
