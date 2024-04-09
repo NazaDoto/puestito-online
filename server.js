@@ -44,9 +44,9 @@ if (env == 'dev') {
 
     connection = mysql.createConnection({
         host: 'localhost',
-        user: 'naza_root',
-        password: 'naza2112',
-        database: 'naza_menu'
+        user: 'root',
+        password: 'Nazacapo341746$',
+        database: 'menu'
     });
     connection.connect(err => {
         if (err) {

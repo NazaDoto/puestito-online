@@ -1,4 +1,4 @@
-SELECT * FROM menu.usuarios;CREATE TABLE `usuarios` (
+CREATE TABLE `usuarios` (
   `usuario_id` int(11) NOT NULL AUTO_INCREMENT,
   `usuario_nombre` varchar(50) DEFAULT NULL,
   `usuario_contraseña` varchar(100) NOT NULL,
