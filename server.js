@@ -4,17 +4,22 @@ const bcrypt = require('bcrypt');
 const mysql = require('mysql2');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
-const https = require('https')
 const multer = require('multer');
 const axios = require('axios');
 
 
-const fs = require('fs');
 const { connect } = require('http2');
 const app = express();
 const port = 3500;
 // Middleware
 
+const https = require("https"),
+    fs = require("fs");
+
+const options = {
+    key: fs.readFileSync("/var/www/ssl/nazadoto.com.key"),
+    cert: fs.readFileSync("/var/www/ssl/nazadoto.com.crt")
+};
 
 
 const env = "prod";
@@ -600,6 +605,11 @@ app.delete('/eliminarProducto', (req, res) => {
 });
 // ... Otras rutas y configuraciones
 
-app.listen(port, () => {
-    console.log(`Servidor funcionando en el puerto ${port}`);
-})
+if (env == 'dev') {
+    app.listen(port, () => {
+        console.log(`Servidor funcionando en el puerto ${port}`);
+    })
+} else {
+    const httpsServer = https.createServer(options);
+    httpsServer.listen(3500);
+}
