@@ -4,22 +4,18 @@ const bcrypt = require('bcrypt');
 const mysql = require('mysql2');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
-const multer = require('multer');
 const axios = require('axios');
+const morgan = require('morgan');
+const path = require('path'); // Importa el módulo 'path'
 
 
 const { connect } = require('http2');
 const app = express();
 const port = 3500;
-// Middleware
 
 const https = require("https"),
     fs = require("fs");
 
-const options = {
-    key: fs.readFileSync("/var/www/ssl/nazadoto.com.key"),
-    cert: fs.readFileSync("/var/www/ssl/nazadoto.com.crt")
-};
 
 
 const env = "prod";
@@ -30,7 +26,11 @@ app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 app.use(cors());
 app.use(express.json());
 
-//app.use(express.ssl.Cert('./nazadoto.pem'));
+
+app.use(morgan('dev'));
+
+
+
 if (env == 'dev') {
     connection = mysql.createPool({
         host: 'localhost',
@@ -76,42 +76,6 @@ function generarToken(usuarioId) {
 
 
 
-
-// Ruta para registrar un usuario
-
-app.post('/procesar_pago', async(req, res) => {
-    try {
-        const { token, issuer_id, payment_method_id, amount, installments, email, identificationType, identificationNumber } = req.body;
-        console.log(req.body);
-        const response = await axios.post("https://api.mercadopago.com/v1/payments", {
-            transaction_amount: Number(amount),
-            token,
-            description: "Descripción del producto",
-            installments: Number(installments),
-            payment_method_id,
-            issuer_id,
-            payer: {
-                email,
-                identification: {
-                    type: identificationType,
-                    number: identificationNumber
-                }
-            }
-        }, {
-            headers: {
-                "Content-Type": "application/json",
-                'X-Idempotency-Key': 'SOME_UNIQUE_VALUE',
-                "Authorization": "Bearer TEST-3974731186843034-040421-b2b9db436a8f5db87508f73cdfead3c9-232808230" // Agrega tu access token aquí
-            }
-        });
-
-        res.json(response.data); // Enviar la respuesta del MercadoPago al cliente
-    } catch (error) {
-        console.error("Error al procesar el pago:", error);
-        res.status(500).json({ error: 'Error al procesar el pago' });
-    }
-});
-
 app.put('/modificarVencimiento', (req, res) => {
     const { usuario, fechaVence } = req.body;
     query = 'UPDATE usuarios SET usuario_fecha_vencimiento = ? WHERE usuario_nombre = ?';
@@ -138,8 +102,10 @@ app.post('/register', (req, res) => {
             const query = 'INSERT INTO usuarios (usuario_nombre, usuario_contraseña, usuario_nombre_negocio, usuario_fecha_vencimiento, usuario_correo, usuario_imagen, usuario_direccion, usuario_telefono, usuario_descripcion, usuario_instagram, usuario_facebook) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
             connection.query(query, [usuario, hash, nombre, fechaVence, email, imagen, direccion, telefono, descripcion, instagram, facebook], (err, result) => {
                 if (err) {
+                    if (err.code == 'ER_DUP_ENTRY') {
+                        res.status(500).json({ message: 'Ya existe este usuario. Por favor elige otro nombre de usuario.' });
+                    }
                     console.error('Error al registrar usuario:', err);
-                    res.status(500).json({ message: 'Error al registrar usuario' });
                 } else {
                     res.status(200).json({ message: 'Usuario registrado exitosamente' });
                 }
@@ -221,6 +187,12 @@ app.get('/listarNegocios', async(req, res) => {
     }
 })
 
+const googleMapsClient = require('@google/maps').createClient({
+    key: 'AIzaSyC8vrGiWbmnS138WURJk2odQ9HU_BIEz9s',
+    Promise: Promise
+});
+
+
 app.get('/negocios', async(req, res) => {
     try {
         // Consultar la base de datos para obtener la información de los negocios
@@ -230,47 +202,27 @@ app.get('/negocios', async(req, res) => {
                 console.error('Error al obtener los negocios de la base de datos:', error);
                 res.status(500).json({ error: 'Error al obtener los negocios de la base de datos' });
             } else {
-
                 // Convertir direcciones a coordenadas geográficas
                 const negociosPromises = results.map(async negocio => {
-                    const fechaHoy = new Date();
-                    // Establecer la hora, los minutos, los segundos y los milisegundos a cero
-                    fechaHoy.setHours(0, 0, 0, 0);
-
-                    const fechaVence = new Date(negocio.usuario_fecha_vencimiento);
-                    // Establecer la hora, los minutos, los segundos y los milisegundos a cero
-                    fechaVence.setHours(0, 0, 0, 0);
-
-
-                    // Comparar las fechas sin tener en cuenta la hora
-                    if (fechaVence >= fechaHoy) {
-
-                        const direccion = negocio.usuario_direccion;
-                        try {
-                            const response = await axios.get(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(direccion)}&format=json&limit=1`);
-                            const data = response.data;
-                            if (data && data.length > 0) {
-                                return {
-                                    usuario: negocio.usuario_nombre,
-                                    nombre: negocio.usuario_nombre_negocio,
-                                    direccion: negocio.usuario_direccion,
-                                    correo: negocio.usuario_correo,
-                                    telefono: negocio.usuario_telefono,
-                                    descripcion: negocio.usuario_descripcion,
-                                    imagen: negocio.usuario_imagen,
-                                    instagram: negocio.usuario_instagram,
-                                    facebook: negocio.usuario_facebook,
-                                    latitud: parseFloat(data[0].lat),
-                                    longitud: parseFloat(data[0].lon)
-                                };
-                            } else {
-                                console.error("No se encontraron resultados para la dirección especificada:", direccion);
-                                return null;
-                            }
-                        } catch (error) {
-                            console.log('Error: ' + error);
-                        }
-                    } else {
+                    const direccion = negocio.usuario_direccion;
+                    try {
+                        const response = await googleMapsClient.geocode({ address: direccion }).asPromise();
+                        const { lat, lng } = response.json.results[0].geometry.location;
+                        const location = { lat, lng };
+                        return {
+                            usuario: negocio.usuario_nombre,
+                            nombre: negocio.usuario_nombre_negocio,
+                            direccion: negocio.usuario_direccion,
+                            correo: negocio.usuario_correo,
+                            telefono: negocio.usuario_telefono,
+                            descripcion: negocio.usuario_descripcion,
+                            imagen: negocio.usuario_imagen,
+                            instagram: negocio.usuario_instagram,
+                            facebook: negocio.usuario_facebook,
+                            location: location
+                        };
+                    } catch (error) {
+                        console.error("Error al obtener las coordenadas para la dirección:", direccion, error);
                         return null;
                     }
                 });
@@ -289,6 +241,7 @@ app.get('/negocios', async(req, res) => {
         res.status(500).json({ error: 'Error al obtener los negocios' });
     }
 });
+
 app.get('/miNegocio', (req, res) => {
     const usuario = req.query.usuario;
     const query = "SELECT usuario_nombre_negocio,  usuario_correo, usuario_telefono, usuario_descripcion, usuario_imagen, usuario_direccion, usuario_instagram, usuario_facebook FROM usuarios WHERE usuario_nombre = ?";
@@ -605,11 +558,78 @@ app.delete('/eliminarProducto', (req, res) => {
 });
 // ... Otras rutas y configuraciones
 
+
+const mercado = require('mercadopago');
+
+// Configurar Mercado Pago
+const client = new mercado.MercadoPagoConfig({ accessToken: 'APP_USR-3974731186843034-040421-a31df430f192320ee94b04ac13d48f80-232808230' });
+
+// Crear una instancia de Preference
+const pref = new mercado.Preference(client);
+
+const payment = new mercado.Payment(client);
+// Crear la preferencia
+app.post('/facturar/crearOrden', async(req, res) => {
+    const orden = req.body;
+
+    const precios = {
+        "1": 1500,
+        "6": 7500,
+        "12": 15000
+    };
+    const precioPlan = precios[orden.plan];
+
+    const preference = {
+            items: [{
+                title: 'Puestito Online',
+                unit_price: precioPlan,
+                description: 'Plan por ' + orden.plan + ' meses.',
+                quantity: 1,
+                currency_id: "ARS",
+            }],
+            payment_methods: {
+                excluded_payment_types: [{
+                    id: "ticket"
+                }]
+            },
+            back_urls: {
+                success: "http://localhost:8080/u/registrar/return/",
+                failure: "http://localhost:8080/u/registrar/return/",
+                pending: "http://localhost:8080/u/registrar/return/"
+            },
+            notification_url: "https://nazadoto.com:3500/facturar/webhook",
+        }
+        // Crear la preferencia
+    const response = await pref.create({
+        body: preference
+
+    }).catch(error => {
+        console.log(error);
+    });
+    res.json(response);
+});
+
+// app.post('/facturar/webhook', async(req, res) => {
+//     try {
+//         const datosPago = req.query;
+//         if (datosPago.type === 'payment') {
+//             const datos = await payment.search(datosPago['data.id']);
+//             console.log(datos);
+//         }
+//     } catch (error) {
+//         console.log('Error: ', error);
+//     }
+// });
+
 if (env == 'dev') {
     app.listen(port, () => {
         console.log(`Servidor funcionando en el puerto ${port}`);
     })
 } else {
+    const options = {
+        key: fs.readFileSync("/var/www/ssl/nazadoto.com.key"),
+        cert: fs.readFileSync("/var/www/ssl/nazadoto.com.crt")
+    };
     const httpsServer = https.createServer(options, app);
     httpsServer.listen(3500);
     console.log('Servidor funcionando en puerto 3500');

@@ -6,10 +6,10 @@
       <h1 class="text-center">Bienvenid@, {{ nombreNegocio }}</h1>
       <div v-if="esAdmin()" class="container ">
         <div class="col-md-6">
-          <router-link class="btn btn-success" to="/register">Nuevo Negocio</router-link>
+          <router-link class="btn btn-menu" to="/register">Nuevo Negocio</router-link>
         </div>
         <div class="col-md-6 mt-2">
-          <router-link class="btn btn-success" to="/negocios">Listar Negocios</router-link>
+          <router-link class="btn btn-menu" to="/u/negocios">Listar Negocios</router-link>
         </div>
 
       </div>
@@ -17,14 +17,14 @@
         <div class="row g-3 div-forms border">
           <div class="col-md-6">
             <h2 class="titulo-div-forms mb-2">Perfil</h2>
-            <router-link class="btn btn-success" to="/modificar">Ver Información</router-link>
+            <router-link class="btn btn-menu" to='/u/modificar'>Ver Información</router-link>
           </div>
         </div>
         <div class="row g-3 div-forms border mt-2">
           <div class="col-md-6">
             <h2 class="titulo-div-forms mb-2">Productos</h2>
-            <router-link class="btn btn-success" to="/nuevoProducto">Nuevo Producto</router-link><br>
-            <router-link class="btn btn-success" to="/productos">Listar Productos</router-link>
+            <router-link class="btn btn-menu" to="/u/nuevoProducto">Nuevo Producto</router-link><br>
+            <router-link class="btn btn-menu" to='/u/productos'>Listar Productos</router-link>
           </div>
         </div>
         <div class="row g-3 div-forms border mt-2">
@@ -39,7 +39,7 @@
           <div class="col-md-6">
             <h2 class="titulo-div-forms mb-2">Tu código QR</h2>
             <a ref="qrcode" :href="'http://192.168.0.7:8080/' + nombreUsuario" target="_blank"></a><br>            
-            <button @click="descargarQR" class="btn btn-success margenbtn">Descargar QR</button>
+            <button @click="descargarQR" class="btn btn-menu margenbtn">Descargar QR</button>
           </div>
         </div>
       </div>

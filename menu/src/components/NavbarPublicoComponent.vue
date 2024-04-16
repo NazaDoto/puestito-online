@@ -6,8 +6,8 @@
             Puestito Online
         </router-link>
         <!-- Botón de login -->
-        <router-link v-if="usuario" to="/home">Mi Negocio</router-link>
-        <router-link v-else to="/login">Login</router-link>
+        <router-link v-if="usuario" to="/u/home">Mi Negocio</router-link>
+        <router-link v-else to="/u/login">Login</router-link>
     </nav>
 </template>
 
@@ -24,7 +24,6 @@ export default {
     methods: {
         obtenerUsuario() {
             this.usuario = localStorage.getItem('usuario');
-            console.log(this.usuario);
         }
     },
 }

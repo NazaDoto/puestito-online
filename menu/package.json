@@ -8,19 +8,24 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@fawmi/vue-google-maps": "^0.9.79",
+    "@googlemaps/google-maps-services-js": "^3.4.0",
     "@mercadopago/sdk-js": "^0.0.3",
     "axios": "^1.6.8",
     "body-parser": "^1.20.2",
     "core-js": "^3.8.3",
     "date-fns": "^3.6.0",
     "file-saver": "^2.0.5",
+    "google-maps-api-loader": "^1.1.1",
     "leaflet": "^1.9.4",
     "multer": "^1.4.5-lts.1",
     "qrcode-generator": "^1.4.4",
     "sweet-alert": "^2.0.5",
     "sweetalert2": "^11.6.13",
     "vue": "^3.2.13",
-    "vue-router": "^4.2.4"
+    "vue-router": "^4.2.4",
+    "vue2-google-maps": "^0.10.7",
+    "vuex": "^4.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",

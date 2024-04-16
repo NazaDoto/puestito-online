@@ -49,9 +49,10 @@
                         <div class="col-md-6">
                             <label class="form-label text-center" for="imagen">Logo (JPG)</label>
                             <input class="form-control" type="file" name="imagen" id="imagen" accept=".jpg"
-                                @change="imagenSeleccionada($event)" required/>
+                                @change="imagenSeleccionada($event)" required />
                         </div>
-                        <button class="btn btn-success botones m-auto mb-2" type="submit">Contratar</button>
+                        <button v-if="!plan" class="btn btn-menu botones m-auto mb-2" type="submit">Contratar</button>
+                        <button v-else class="btn btn-menu botones m-auto mb-2" type="submit">Ir a Pagar</button>
                     </div>
                 </form>
             </div>
@@ -123,19 +124,29 @@ export default {
             this.negocio.instagram = '';
             this.negocio.facebook = '';
         },
-        registrarNegocio() {
+        async registrarNegocio() {
             // Realizar una solicitud HTTP POST al servidor Express
-            let fechaActual = new Date();
-            fechaActual.setYear(2100);
-            this.negocio.fechaVence = fechaActual.toISOString().slice(0, 19).replace('T', ' ');
-            axios.post('/register', this.negocio)
-                .then(() => {
+
+            await axios.post('/register', this.negocio)
+                .then(async () => {
                     if (this.plan) {
                         console.log("Entro a la parte de facturar")
                         localStorage.setItem("usuario", this.negocio.usuario);
-                        router.push('/facturar');                        
+                        const response = await axios.post('/facturar/crearOrden', { plan: this.plan }).then(async () => {
+                            let fechaActual = new Date();
+                            const planMes = fechaActual.getMonth() - 1;
+                            fechaActual.setMonth(planMes + this.plan);
+                            this.negocio.fechaVence = fechaActual.toISOString().slice(0, 19).replace('T', ' ');
+                            window.open(await response.data.init_point, '_blank');
+                            await axios.post('/register', this.negocio).then(()=>{
+                                
+                            })
+                        })
+                            .catch(error => {
+                                console.log(error);
+                            });
                     } else {
-                        router.push('/login');
+                        router.push('/u/login');
                         const Toast = Swal.mixin({
                             toast: true,
                             position: 'bottom-end',
@@ -157,7 +168,7 @@ export default {
                 .catch(error => {
                     Swal.fire({
                         icon: 'error',
-                        text: 'Error al registrar!'
+                        text: error.response.data.message
                     });
                     console.error('Error al registrar usuario:', error);
                 });

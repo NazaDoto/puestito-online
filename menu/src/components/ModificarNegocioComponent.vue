@@ -30,7 +30,7 @@
                                             <div v-else>Sin Facebook</div>
                                         </div>
                                     </div>
-                                    <button class="btn btn-success derecha mt-2 mb-2" title="Modificar"
+                                    <button class="btn btn-menu derecha mt-2 mb-2" title="Modificar"
                                         data-bs-toggle="modal" data-bs-target="#modificarProducto">Modificar</button>
                                 </div>
                             </div>
@@ -88,7 +88,7 @@
                                         </div>
                                     </div>
                                     <div class="text-end">
-                                        <button class="btn btn-success botones mt-3" type="submit"
+                                        <button class="btn btn-menu botones mt-3" type="submit"
                                             data-bs-dismiss="modal" aria-label="Close">Modificar</button>
                                     </div>
                                 </form>
@@ -155,7 +155,7 @@ export default {
                     title: 'Datos modificados.'
                 });
                 setTimeout(function () {
-                    router.push('/productos');
+                    router.push('/u/productos');
                 }, 2000);
             })
                 .catch((error) => {

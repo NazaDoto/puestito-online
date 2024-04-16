@@ -2,7 +2,7 @@
     <div class="">
       <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-          <router-link class="navbar-brand" to="/home">{{ leerUsuario() }} | </router-link>
+          <router-link class="navbar-brand" to="/u/home">{{ leerUsuario() }} | </router-link>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDarkDropdown"
             aria-controls="navbarNavDarkDropdown" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -10,13 +10,13 @@
           <div class="collapse navbar-collapse" id="navbarNavDarkDropdown">
             <ul class="navbar-nav">
               <li class="test nav-item">
-                <router-link class="nav-link" to="/home">Inicio</router-link>
+                <router-link class="nav-link" to="/u/home">Inicio</router-link>
               </li>
               <li class="test nav-item">
-                <router-link class="nav-link" to="/register">Nuevo Negocio</router-link>
+                <router-link class="nav-link" to="/u/registrar">Nuevo Negocio</router-link>
               </li>
               <li class="test nav-item">
-                <router-link class="nav-link" to="/negocios">Listar Negocios</router-link>
+                <router-link class="nav-link" to="/u/negocios">Listar Negocios</router-link>
               </li>
               
               <li class="test nav-item">
@@ -34,7 +34,7 @@
                       </div>
                       <div class="modal-footer text-center">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
-                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @click="cerrarSesion">Sí, cerrar sesión</button>
+                        <button type="button" class="btn btn-menu-danger" data-bs-dismiss="modal" @click="cerrarSesion">Sí, cerrar sesión</button>
                       </div>
                     </div>
                   </div>

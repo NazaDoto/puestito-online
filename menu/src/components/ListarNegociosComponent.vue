@@ -26,7 +26,7 @@
             <div class="item-descripcion" v-if="negocio.fechaVence">
               <b>Fecha de Vencimiento:</b> "{{ formatear(negocio.fechaVence) }}"
             </div>
-            <button class="btn btn-success derecha mt-2 mb-2" title="Modificar" data-bs-toggle="modal"
+            <button class="btn btn-menu derecha mt-2 mb-2" title="Modificar" data-bs-toggle="modal"
               data-bs-target="#modificarProducto" @click="modificarNegocio(negocio)">Modificar</button>
 
           </div>
@@ -110,7 +110,7 @@
                 </div>
               </div>
               <div class="text-end">
-                <button class="btn btn-success botones mt-3" type="submit" aria-label="Close">Modificar</button>
+                <button class="btn btn-menu botones mt-3" type="submit" aria-label="Close">Modificar</button>
               </div>
             </form>
           </div>
@@ -176,7 +176,7 @@ export default {
           title: 'Datos modificados.'
         });
         setTimeout(function () {
-          router.push('/negocios');
+          router.push('/u/u/negocios');
         }, 2000);
       })
         .catch((error) => {

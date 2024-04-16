@@ -41,7 +41,7 @@
                 </div>
 
                 <div>
-                    <button class="btn btn-success botones mt-3" type="submit">Registrar</button>
+                    <button class="btn btn-menu botones mt-3" type="submit">Agregar</button>
                 </div>
             </form>
             <!-- Modal -->
@@ -149,7 +149,7 @@ export default {
                     });
                     this.modalAbierto = true;
                     setTimeout(function () {
-                        router.push('/nuevoProducto');
+                        router.push('/u/nuevoProducto');
                     }, 2000);
                 })
                 .catch(() => {

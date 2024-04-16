@@ -17,14 +17,41 @@
                         <input class="form-control barra-busqueda" v-model="busqueda" type="text" name="busqueda" id=""
                             placeholder="Buscar" title="Ingrese una palabra clave...">
                     </div>
-                    <button class="btn btn-success derecha" @click="mostrarMapa">{{ !mapaMostrado2 ? 'Ver Mapa' :
+                    <button class="btn btn-menu derecha" @click="mostrarMapa">{{ !mapaMostrado2 ? 'Ver Mapa' :
                         `Ocultar
                         Mapa`}}</button>
                 </div>
+
                 <div class="negocios-body">
-                    <div class="modalMapa" v-show="mapaMostrado2">
-                        <div id="map"></div>
+                    <div class="modalMapa mt-2" v-show="mapaMostrado2" style="height: 400px;">
+                        <!-- Aquí iría todo lo relacionado con el mapa de Google Maps -->
+                        <GMapMap style="height: 400px;" :center="mapCenter" :zoom="zoom" :options="options">
+                            <GMapMarker v-for="(negocio, index) in negocios" :key="index" :position="negocio.location"
+                                :title="negocio.nombre" @click="openInfoWindow(index)">
+                                <GMapInfoWindow v-if="infoWindowOpened == index" :options="infoWindow[index].options"
+                                    :closeclick="true" @closeclick="openInfoWindow(null)">
+                                    <div style="max-width: 150px;">
+                                        <b style="font-size:20px;">{{ negocio.nombre }}</b><br>
+                                        <div style="text-align:center;">
+                                            <a style="text-decoration:none;color:white;font-size:12px;padding:4px 6px;"
+                                                href="https://nazadoto.com:8080/${punto.usuario}" target="_blank"><img
+                                                    src="/favicon.ico" width="20" alt=""></a>
+                                            <a v-if="negocio.instagram" :href="negocio.instagram" target="blank"><img
+                                                    style="margin:0px 10px" width='20'
+                                                    src="/recursos/instagram.png"></a>
+                                            <a v-if="negocio.facebook" :href="negocio.facebook" target="blank"><img
+                                                    style="margin:0px 10px" width='20' src="/recursos/facebook.png"></a>
+                                        </div>
+                                        <p style="margin:5px 0px"><b>Dirección:</b> {{ negocio.direccion }}</p>
+                                        <p style="margin:5px 0px"><b>Correo:</b> {{ negocio.correo }}</p>
+                                        <p style="margin:5px 0px"><b>Teléfono:</b> {{ negocio.telefono }}</p>
+                                        <p style="text-align:center;margin:7px 0px">"{{ negocio.descripcion }}"</p>
+                                    </div>
+                                </GMapInfoWindow>
+                            </GMapMarker>
+                        </GMapMap>
                     </div>
+
                     <ul>
                         <li class="item-container mt-2" v-for="(negocio, index) in negociosFiltrados" :key="index">
                             <div class="item-imagen">
@@ -43,7 +70,7 @@
                             </div>
                             <!-- Botón para dirigirse al menú -->
                             <div class="item-btn">
-                                <router-link class="item-texto-block-end" :to="'/' + negocio.usuario">
+                                <router-link class="item-texto-block-end" :to="'/' + negocio.usuario" target="_blank">
                                     <img src="/favicon.ico" width="30" alt="">
                                 </router-link>
                             </div>
@@ -60,7 +87,7 @@
 </template>
 
 <script>
-import L from 'leaflet';
+
 import axios from 'axios';
 import NavbarPublicoComponent from './NavbarPublicoComponent.vue';
 
@@ -71,6 +98,21 @@ export default {
     name: 'MapaComponent',
     data() {
         return {
+            options: {
+                disableDefaultUI: true,
+                styles: [{
+                    featureType: 'poi.business',
+                    stylers: [{ visibility: 'off' }],
+                }, {
+                    featureType: 'transit',
+                    elementType: 'labels.icon',
+                    stylers: [{ visibility: 'off' }],
+                },],
+            },
+            infoWindowOpened: null,
+            infoWindow: [],
+            mapCenter: { lat: -27.7876, lng: -64.2596 },
+            zoom: 14,
             negocios: [],
             busqueda: '',
             mapaMostrado: false,
@@ -80,92 +122,62 @@ export default {
     },
     created() {
         this.fetchNegocios();
-
     },
     computed: {
         negociosFiltrados() {
-            // Filtra los informes basándose en el valor de busqueda
             return this.negocios.filter(negocio => {
                 const nombre = negocio.nombre || '';
                 const descripcion = negocio.descripcion || '';
                 return (
                     nombre.toLowerCase().includes(this.busqueda.toLowerCase()) ||
                     descripcion.toLowerCase().includes(this.busqueda.toLowerCase())
-                    // Agrega más condiciones de búsqueda según tus necesidades
                 );
             });
         },
     },
     methods: {
+        openInfoWindow(index) {
+            if (this.infoWindowOpened == index) {
+                this.infoWindowOpened = null;
+            } else {
+                this.infoWindowOpened = index;
+            }
+        },
+        async inicializarMapa() {
+            try {
+                if (!navigator.geolocation) {
+                    console.log('No funciona geolocation. Centrando mapa en Plaza Libertad.');
+                } else {
+                    navigator.geolocation.getCurrentPosition((coords) => {
+                        const position = {
+                            lat: coords.coords.latitude,
+                            lng: coords.coords.longitude
+                        };
+                        this.mapCenter = position;
+                    }, (error) => {
+                        console.log('Error al geolocalizar. Inicializando en Plaza Libertad. ', error);
+                    });
+                }
+            } catch (error) {
+                console.error("Error al obtener la ubicación actual:", error);
+            }
+        },
         async fetchNegocios() {
             try {
                 const response = await axios.get('/negocios');
                 this.negocios = response.data;
+                this.infoWindow = Array(this.negocios.length).fill({
+                    open: false,
+                    options: {
+                        pixelOffset: { width: 0, height: -10 },
+                        maxWidth: 320,
+                        maxHeight: 320
+                    }
+                });
             } catch (error) {
                 console.error("Error al obtener los datos de los negocios:", error);
             } finally {
-                this.cargando = false; // Indicar que la carga ha terminado, independientemente del resultado
-            }
-        },
-
-        async inicializarMapa() {
-            const map = L.map('map');
-
-
-            // Añade un mapa base
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                enableRetina: true,
-                maxZoom: 19,
-                attribution: '&copy; <a href="https://linkedin.com/in/nazadoto">Nazareno Navarrete</a>'
-            }).addTo(map);
-
-            if (!navigator.geolocation) {
-                console.log('No funciona geolocation.')
-            } else {
-
-                navigator.geolocation.getCurrentPosition((position) => {
-                    const latitud = position.coords.latitude;
-                    const longitud = position.coords.longitude;
-                    map.setView([latitud, longitud], 14);
-                    L.marker([latitud, longitud]).addTo(map).bindPopup(`Estás aquí.`).bindTooltip(`<b>Estás aquí</b>`, { direction: 'bottom', offset: L.point(-15, 30) });
-                }, (error) => {
-                    map.setView([-27.7876, -64.2596], 14);
-                    console.log('Error al geolocalizar. Inicializando en Plaza Libertad. ', error)
-                });
-            }
-            // Centra el mapa en las coordenadas proporcionadas
-
-
-            const myIcon = L.icon({
-                iconUrl: '/recursos/pin.png',
-                iconSize: [38, 38], // Tamaño del icono
-                iconAnchor: [19, 38], // Punto de anclaje del icono
-                popupAnchor: [0, -38] // Punto de anclaje del popup
-            });
-
-            try {
-                // Realiza la solicitud al backend para obtener la información de los negocios
-
-
-                // Itera sobre los datos recibidos y agrega marcadores al mapa
-                this.negocios.forEach(punto => {
-
-                    L.marker([punto.latitud, punto.longitud], { icon: myIcon }).addTo(map)
-                        .bindPopup(`<div style="max-width: 150px;">
-                <b style="font-size:20px;">${punto.nombre}</b><br>
-                <a style="text-decoration:none;color:white;font-size:12px;padding:4px 6px;" href="https://nazadoto.com:8080/${punto.usuario}" target="_blank"><img src="/favicon.ico" width="20" alt=""></a>
-                <p style="margin:5px 0px"><b>Dirección:</b> ${punto.direccion}</p>
-                <p style="margin:5px 0px"><b>Correo:</b> ${punto.correo}</p>
-                <p style="margin:5px 0px"><b>Teléfono:</b> ${punto.telefono}</p>
-                <p style="text-align:center;margin:7px 0px">"${punto.descripcion}"</p>
-                <div style="text-align:center;"> ${punto.instagram  ? `<a href="${punto.instagram}" target="blank"><img style="margin:0px 10px" width='20' src="/recursos/instagram.png"></a>` : ''}
-                            ${ punto.facebook ? `<a href="${punto.facebook}" target="blank"><img style="margin:0px 10px" width='20' src="/recursos/facebook.png"></a>` : '' }</div>
-                </div>`).bindTooltip(`<b>${punto.nombre}</b>`, { direction: 'bottom', offset: L.point(0, 10) });
-                });
-                document.getElementById('map').classList.add('show');
-
-            } catch (error) {
-                console.error("Error al obtener los datos de los negocios:", error);
+                this.cargando = false;
             }
         },
         mostrarMapa() {
@@ -188,6 +200,17 @@ export default {
 </script>
 
 <style scoped>
+.popup {
+    position: absolute;
+    top: 10px;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 50px;
+}
+
+.modalMapa {
+    height: 100px;
+}
+
 .texto-carga {
     font-style: italic;
     margin: 20px;
@@ -239,29 +262,8 @@ export default {
     font-style: italic;
 }
 
-
 .link-login {
     text-decoration: none;
-}
-
-#map {
-    box-shadow: 0.5px 1px 4px;
-    height: 0;
-    /* Establecemos la altura inicial en 0 */
-    border-radius: 10px;
-    margin-top: 10px;
-    opacity: 0;
-    /* Establecemos la opacidad inicial en 0 */
-    overflow: hidden;
-    /* Ocultamos el contenido que excede el contenedor */
-    transition: height 0.5s ease, opacity 0.5s ease;
-    height: 50vh;
-    /* Altura deseada */
-}
-
-#map.show {
-    opacity: 1;
-    /* Opacidad deseada */
 }
 
 ul {
@@ -275,24 +277,19 @@ ul {
     background-color: white;
     border-radius: 10px;
     display: flex;
-    /* Utilizamos flexbox para posicionar los elementos */
     align-items: center;
-    /* Centramos verticalmente los elementos */
 }
 
 .imagen {
     height: 100px;
     width: 100px;
-    /* Ajustamos el tamaño de la imagen */
     margin-right: 20px;
-    /* Añadimos un margen a la derecha */
     border-top-left-radius: 10px;
     border-bottom-left-radius: 10px;
 }
 
 .item-texto-block {
     flex-grow: 1;
-    /* Hacemos que este bloque ocupe el espacio disponible */
 }
 
 .item-nombre {
@@ -311,7 +308,6 @@ ul {
 
 .item-btn {
     margin-left: auto;
-    /* Empuja este elemento hacia la derecha */
     margin-right: 20px;
 }
 
@@ -323,7 +319,6 @@ ul {
 .item-texto-block-end:hover {
     cursor: pointer;
 }
-
 
 @media screen and (max-width: 992px) {
     .ancho-busqueda {

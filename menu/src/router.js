@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from 'vue-router';
 import InicioNegocioComponent from './components/InicioNegocioComponent.vue';
 import InicioComponent from './components/InicioComponent.vue';
 import LoginComponent from './components/LoginComponent.vue';
-import FacturarComponent from './components/FacturarComponent.vue';
 import RegistrarComponent from './components/RegistrarComponent.vue';
 import ListarNegociosComponent from './components/ListarNegociosComponent.vue';
 import NuevoProductoComponent from './components/NuevoProductoComponent.vue';
@@ -12,6 +11,7 @@ import ListarCategoriasComponent from './components/ListarCategoriasComponent.vu
 import NegocioComponent from './components/NegocioComponent.vue';
 import ModificarNegocioComponent from './components/ModificarNegocioComponent.vue';
 import PlanesComponent from './components/PlanesComponent.vue';
+import SuccessComponent from './components/SuccessComponent.vue';
 
 
 const routes = [{
@@ -20,60 +20,59 @@ const routes = [{
         meta: { requiresAuth: false },
     },
     {
-        path: '/home',
+        path: '/u/home',
         component: InicioNegocioComponent,
         meta: { requiresAuth: true },
     },
 
     {
-        path: '/login',
+        path: '/u/login',
         component: LoginComponent,
     },
     {
-        path: '/facturar',
-        component: FacturarComponent,
-        meta: { requiresAuth: false },
-
-    },
-    {
-        path: '/registrar',
+        path: '/u/registrar',
         component: RegistrarComponent,
         meta: { requiresAuth: false },
 
     },
     {
-        path: '/planes',
+        path: '/u/planes',
         component: PlanesComponent,
         meta: { requiresAuth: false },
 
     },
     {
-        path: '/negocios',
+        path: '/u/registrar/return', // Utiliza un comodín para capturar todos los datos después de /u/registrar/return
+        component: SuccessComponent,
+        meta: { requiresAuth: false },
+    },
+    {
+        path: '/u/negocios',
         component: ListarNegociosComponent,
         meta: { requiresAuth: true },
     },
     {
-        path: '/modificar',
+        path: '/u/modificar',
         component: ModificarNegocioComponent,
         meta: { requiresAuth: true },
     },
     {
-        path: '/nuevoProducto',
+        path: '/u/nuevoProducto',
         component: NuevoProductoComponent,
         meta: { requiresAuth: true },
     },
     {
-        path: '/productos',
+        path: '/u/productos',
         component: ListarProductosComponent,
         meta: { requiresAuth: true },
     },
     {
-        path: '/nuevaCategoria',
+        path: '/u/nuevaCategoria',
         component: NuevaCategoriaComponent,
         meta: { requiresAuth: true },
     },
     {
-        path: '/categorias',
+        path: '/u/categorias',
         component: ListarCategoriasComponent,
         meta: { requiresAuth: true },
     },
@@ -97,7 +96,7 @@ router.beforeEach((to, from, next) => {
         // Verifica si la ruta requiere autenticación
         if (!token) {
             // Si no hay token y la ruta requiere autenticación, redirige a /login
-            next('/login');
+            next('/u/login');
         } else {
             // Si hay token, permite que el usuario continúe navegando
             next();

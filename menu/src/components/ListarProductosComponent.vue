@@ -42,11 +42,11 @@
                 <img class="imagen" src="/recursos/missing-img.png" alt="">
               </div></td>
               <td>
-                <button class="btn btn-success" title="Modificar" data-bs-toggle="modal"
+                <button class="btn btn-menu" title="Modificar" data-bs-toggle="modal"
                   data-bs-target="#modificarProducto" @click="modificar(producto)">Modificar</button>
               </td>
               <td>
-                <button class="btn btn-danger" title="Eliminar" @click="eliminar(producto.producto_id)">Eliminar</button>
+                <button class="btn btn-menu-danger" title="Eliminar" @click="eliminar(producto.producto_id)">Eliminar</button>
               </td>
             </tr>
           </tbody>
@@ -102,7 +102,7 @@
                   </div>
                 </div>
                 <div class="text-end">
-                  <button class="btn btn-success botones mt-3" type="submit" data-bs-dismiss="modal" aria-label="Close">Modificar</button>
+                  <button class="btn btn-menu botones mt-3" type="submit" data-bs-dismiss="modal" aria-label="Close">Modificar</button>
                 </div>
               </form>
             </div>

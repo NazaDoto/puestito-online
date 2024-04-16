@@ -2,7 +2,7 @@
   <div class="">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <div class="container-fluid">
-        <router-link class="navbar-brand" to="/home">{{ leerUsuario() }} | </router-link>
+        <router-link class="navbar-brand" to="/u/home">{{ leerUsuario() }} | </router-link>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDarkDropdown"
           aria-controls="navbarNavDarkDropdown" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
@@ -10,10 +10,10 @@
         <div class="collapse navbar-collapse" id="navbarNavDarkDropdown">
           <ul class="navbar-nav">
             <li class="test nav-item">
-              <router-link class="nav-link" to="/home">Inicio </router-link>
+              <router-link class="nav-link" to="/u/home">Inicio </router-link>
             </li>
             <li class="test nav-item">
-              <router-link class="nav-link" to="/modificar">Pefil</router-link>
+              <router-link class="nav-link" to='/u/modificar'>Pefil</router-link>
             </li>
             <li class="test nav-item dropdown">
               <button :class="{ active: isActiveProductos() }" class="dropdown-toggle nav-link" data-bs-toggle="dropdown"
@@ -21,8 +21,8 @@
                 Productos
               </button>
               <ul class="dropdown-menu dropdown-menu-dark">
-                <li><router-link class="dropdown-item" to="/nuevoProducto">Nuevo Producto</router-link></li>
-                <li><router-link class="dropdown-item" to="/productos">Listar Productos</router-link></li>
+                <li><router-link class="dropdown-item" to="/u/nuevoProducto">Nuevo Producto</router-link></li>
+                <li><router-link class="dropdown-item" to='/u/productos'>Listar Productos</router-link></li>
               </ul>
             </li>
             <li class="test nav-item">
@@ -39,7 +39,7 @@
                     </div>
                     <div class="modal-footer text-center">
                       <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
-                      <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @click="cerrarSesion">Sí, cerrar sesión</button>
+                      <button type="button" class="btn btn-menu-danger" data-bs-dismiss="modal" @click="cerrarSesion">Sí, cerrar sesión</button>
                     </div>
                   </div>
                 </div>
@@ -60,12 +60,12 @@ export default {
   },
   methods: {
     isActiveProductos() {
-      if (this.$route.path == '/nuevoProducto' || this.$route.path == '/productos') {
+      if (this.$route.path == '/u/nuevoProducto' || this.$route.path == '/u/productos') {
         return true;
       } else { return false; }
     },
     isActiveCategorias() {
-      if (this.$route.path == '/nuevaCategoria' || this.$route.path == '/categorias') {
+      if (this.$route.path == '/u/nuevaCategoria' || this.$route.path == '/u/categorias') {
         return true;
       } else { return false; }
     },

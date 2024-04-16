@@ -20,9 +20,7 @@
                                 <li>❌Carrito y pedidos por WhatsApp.</li>
                                 <li>❌Código QR para el menú.</li>
                             </ul>
-                            <router-link class="btn btn-success" to="/registrar">
-                                REGISTRAR
-                            </router-link>
+                            <button class="btn btn-menu" @click="elegirPlan('')">REGISTRAR</button>
                         </div>
                     </div>
                 </div>
@@ -50,7 +48,7 @@
                                 <div class="precio-plan">
                                     $1500
                                 </div>
-                                <button class="btn btn-success" @click="elegirPlan(1)">CONTRATAR</button>
+                                <button class="btn btn-menu" @click="elegirPlan(1)">CONTRATAR</button>
                             </div>
                             <div class="border p-2 m-2 col-md-3">
                                 <div class="titulo-plan">
@@ -59,7 +57,7 @@
                                 <div class="precio-plan">
                                     $7500
                                 </div>
-                                <button class="btn btn-success" @click="elegirPlan(6)">CONTRATAR</button>
+                                <button class="btn btn-menu" @click="elegirPlan(6)">CONTRATAR</button>
                             </div>
                             <div class="border p-2 m-2 col-md-3">
                                 <div class="titulo-plan">
@@ -68,7 +66,7 @@
                                 <div class="precio-plan">
                                     $15000
                                 </div>
-                                <button class="btn btn-success" @click="elegirPlan(12)">CONTRATAR</button>
+                                <button class="btn btn-menu" @click="elegirPlan(12)">CONTRATAR</button>
                             </div>
                         </div>
                     </div>
@@ -86,10 +84,16 @@ export default {
         NavbarPublicoComponent,
     },
     methods: {
-        elegirPlan(id) {
-            localStorage.setItem("plan", id);
-            console.log("PlanesComponent: ",localStorage.getItem("plan"))
-            router.push('/registrar');
+        elegirPlan(plan) {
+            if (plan){
+                localStorage.setItem("plan", plan);
+                console.log("PlanesComponent: ",localStorage.getItem("plan"))
+                router.push('/u/registrar');
+            } else{
+                console.log('plan nulo')
+                localStorage.clear();
+                router.push('/u/registrar');
+            }
         },
     }
 }

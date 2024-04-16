@@ -18,7 +18,7 @@
           <div class="col-md-8">
             <button type="submit" class="btn btn-entrar">Entrar</button>
           </div>
-          <router-link  to="/planes">Registrar Negocio</router-link>
+          <router-link  to="/u/planes">Registrar Negocio</router-link>
           <router-link  to="/">Volver</router-link>
         </form>
       </div>
@@ -44,7 +44,7 @@ export default {
     checkAuthentication() {
       const isAuthenticated = !!localStorage.getItem("token");/* Agrega aquí tu lógica para verificar si el usuario está autenticado */
       if (isAuthenticated) {
-        this.$router.push("/home");
+        this.$router.push("/u/home");
       }
     },
     async login() {
@@ -64,8 +64,8 @@ export default {
           const fechaVence = new Date(response.data.fechaVence);
           
           localStorage.setItem("año", fechaVence.getFullYear());
-          // Redirige al usuario a la página de inicio (por ejemplo, /home)
-          this.$router.push("/home");
+          // Redirige al usuario a la página de inicio (por ejemplo, /u/home)
+          this.$router.push("/u/home");
           const Toast = Swal.mixin({
             toast: true,
             position: 'bottom-end',

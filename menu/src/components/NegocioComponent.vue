@@ -38,6 +38,8 @@
                             <div class="texto-superpuesto">BIENVENIDOS
                                 <div class="texto-superpuesto2">"{{ negocio.descripcion }}"</div>
                                 <div class="text-center">
+                                    <a :href="'https://www.google.com/maps/search/' + encodeURIComponent(negocio.direccion)" target="_blank"><img width='40' src="/recursos/pin.png"></a> <br>
+
                                     <a v-if="negocio.instagram" class="mauto" :href="negocio.instagram"
                                         target="blank"><img width='40' src="/recursos/instagram.png"></a>
                                     <a v-if="negocio.facebook" class="mauto" :href="negocio.facebook"
@@ -58,40 +60,45 @@
                                 :id="categoria">
                                 <div v-if="filteredProductos(categoria)">
 
-                                    <div class="titulo-categoria">{{ categoria }}</div>
-                                    <div class="p-2">
-                                        <div class="item-container mt-2"
-                                            v-for="(producto, index) in filteredProductos(categoria)" :key="index">
-                                            <div class="item-imagen" v-if="producto.producto_imagen">
-                                                <div>
-                                                    <img class="imagen" :src="producto.producto_imagen" alt=" ">
-                                                </div>
-                                            </div>
-                                            <!-- Nombre del producto -->
-                                            <div class="item-texto-block">
-                                                <div class="item-texto-block-start">
-                                                    <div class="item-nombre">
-                                                        {{ producto.producto_nombre }}
-                                                    </div>
-                                                    <div class="item-precio">
-                                                        ${{ producto.producto_precio }}
-                                                    </div>
-                                                    <div class="item-descripcion" v-if="producto.producto_descripcion">
-                                                        "{{ producto.producto_descripcion }}"
+                                    <div class="titulo-categoria" @click="toggleCategoria(categoria)">{{ categoria }}
+                                    </div>
+                                    <div
+                                        :class="{ 'categoria-productos': true, 'categoria-activa': categoriaSeleccionada === categoria }">
+                                        <div class="p-2">
+                                            <div class="item-container mt-2"
+                                                v-for="(producto, index) in filteredProductos(categoria)" :key="index">
+                                                <div class="item-imagen" v-if="producto.producto_imagen">
+                                                    <div>
+                                                        <img class="imagen" :src="producto.producto_imagen" alt=" ">
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div v-if="negocio.fechaVence !== 2100" class="item-texto-block-end">
-                                                <button class="btn-mas" @click="agregarAlCarrito(producto)">
-                                                    +
-                                                </button>
-                                                <div class="cantidad">
-                                                    {{ producto.cantidadSeleccionada }}
+                                                <!-- Nombre del producto -->
+                                                <div class="item-texto-block">
+                                                    <div class="item-texto-block-start">
+                                                        <div class="item-nombre">
+                                                            {{ producto.producto_nombre }}
+                                                        </div>
+                                                        <div class="item-precio">
+                                                            ${{ producto.producto_precio }}
+                                                        </div>
+                                                        <div class="item-descripcion"
+                                                            v-if="producto.producto_descripcion">
+                                                            "{{ producto.producto_descripcion }}"
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <button class="btn-menos" @click="quitarDelCarrito(producto)"
-                                                    :disabled="!producto.cantidadSeleccionada">
-                                                    -
-                                                </button>
+                                                <div v-if="negocio.fechaVence !== 2100" class="item-texto-block-end">
+                                                    <button class="btn-mas" @click="agregarAlCarrito(producto)">
+                                                        +
+                                                    </button>
+                                                    <div class="cantidad">
+                                                        {{ producto.cantidadSeleccionada }}
+                                                    </div>
+                                                    <button class="btn-menos" @click="quitarDelCarrito(producto)"
+                                                        :disabled="!producto.cantidadSeleccionada">
+                                                        -
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -112,7 +119,8 @@
                         <div class="error-content">
                             <h1 class="display-1 text-danger">404</h1>
                             <h2 class="display-4">Página no encontrada</h2>
-                            <p class="lead">Lo sentimos, la página que buscas no se encuentra disponible.</p>
+                            <p class="lead">Lo sentimos, la página que buscas no se encuentra disponible o no tiene
+                                productos disponibles.</p>
                         </div>
                     </div>
                 </div>
@@ -179,20 +187,20 @@
                     </div>
                     <form @submit.prevent="realizarPedido">
                         <div class="modal-body">
-                            <input type="text" class="form-control" placeholder="Nombre y Apellido"
+                            <input type="text" class="form-control" placeholder="Nombre y Apellido (obligatorio)"
                                 v-model="pedido.nombre" required>
                             <select class="form-control form-select mt-4" id="" v-model="pedido.medio" required>
                                 <option value="Transferencia">Transferencia</option>
                                 <option value="Efectivo">Efectivo</option>
                             </select>
-                            <input type="text" class="form-control mt-4" placeholder="Dirección"
-                                v-model="pedido.direccion" required>
-                            <input type="text" class="form-control mt-4" placeholder="Detalle del pedido"
+                            <input type="text" class="form-control mt-4" placeholder="Dirección (opcional)"
+                                v-model="pedido.direccion">
+                            <input type="text" class="form-control mt-4" placeholder="Detalle del pedido (opcional)"
                                 v-model="pedido.detalle">
                         </div>
                         <div class="modal-footer">
                             <button type="submit" class="ver-carrito-btn2" :disabled="!carrito.length > 0"
-                                data-bs-dismiss="modal">Realizar pedido</button>
+                                >Realizar pedido</button>
                         </div>
                     </form>
                 </div>
@@ -202,11 +210,11 @@
 </template>
 
 <script>
-import router from '@/router';
 import axios from 'axios';
 export default {
     data() {
         return {
+            categoriaSeleccionada: null,
             mostrarModal: true,
             nombreNegocio: '', // Variable para almacenar el nombre de usuario del negocio
             productos: [],      // Array para almacenar los productos del negocio
@@ -244,17 +252,23 @@ export default {
             return [...new Set(this.productosFiltrados.map(producto => producto.producto_categoria))].sort();
         },
         productosFiltrados() {
-            // Filtra los productos basándose en el valor de busqueda y producto_disponibilidad = 1
+            const quitarAcentos = (texto) => {
+                return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            };
+
+            // Filtra los productos basándose en el valor de búsqueda y producto_disponibilidad = 1
             return this.productos.filter(producto => {
                 const nombre = producto.producto_nombre || '';
                 const descripcion = producto.producto_descripcion || '';
                 const categoria = producto.producto_categoria || '';
                 const precio = producto.producto_precio || '';
+                // Quita los acentos de las letras antes de realizar la comparación
+                const busquedaSinAcentos = quitarAcentos(this.busqueda.toLowerCase());
                 return (
-                    nombre.toLowerCase().includes(this.busqueda.toLowerCase()) ||
-                    descripcion.toLowerCase().includes(this.busqueda.toLowerCase()) ||
-                    categoria.toLowerCase().includes(this.busqueda.toLowerCase()) ||
-                    precio.toLowerCase().includes(this.busqueda.toLowerCase())
+                    quitarAcentos(nombre.toLowerCase()).includes(busquedaSinAcentos) ||
+                    quitarAcentos(descripcion.toLowerCase()).includes(busquedaSinAcentos) ||
+                    quitarAcentos(categoria.toLowerCase()).includes(busquedaSinAcentos) ||
+                    quitarAcentos(precio.toString().toLowerCase()).includes(busquedaSinAcentos)
                 );
             });
         },
@@ -264,6 +278,15 @@ export default {
         }
     },
     methods: {
+        toggleCategoria(categoria) {
+            if (this.categoriaSeleccionada === categoria) {
+                // Si la categoría seleccionada es la misma que se hizo clic, la contraemos
+                this.categoriaSeleccionada = null;
+            } else {
+                // De lo contrario, establecemos la categoría seleccionada como la categoría en la que se hizo clic
+                this.categoriaSeleccionada = categoria;
+            }
+        },
         async obtenerCarrito() {
             if (sessionStorage.getItem('carrito') !== null) {
                 this.carrito = JSON.parse(sessionStorage.getItem('carrito'));
@@ -291,8 +314,9 @@ export default {
             const mensaje = `¡Hola *${this.negocio.nombre}*! Quiero realizar un pedido:\n`;
             const productos = this.carrito.map(producto => `*${producto.producto_nombre}:* $${producto.producto_precio} (${producto.cantidadSeleccionada})\n\n`);
             const total = `*Total: $${this.total}*\n\n`;
-            let datos = `*Nombre:* ${this.pedido.nombre}\n*Medio de pago:* ${this.pedido.medio}\n*Dirección:* ${this.pedido.direccion}\n`;
-            this.pedido.detalle ? datos += `*Detalle:* ${this.pedido.detalle}\n\n¡Muchas gracias!` : datos += `\n¡Muchas gracias!`;
+            let datos = `*Nombre:* ${this.pedido.nombre}\n*Medio de pago:* ${this.pedido.medio}\n`;
+            this.pedido.direccion ? datos += `*Dirección:* ${this.pedido.direccion}\n` : this.pedido.detalle ? datos += `*Detalle:* ${this.pedido.detalle}\n\n¡Muchas gracias!` : datos += `\n¡Muchas gracias!`;
+            
 
             // Concatenamos el mensaje con la lista de productos y el total
             const mensajeCompleto = mensaje + productos.join('') + total + datos;
@@ -311,8 +335,8 @@ export default {
             const numeroWhatsapp = `${baseLink}?phone=${this.negocio.telefono}&text=${encodeURIComponent(mensajeCompleto)}`;
             sessionStorage.clear();
             // Finalmente, abrimos una nueva ventana del navegador con el enlace generado
+            location.reload(1);
             window.open(numeroWhatsapp);
-            router.push('/' + this.negocio.usuario);
         },
         agregarAlCarrito(producto) {
             const index = this.carrito.findIndex(item => item.producto_id === producto.producto_id);
@@ -367,6 +391,7 @@ export default {
                     behavior: 'smooth'
                 });
             }
+            this.toggleCategoria(categoria);
         },
         scrollToInicio() {
             // Función para desplazarse al inicio de la página
@@ -421,6 +446,19 @@ export default {
 </script>
 
 <style scoped>
+.categoria-productos {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.7s ease-in-out;
+    /* Duración y función de la transición */
+}
+
+/* Clase para activar la categoría seleccionada */
+.categoria-activa {
+    max-height: 1000px;
+    /* Altura máxima suficientemente grande para mostrar todos los productos */
+}
+
 .cantidad {
     vertical-align: middle;
     font-size: 20px;
@@ -613,6 +651,8 @@ nav {
     width: 100%;
     margin: 0px;
     padding: 5px 10px;
+    cursor: pointer;
+
 }
 
 .tarjetaProducto {
@@ -655,7 +695,7 @@ img {
 
 
 .ancho-busqueda {
-    width:100%;
+    width: 100%;
     height: 50px;
     display: inline-flex;
     margin-top: 20px;
@@ -713,13 +753,19 @@ ul {
 }
 
 @media screen and (max-width: 992px) {
+    .navbar{
+        background: linear-gradient(to right, rgb(254, 255, 174), #ffffff);
+    }
+    .navbar-brand{
+        font-size: 30px;
+    }
     .img-negocio {
         object-fit: cover;
         height: 100%;
     }
 
     .presentacion {
-        height: calc(100vh - 100px);
+        height: calc(100vh - 120px);
     }
 
 
