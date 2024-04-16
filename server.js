@@ -223,7 +223,18 @@ app.get('/negocios', async(req, res) => {
                         };
                     } catch (error) {
                         console.error("Error al obtener las coordenadas para la dirección:", direccion, error);
-                        return null;
+                        return {
+                            usuario: negocio.usuario_nombre,
+                            nombre: negocio.usuario_nombre_negocio,
+                            direccion: negocio.usuario_direccion,
+                            correo: negocio.usuario_correo,
+                            telefono: negocio.usuario_telefono,
+                            descripcion: negocio.usuario_descripcion,
+                            imagen: negocio.usuario_imagen,
+                            instagram: negocio.usuario_instagram,
+                            facebook: negocio.usuario_facebook,
+                            location: null
+                        };
                     }
                 });
 

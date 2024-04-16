@@ -34,7 +34,7 @@
                                         <b style="font-size:20px;">{{ negocio.nombre }}</b><br>
                                         <div style="text-align:center;">
                                             <a style="text-decoration:none;color:white;font-size:12px;padding:4px 6px;"
-                                                href="https://nazadoto.com:8080/${punto.usuario}" target="_blank"><img
+                                                :href="'https://nazadoto.com/' + negocio.usuario" target="_blank"><img
                                                     src="/favicon.ico" width="20" alt=""></a>
                                             <a v-if="negocio.instagram" :href="negocio.instagram" target="blank"><img
                                                     style="margin:0px 10px" width='20'
@@ -70,6 +70,7 @@
                             </div>
                             <!-- Botón para dirigirse al menú -->
                             <div class="item-btn">
+                                <a class="cursor-pointer mt-1" @click="localizar(negocio, index)"><img src="/recursos/pin.png" width="30" alt=""></a>
                                 <router-link class="item-texto-block-end" :to="'/' + negocio.usuario" target="_blank">
                                     <img src="/favicon.ico" width="30" alt="">
                                 </router-link>
@@ -90,6 +91,7 @@
 
 import axios from 'axios';
 import NavbarPublicoComponent from './NavbarPublicoComponent.vue';
+import router from '@/router';
 
 export default {
     components: {
@@ -123,6 +125,12 @@ export default {
     created() {
         this.fetchNegocios();
     },
+    mounted(){
+        console.log(this.$route.params);
+        if (this.$route.params){
+            router.push('/', this.$route.params);
+        }
+    },
     computed: {
         negociosFiltrados() {
             return this.negocios.filter(negocio => {
@@ -136,6 +144,11 @@ export default {
         },
     },
     methods: {
+        localizar(negocio, index){
+            this.mapaMostrado2 = true;
+            this.mapCenter = negocio.location;
+            this.infoWindowOpened = index;
+        },
         openInfoWindow(index) {
             if (this.infoWindowOpened == index) {
                 this.infoWindowOpened = null;
@@ -216,7 +229,9 @@ export default {
     margin: 20px;
     color: grey;
 }
-
+.cursor-pointer{
+    cursor:pointer;
+}
 .logo-carga {
     margin-top: -10vh;
 }
@@ -307,6 +322,7 @@ ul {
 }
 
 .item-btn {
+    display: inline-flex;
     margin-left: auto;
     margin-right: 20px;
 }
