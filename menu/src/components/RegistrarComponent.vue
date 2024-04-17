@@ -77,17 +77,17 @@ export default {
         return {
             plan: null,
             negocio: {
-                usuario: 'pepopa',
-                contraseña: 'pepopa',
-                nombre: 'Pepopa',
+                usuario: '',
+                contraseña: '',
+                nombre: '',
                 fechaVence: '',
-                email: 'pepopa@gmail.com',
-                imagen: '1',
-                direccion: 'Tucumán 100, Santiago del Estero, Argentina',
-                telefono: '3855223288',
-                descripcion: 'Esposisima',
-                instagram: 'igpepopa',
-                facebook: 'facepepopa',
+                email: '',
+                imagen: '',
+                direccion: '',
+                telefono: '',
+                descripcion: '',
+                instagram: '',
+                facebook: '',
             },
         };
     },
@@ -126,52 +126,77 @@ export default {
         },
         async registrarNegocio() {
             // Realizar una solicitud HTTP POST al servidor Express
-
-            await axios.post('/register', this.negocio)
-                .then(async () => {
-                    if (this.plan) {
-                        console.log("Entro a la parte de facturar")
-                        localStorage.setItem("usuario", this.negocio.usuario);
-                        const response = await axios.post('/facturar/crearOrden', { plan: this.plan }).then(async () => {
-                            let fechaActual = new Date();
-                            const planMes = fechaActual.getMonth() - 1;
-                            fechaActual.setMonth(planMes + this.plan);
-                            this.negocio.fechaVence = fechaActual.toISOString().slice(0, 19).replace('T', ' ');
-                            window.open(await response.data.init_point, '_blank');
-                            await axios.post('/register', this.negocio).then(()=>{
-                                
+            if (this.plan) {
+                localStorage.setItem("usuario", this.negocio.usuario);
+                try {
+                    const response = await axios.post('/facturar/crearOrden', { plan: this.plan });
+                    try {
+                        let fechaActual = new Date();
+                        const planMes = fechaActual.getMonth() - 1;
+                        fechaActual.setMonth(planMes + this.plan);
+                        this.negocio.fechaVence = fechaActual.toISOString().slice(0, 19).replace('T', ' ');
+                        window.open(await response.data.init_point, '_blank');
+                        await axios.post('/register', this.negocio).then(() => {
+                            router.push('/u/login');
+                            const Toast = Swal.mixin({
+                                toast: true,
+                                position: 'bottom-end',
+                                showConfirmButton: false,
+                                timer: 3000,
+                                timerProgressBar: true,
+                                didOpen: (toast) => {
+                                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                                }
                             })
-                        })
-                            .catch(error => {
-                                console.log(error);
-                            });
-                    } else {
-                        router.push('/u/login');
-                        const Toast = Swal.mixin({
-                            toast: true,
-                            position: 'bottom-end',
-                            showConfirmButton: false,
-                            timer: 3000,
-                            timerProgressBar: true,
-                            didOpen: (toast) => {
-                                toast.addEventListener('mouseenter', Swal.stopTimer)
-                                toast.addEventListener('mouseleave', Swal.resumeTimer)
-                            }
-                        })
 
-                        Toast.fire({
-                            icon: 'success',
-                            title: 'Registro exitoso.'
-                        })
+                            Toast.fire({
+                                icon: 'success',
+                                title: 'Registro exitoso.'
+                            })
+                        }).catch(error => {
+                            Swal.fire({
+                                icon: 'error',
+                                text: error.response.data.message
+                            });
+                            console.error('Error al registrar usuario:', error);
+                        });
+                    } catch (error) {
+                        console.log(error)
                     }
-                })
-                .catch(error => {
+                } catch (error) {
+                    console.log(error)
+                }
+            } else {
+                let fechaActual = new Date();
+                this.negocio.fechaVence = fechaActual.toISOString().slice(0, 19).replace('T', ' ');
+                await axios.post('/register', this.negocio).then(() => {
+                    router.push('/u/login');
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: 'bottom-end',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+                        didOpen: (toast) => {
+                            toast.addEventListener('mouseenter', Swal.stopTimer)
+                            toast.addEventListener('mouseleave', Swal.resumeTimer)
+                        }
+                    })
+
+                    Toast.fire({
+                        icon: 'success',
+                        title: 'Registro exitoso.'
+                    })
+                }).catch(error => {
                     Swal.fire({
                         icon: 'error',
                         text: error.response.data.message
                     });
                     console.error('Error al registrar usuario:', error);
                 });
+            }
+
 
         },
     },

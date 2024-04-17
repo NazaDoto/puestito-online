@@ -18,7 +18,7 @@ const https = require("https"),
 
 
 
-const env = "prod";
+const env = "dev";
 
 
 app.use(bodyParser.json({ limit: '50mb' }));
@@ -38,27 +38,12 @@ if (env == 'dev') {
         password: '2112',
         database: 'menu'
     });
-    // connection.connect(err => {
-    //     if (err) {
-    //         console.error('Error al conectar a MySQL:', err);
-    //     } else {
-    //         console.log('Conexión exitosa a MySQL');
-    //     }
-    // });
 } else {
-
-    connection = mysql.createConnection({
+    connection = mysql.createPool({
         host: 'localhost',
         user: 'root',
         password: 'Nazacapo341746$',
         database: 'menu'
-    });
-    connection.connect(err => {
-        if (err) {
-            console.error('Error al conectar a MySQL:', err);
-        } else {
-            console.log('Conexión exitosa a MySQL');
-        }
     });
 }
 
@@ -573,7 +558,10 @@ app.delete('/eliminarProducto', (req, res) => {
 const mercado = require('mercadopago');
 
 // Configurar Mercado Pago
-const client = new mercado.MercadoPagoConfig({ accessToken: 'APP_USR-3974731186843034-040421-a31df430f192320ee94b04ac13d48f80-232808230' });
+
+
+const client = new mercado.MercadoPagoConfig({ accessToken: 'APP_USR-3974731186843034-040421-a31df430f192320ee94b04ac13d48f80-232808230' }); //prod
+//const client = new mercado.MercadoPagoConfig({ accessToken: 'TEST-6756231137958668-041108-d71f41fe529ec1b71e76caf0a57c4334-1755754609' }); //prod
 
 // Crear una instancia de Preference
 const pref = new mercado.Preference(client);
@@ -591,32 +579,35 @@ app.post('/facturar/crearOrden', async(req, res) => {
     const precioPlan = precios[orden.plan];
 
     const preference = {
-            items: [{
-                title: 'Puestito Online',
-                unit_price: precioPlan,
-                description: 'Plan por ' + orden.plan + ' meses.',
-                quantity: 1,
-                currency_id: "ARS",
-            }],
-            payment_methods: {
-                excluded_payment_types: [{
-                    id: "ticket"
-                }]
-            },
-            back_urls: {
-                success: "http://localhost:8080/u/registrar/return/",
-                failure: "http://localhost:8080/u/registrar/return/",
-                pending: "http://localhost:8080/u/registrar/return/"
-            },
-            notification_url: "https://nazadoto.com:3500/facturar/webhook",
-        }
-        // Crear la preferencia
+        items: [{
+            title: 'Puestito Online',
+            unit_price: precioPlan,
+            description: 'Plan por ' + orden.plan + ' meses.',
+            quantity: 1,
+            currency_id: "ARS",
+        }],
+        payment_methods: {
+            excluded_payment_types: [{
+                id: "ticket"
+            }]
+        },
+        back_urls: {
+            success: "http://localhost:8080/u/registrar/return/",
+            failure: "http://localhost:8080/u/registrar/return/",
+            pending: "http://localhost:8080/u/registrar/return/"
+        },
+        notification_url: "https://a65a-200-81-126-76.ngrok-free.app/facturar/webhook",
+    }
+
+
+    // Crear la preferencia
     const response = await pref.create({
         body: preference
 
     }).catch(error => {
         console.log(error);
     });
+
     res.json(response);
 });
 

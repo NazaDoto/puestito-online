@@ -4,7 +4,7 @@ import App from './App.vue';
 import router from './router';
 import VueGoogleMaps from '@fawmi/vue-google-maps';
 
-const env = 'prod';
+const env = 'dev';
 
 if (env == 'dev') {
     axios.defaults.baseURL = 'http://192.168.1.235:3500';
