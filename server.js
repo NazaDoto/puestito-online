@@ -618,8 +618,8 @@ const mercado = require('mercadopago');
 // Configurar Mercado Pago
 
 
-const client = new mercado.MercadoPagoConfig({ accessToken: 'APP_USR-3974731186843034-040421-a31df430f192320ee94b04ac13d48f80-232808230' }); //prod
-//const client = new mercado.MercadoPagoConfig({ accessToken: 'TEST-6756231137958668-041108-d71f41fe529ec1b71e76caf0a57c4334-1755754609' }); //prod
+//const client = new mercado.MercadoPagoConfig({ accessToken: 'APP_USR-3974731186843034-040421-a31df430f192320ee94b04ac13d48f80-232808230' }); //prod
+const client = new mercado.MercadoPagoConfig({ accessToken: 'TEST-6756231137958668-041108-d71f41fe529ec1b71e76caf0a57c4334-1755754609' }); //prod
 
 // Crear una instancia de Preference
 const pref = new mercado.Preference(client);
@@ -695,7 +695,7 @@ app.put('/facturar/acreditar', (req, res) => {
 
 
 app.post('/facturar/webhook', async(req, res) => {
-    console.log('webjuk ', req.body)
+    console.log('webjuk ', req.body.type)
     try {
         const datosPago = req.body;
         if (datosPago.type === 'payment') {
