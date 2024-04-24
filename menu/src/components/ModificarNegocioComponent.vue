@@ -59,9 +59,8 @@
                                 </div>
                             </div>
                             <br>
-                            <div v-if="fechaVence == '2100'">
+                            <div v-if="añoVence == '2100'">
                                 <h4 class="titulo-div-forms mb-2">Esta es una cuenta gratis.</h4>
-                                <hr class="mt-2 mb-2">
                                 <button @click="mejorarPlan" class="btn btn-menu derecha mb-2">Mejorar Plan</button>
                             </div>
                             <div v-else>
@@ -151,6 +150,7 @@ export default {
     data() {
         return {
             fechaVence: '',
+            añoVence: '',
             negocio: {
                 usuario: '',
                 nombre: '',
@@ -211,6 +211,7 @@ export default {
                 this.negocio = response.data;
                 this.negocioModificar = response.data;
                 const fechaVence = new Date(response.data.fechaVence);
+                this.añoVence = fechaVence.getFullYear();
                 this.fechaVence = fechaVence.getDate() + '/' + (Number(fechaVence.getMonth()) + 1 )+ '/' + fechaVence.getFullYear();
             } catch (error) {
                 console.error("Error al cargar los productos:", error);
