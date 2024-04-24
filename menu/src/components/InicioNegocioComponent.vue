@@ -5,9 +5,6 @@
     <div class="container mt-4 mb-2">
       <h1 class="text-center">Bienvenid@, {{ nombreNegocio }}</h1>
       <div v-if="esAdmin()" class="container ">
-        <div class="col-md-6">
-          <router-link class="btn btn-menu" to="/register">Nuevo Negocio</router-link>
-        </div>
         <div class="col-md-6 mt-2">
           <router-link class="btn btn-menu" to="/u/negocios">Listar Negocios</router-link>
         </div>
@@ -32,13 +29,13 @@
             <h2 class="titulo-div-forms mb-2">
               Tu link
             </h2>
-            <a :href="'http://192.168.0.7:8080/' + nombreUsuario" target="_blank">http://192.168.0.7:8080/{{ nombreUsuario }}</a><br>
+            <a :href="'https://puestito.online/' + nombreUsuario" target="_blank">https://puestito.online/{{ nombreUsuario }}</a><br>
           </div>
         </div>
         <div v-if="fechaVence !== '2100'" class="row g-3 div-forms border mt-2">
           <div class="col-md-6">
             <h2 class="titulo-div-forms mb-2">Tu código QR</h2>
-            <a ref="qrcode" :href="'http://192.168.0.7:8080/' + nombreUsuario" target="_blank"></a><br>            
+            <a ref="qrcode" :href="'https://puestito.online/' + nombreUsuario" target="_blank"></a><br>            
             <button @click="descargarQR" class="btn btn-menu margenbtn">Descargar QR</button>
           </div>
         </div>
@@ -88,7 +85,7 @@ export default {
         qr.size = tamaño;
 
         // Define el contenido del código QR (puedes ajustar esto según tus necesidades)
-        const url = 'http://192.168.0.5:8080/' + nombreUsuario;
+        const url = 'https://puestito.online/' + nombreUsuario;
         qr.addData(url);
         qr.make();
 

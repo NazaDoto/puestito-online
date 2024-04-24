@@ -5,26 +5,28 @@
             <div class="mt-4 mb-4">
                 <h1 class="text-center">¡Potenciá tu negocio!</h1>
                 <hr>
-                <div class="row justify-content-center text-center mb-4">
-                    <div class="col-md-6">
-                        <div class="titulo-plan">
-                            <h3>Plan Básico</h3>
-                        </div>
-                        <div class="border mt-2 p-2 text-center">
+                <div v-if="!usuario">
+                    <div class="row justify-content-center text-center mb-4">
+                        <div class="col-md-6">
                             <div class="titulo-plan">
-                                Gratis
+                                <h3>Plan Básico</h3>
                             </div>
-                            <ul class="text-start">
-                                <li>✅Menú online autoadministrable.</li>
-                                <li>❌Visualización en nuestra plataforma.</li>
-                                <li>❌Carrito y pedidos por WhatsApp.</li>
-                                <li>❌Código QR para el menú.</li>
-                            </ul>
-                            <button class="btn btn-menu" @click="elegirPlan('')">REGISTRAR</button>
+                            <div class="border mt-2 p-2 text-center">
+                                <div class="titulo-plan">
+                                    Gratis
+                                </div>
+                                <ul class="text-start">
+                                    <li>✅Menú online autoadministrable.</li>
+                                    <li>❌Visualización en nuestra plataforma.</li>
+                                    <li>❌Carrito y pedidos por WhatsApp.</li>
+                                    <li>❌Código QR para el menú.</li>
+                                </ul>
+                                <button class="btn btn-menu" @click="elegirPlan('')">REGISTRAR</button>
+                            </div>
                         </div>
                     </div>
+                    <hr>
                 </div>
-                <hr>
                 <div class="row justify-content-center text-center">
                     <div class="col-md-6">
                         <div class="titulo-plan">
@@ -80,8 +82,16 @@
 import router from '@/router';
 import NavbarPublicoComponent from './NavbarPublicoComponent.vue'
 export default {
+    data(){
+        return{
+            usuario:'',
+        }
+    },
     components: {
         NavbarPublicoComponent,
+    },
+    mounted(){
+        this.usuario = localStorage.getItem("usuario");
     },
     methods: {
         elegirPlan(plan) {

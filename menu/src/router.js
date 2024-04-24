@@ -6,7 +6,6 @@ import RegistrarComponent from './components/RegistrarComponent.vue';
 import ListarNegociosComponent from './components/ListarNegociosComponent.vue';
 import NuevoProductoComponent from './components/NuevoProductoComponent.vue';
 import ListarProductosComponent from './components/ListarProductosComponent.vue';
-import NuevaCategoriaComponent from './components/NuevaCategoriaComponent.vue';
 import ListarCategoriasComponent from './components/ListarCategoriasComponent.vue';
 import NegocioComponent from './components/NegocioComponent.vue';
 import ModificarNegocioComponent from './components/ModificarNegocioComponent.vue';
@@ -64,11 +63,6 @@ const routes = [{
     {
         path: '/u/productos',
         component: ListarProductosComponent,
-        meta: { requiresAuth: true },
-    },
-    {
-        path: '/u/nuevaCategoria',
-        component: NuevaCategoriaComponent,
         meta: { requiresAuth: true },
     },
     {

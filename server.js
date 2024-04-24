@@ -139,6 +139,38 @@ app.post('/login', (req, res) => {
 });
 
 
+app.post('/comprobar-vencimiento', (req, res) => {
+    const datos = req.body;
+    let año; // Definir la variable año antes del callback de la consulta
+
+    query = 'SELECT usuario_fecha_vencimiento FROM usuarios WHERE usuario_nombre = ?';
+    connection.query(query, datos.usuario, (err, results) => {
+        if (err) {
+            console.log(err);
+            res.status(500).send('Error al consultar la base de datos'); // Enviar respuesta de error si hay un error en la consulta
+        } else {
+            const fechaUsuario = results[0].usuario_fecha_vencimiento;
+            let fechaHoy = new Date();
+            if (fechaHoy > fechaUsuario) {
+                fechaHoy.setFullYear(2100);
+                const fechaActualizada = fechaHoy.toISOString().slice(0, 19).replace('T', ' ');
+                query = 'UPDATE usuarios SET usuario_fecha_vencimiento = ? WHERE usuario_nombre = ?';
+                connection.query(query, [fechaActualizada, datos.usuario], (err, results) => {
+                    if (err) {
+                        console.log(err);
+                        res.status(500).send('Error al actualizar la fecha de vencimiento'); // Enviar respuesta de error si hay un error en la actualización
+                    } else {
+                        año = '2100';
+                        res.send(año); // Enviar la respuesta dentro del callback de la actualización
+                    }
+                });
+            } else {
+                año = new Date(fechaUsuario).getFullYear();
+                res.send(año.toString()); // Enviar la respuesta dentro del else
+            }
+        }
+    });
+});
 
 
 
@@ -240,7 +272,7 @@ app.get('/negocios', async(req, res) => {
 
 app.get('/miNegocio', (req, res) => {
     const usuario = req.query.usuario;
-    const query = "SELECT usuario_nombre_negocio,  usuario_correo, usuario_telefono, usuario_descripcion, usuario_imagen, usuario_direccion, usuario_instagram, usuario_facebook FROM usuarios WHERE usuario_nombre = ?";
+    const query = "SELECT usuario_nombre_negocio,  usuario_fecha_vencimiento, usuario_correo, usuario_telefono, usuario_descripcion, usuario_imagen, usuario_direccion, usuario_instagram, usuario_facebook FROM usuarios WHERE usuario_nombre = ?";
     // Ejecutar la consulta
     connection.query(query, usuario, (error, results) => {
         if (error) {
@@ -256,6 +288,7 @@ app.get('/miNegocio', (req, res) => {
         res.json({
             usuario: usuario,
             nombre: results[0].usuario_nombre_negocio,
+            fechaVence: results[0].usuario_fecha_vencimiento,
             correo: results[0].usuario_correo,
             telefono: results[0].usuario_telefono,
             direccion: results[0].usuario_direccion,
@@ -326,6 +359,7 @@ app.get('/negocio', (req, res) => {
 
 app.put('/modificarPerfil', (req, res) => {
     const { negocio } = req.body;
+    console.log(negocio)
     query = 'UPDATE usuarios SET usuario_nombre_negocio = ?, usuario_correo = ?, usuario_telefono = ?, usuario_descripcion = ?, usuario_imagen = ?, usuario_direccion = ?, usuario_instagram = ?, usuario_facebook = ? WHERE usuario_nombre = ?';
     connection.query(query, [negocio.nombre, negocio.correo, negocio.telefono, negocio.descripcion, negocio.imagen, negocio.direccion, negocio.instagram, negocio.facebook, negocio.usuario], (err, result) => {
         if (err) {
@@ -458,7 +492,12 @@ app.post('/nuevaCategoria', (req, res) => {
         (err, result) => {
             if (err) {
                 console.error('Error al insertar en la base de datos: ' + err.message);
-                res.status(500).json({ error: 'Error al procesar la solicitud.' });
+                if (err.code === 'ER_DUP_ENTRY') {
+                    console.log('dup')
+                    res.status(500).json({ message: 'La categoria ya existe.' });
+                } else {
+                    res.status(500).json({ message: 'Error al procesar la solicitud.' });
+                }
             } else {
                 console.log('Registro insertado correctamente.');
                 res.status(200).json({ message: 'Registro insertado correctamente.', categoria: categoria_nombre });
@@ -552,7 +591,26 @@ app.delete('/eliminarProducto', (req, res) => {
         }
     });
 });
-// ... Otras rutas y configuraciones
+
+app.post('/verificar-usuario', (req, res) => {
+    const usuario = req.body.usuario;
+    query = 'SELECT usuario_nombre FROM usuarios WHERE usuario_nombre = ?';
+    connection.query(query, usuario, (err, results) => {
+        if (err) {
+            console.error("Error al obtener los usuarios:", err);
+            res.status(500).json({ message: "Error al obtener los usuarios" });
+        } else {
+            if (results.length) {
+                res.status(200).json(false);
+            } else {
+                res.status(200).json(true);
+            }
+        }
+    });
+})
+
+
+
 
 
 const mercado = require('mercadopago');
@@ -565,12 +623,13 @@ const client = new mercado.MercadoPagoConfig({ accessToken: 'APP_USR-39747311868
 
 // Crear una instancia de Preference
 const pref = new mercado.Preference(client);
-
 const payment = new mercado.Payment(client);
+
 // Crear la preferencia
 app.post('/facturar/crearOrden', async(req, res) => {
     const orden = req.body;
-
+    let time = new Date().toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' });
+    const ext_ref = time + ' - ' + orden.usuario;
     const precios = {
         "1": 1500,
         "6": 7500,
@@ -579,6 +638,7 @@ app.post('/facturar/crearOrden', async(req, res) => {
     const precioPlan = precios[orden.plan];
 
     const preference = {
+        external_reference: ext_ref,
         items: [{
             title: 'Puestito Online',
             unit_price: precioPlan,
@@ -591,12 +651,7 @@ app.post('/facturar/crearOrden', async(req, res) => {
                 id: "ticket"
             }]
         },
-        back_urls: {
-            success: "http://localhost:8080/u/registrar/return/",
-            failure: "http://localhost:8080/u/registrar/return/",
-            pending: "http://localhost:8080/u/registrar/return/"
-        },
-        notification_url: "https://a65a-200-81-126-76.ngrok-free.app/facturar/webhook",
+        notification_url: "https://puestito.online:3500/facturar/webhook",
     }
 
 
@@ -607,21 +662,83 @@ app.post('/facturar/crearOrden', async(req, res) => {
     }).catch(error => {
         console.log(error);
     });
-
-    res.json(response);
+    res.json({ response });
 });
 
-// app.post('/facturar/webhook', async(req, res) => {
-//     try {
-//         const datosPago = req.query;
-//         if (datosPago.type === 'payment') {
-//             const datos = await payment.search(datosPago['data.id']);
-//             console.log(datos);
-//         }
-//     } catch (error) {
-//         console.log('Error: ', error);
-//     }
-// });
+app.post('/facturar/verificarPago', async(req, res) => {
+    const ref = req.body.ref;
+    const query = 'SELECT * FROM facturas WHERE factura_ext_ref = ?';
+    connection.query(query, ref, (err, result) => {
+        if (err) {
+            console.log(err);
+        } else {
+            if (result.length) {
+                res.send(result[0].factura_status);
+            } else {
+                res.send(false);
+            }
+        }
+    })
+});
+
+app.put('/facturar/acreditar', (req, res) => {
+    const datos = req.body;
+    const query = `UPDATE usuarios SET usuario_fecha_vencimiento = ? WHERE usuario_nombre = ?`;
+    connection.query(query, [datos.fecha, datos.usuario], (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+    })
+})
+
+
+
+
+app.post('/facturar/webhook', async(req, res) => {
+    try {
+        const datosPago = req.body;
+        if (datosPago.type === 'payment') {
+            try {
+                const datos = await payment.get({
+                    id: datosPago.data.id,
+                })
+
+                const queryVerificar = 'SELECT * FROM facturas WHERE factura_id = ?';
+                connection.query(queryVerificar, datos.id, (err, res) => {
+                    if (err) {
+                        console.log(err)
+                    } else {
+                        if (res.length) {
+                            const queryUpdate = 'UPDATE facturas SET factura_status = ? WHERE factura_id = ?';
+                            connection.query(queryUpdate, [datos.status, datos.id], (err, result) => {
+                                if (err) {
+                                    console.log(err)
+                                }
+                            })
+                        } else {
+                            const query = 'INSERT INTO facturas (factura_id, factura_ext_ref, factura_status) VALUES (?, ?, ?)';
+                            try {
+                                connection.query(query, [datos.id, datos.external_reference, datos.status], (err, result) => {
+                                    if (err) {
+                                        console.log(err)
+                                    }
+                                })
+                            } catch (error) {
+                                console.log('error');
+                            }
+                        }
+                    }
+                })
+
+
+            } catch (error) {
+                console.log(error)
+            }
+        }
+    } catch (error) {
+        console.log('Error: ', error);
+    }
+});
 
 if (env == 'dev') {
     app.listen(port, () => {
@@ -629,8 +746,8 @@ if (env == 'dev') {
     })
 } else {
     const options = {
-        key: fs.readFileSync("/var/www/ssl/nazadoto.com.key"),
-        cert: fs.readFileSync("/var/www/ssl/nazadoto.com.crt")
+        key: fs.readFileSync("/var/www/ssl/puestito.online.key"),
+        cert: fs.readFileSync("/var/www/ssl/puestito.online.crt")
     };
     const httpsServer = https.createServer(options, app);
     httpsServer.listen(3500);

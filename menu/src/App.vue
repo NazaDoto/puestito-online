@@ -1,52 +1,70 @@
 <template>
-  <div>
-    <router-view></router-view>
-    <PieComponent />
+    <div>
+        <router-view></router-view>
+        <PieComponent />
 
-  </div>
+    </div>
 </template>
 
 <script>
 import PieComponent from './components/PieComponent.vue';
 
 export default {
-  name: 'App',
-  components: {
-    PieComponent,
+    name: 'App',
+    components: {
+        PieComponent,
 
-  },
-  methods: {
-    // checkAuthentication() {
-    //   const isAuthenticated = !!localStorage.getItem("token");/* Agrega aquí tu lógica para verificar si el usuario está autenticado */
-    //   if (!isAuthenticated) {
-    //     this.$router.push("/login");
-    //   }
-    // },
-  },
-  mounted() {
-    //this.checkAuthentication();
-  },
+    },
+    methods: {
+        // checkAuthentication() {
+        //   const isAuthenticated = !!localStorage.getItem("token");/* Agrega aquí tu lógica para verificar si el usuario está autenticado */
+        //   if (!isAuthenticated) {
+        //     this.$router.push("/login");
+        //   }
+        // },
+    },
+    mounted() {
+        //this.checkAuthentication();
+    },
 }
 </script>
 
 <style>
-@media screen and (max-width: 992px) {
-    .container {
-        width: 90vw !important;
-    }
+.pl-2 {
+    padding-left: 10px;
 }
+
+.modalCategoriaContainer {
+    position: absolute;
+    z-index: 3;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.8);
+    align-content: center;
+}
+
+.modalCategoria {
+    padding: 20px;
+    margin: auto;
+    width: 30vw;
+    background-color: white;
+    border-radius: 10px;
+}
+
 
 .btn-menu {
     color: white;
     border: none;
     box-shadow: 0.2px 0.2px 2px black !important;
     border-radius: 1px;
-    background: linear-gradient( rgb(148, 193, 252), rgb(0, 90, 207)) !important;
+    background: linear-gradient(#94c1fc, #005acf) !important;
     min-width: 100px;
 }
 
 .btn-menu:hover {
-    background: linear-gradient( rgb(148, 193, 252), rgb(0, 87, 168)) !important;
+    background: linear-gradient(rgb(148, 193, 252), rgb(0, 87, 168)) !important;
 }
 
 .btn-menu-danger {
@@ -54,15 +72,67 @@ export default {
     border: none;
     box-shadow: 0.2px 0.2px 2px black !important;
     border-radius: 1px;
-    background: linear-gradient( rgb(255, 175, 175), rgb(207, 0, 0)) !important;
+    background: linear-gradient(#ffafaf, #cf0000) !important;
 }
 
 .btn-menu-danger:hover {
-    background: linear-gradient( rgb(255, 175, 175), rgb(168, 0, 0)) !important;
+    background: linear-gradient(rgb(255, 175, 175), rgb(168, 0, 0)) !important;
+}
+
+.btn-agregar {
+    background: linear-gradient(rgb(255, 251, 234), rgb(255, 240, 155)) !important;
+    box-shadow: 0.2px 0.2px 2px white;
+    border: none;
+    border-radius: 1px;
+}
+
+.btn-agregar:hover {
+    background: linear-gradient(rgb(253, 247, 217), rgb(255, 236, 128)) !important;
 }
 
 .barra-busqueda {
     box-shadow: 0.2px 0.2px 2px;
     border-radius: 1px;
+}
+
+.texto-carga {
+    font-style: italic;
+    margin: 20px;
+    color: grey;
+}
+
+.logo-carga {
+    margin-top: -10vh;
+}
+
+.logo-img {
+    animation: l2 2s infinite;
+}
+
+.pantalla-carga {
+    z-index: 2;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: calc(100vh);
+    background-color: white;
+    align-content: center;
+}
+
+.pantalla-carga:hover {
+    cursor: wait;
+}
+
+@keyframes l2 {
+    to {
+        transform: rotate(1turn)
+    }
+}
+
+@media screen and (max-width: 992px) {
+    .modalCategoria {
+    width: 90vw;
+}
 }
 </style>

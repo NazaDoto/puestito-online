@@ -1,139 +1,144 @@
 <template>
   <div>
     <NavbarComponent></NavbarComponent>
+    <div v-if="cargando" class="pantalla-carga text-center">
+      <div class="logo-carga">
+        <img class="logo-img" src="/favicon.ico" width="50" alt="" />
+        <div class="texto-carga">Cargando productos</div>
+      </div>
+    </div>
     <div class="container mt-4 mb-2">
       <h1 class="text-center">Listado de Productos</h1>
       <div class="flex">
-
         <div class="izquierda ancho-busqueda">
-          <input class="form-control barra-busqueda" v-model="busqueda" type="text" name="busqueda" id="" placeholder="Buscar"
-            title="Ingrese una palabra clave...">
+          <input class="form-control barra-busqueda" v-model="busqueda" type="text" name="busqueda" id=""
+            placeholder="Buscar" title="Ingrese una palabra clave..." />
         </div>
       </div>
-      <div class="ancho border border-2 mt-2">
-        <table class="table table-light table-striped text-center" id="informe-table">
-          <thead>
-            <tr>
-              <th>Nombre del Producto</th>
-              <th>Descripción</th>
-              <th>Categoría</th>
-              <th>Precio</th>
-              <th>¿Disponible?</th>
-              <th>Imagen</th>
-              <th> </th>
-              <th> </th>
+      <div class="ancho mt-2">
+        <div class="mt-2" v-for="(categoria, index) in categoriasOrdenadas" :key="index" :id="categoria">
+          <div v-if="filteredProductos(categoria)">
+            <div class="titulo-categoria" @click="toggleCategoria(categoria)">{{ categoria }}</div>
+            <div :class="{ 'categoria-productos': true, 'categoria-activa': categoriaSeleccionada === categoria }">
+              <div class="p-2">
+                <div class="item-container mt-2" v-for="(producto, index) in filteredProductos(categoria)" :key="index">
+                  <div class="item-imagen" v-if="producto.producto_imagen">
+                    <div>
+                      <img class="imagen" :src="producto.producto_imagen" alt=" ">
+                    </div>
+                  </div>
+                  <!-- Nombre del producto -->
+                  <div class="item-texto-block">
+                    <div class="item-texto-block-start">
+                      <div class="item-nombre">
+                        {{ producto.producto_nombre }}
+                      </div>
+                      <div class="item-precio">
+                        ${{ producto.producto_precio }}
+                      </div>
+                      <div class="item-descripcion" v-if="producto.producto_descripcion">
+                        "{{ producto.producto_descripcion }}"
+                      </div>
+                    </div>
+                  </div>
+                  <div class="item-texto-block-end">
+                    <div class="justify-content-center">
+                      <div class="form-check form-switch"><input type="checkbox"
+                          @change="actualizarEstadoProducto(producto)" class="form-check-input" name=""
+                          id="productoDisponible" :checked="producto.producto_disponibilidad === 1"></div>
+                    </div>
+                    <button class="btn-edit p-2" title="Modificar" @click="modificar(producto)"><img width="20"
+                        src="/recursos/edit.png" alt=""></button>
+                    <button class="btn-delete mt-2 p-2" title="Eliminar" @click="eliminar(producto.producto_id)"><img
+                        width="20" src="/recursos/delete.png" alt=""></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Itera sobre los datos de la lista de informes y muestra cada fila en la tabla -->
-            <tr class="mauto" v-for="(producto, index) in productosFiltrados" :key="index">
-              <td>{{ producto.producto_nombre }}</td>
-              <td>{{ producto.producto_descripcion }}</td>
-              <td>{{ producto.producto_categoria }}</td>
-              <td>{{ producto.producto_precio }}</td>
-              <td>
-                <div class="form-check form-switch"><input type="checkbox" @change="actualizarEstadoProducto(producto)"
-                    class="form-check-input" name="" id="productoDisponible"
-                    :checked="producto.producto_disponibilidad === 1"></div>
-              </td>
-              <td ><img class="imagen" v-if="producto.producto_imagen" :src="producto.producto_imagen" alt="">
-              <div v-else>
-                <img class="imagen" src="/recursos/missing-img.png" alt="">
-              </div></td>
-              <td>
-                <button class="btn btn-menu" title="Modificar" data-bs-toggle="modal"
-                  data-bs-target="#modificarProducto" @click="modificar(producto)">Modificar</button>
-              </td>
-              <td>
-                <button class="btn btn-menu-danger" title="Eliminar" @click="eliminar(producto.producto_id)">Eliminar</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
         <div v-if="productosFiltrados.length === 0" class="text-center mt-3">
-          No se encontraron resultados para esa búsqueda.
+          No se encontraron resultados.
         </div>
       </div>
 
       <!-- MODAL MODIFICAR-->
-      <div class="modal fade" id="modificarProducto" tabindex="-1" aria-labelledby="modificarProductoLabel"
-        aria-hidden="true" ref="modalModificar">
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content ">
-            <div class="modal-header">
-              <h1 class="modal-title fs-5" id="modificarProductoLabel">Modificar Producto</h1>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
+      <div v-if="modificarModalAbierto" class="modalCategoriaContainer">
+        <div class="modalCategoria">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header pl-2">
+                <h1 class="modal-title fs-5" id="modificarProductoLabel">
+                  Modificar Producto
+                </h1>
+                <button type="button" class="btn-close" @click="cerrarModificarModal" aria-label="Close"></button>
+              </div>
               <form @submit.prevent="modificarProducto(this.productoModificar)">
-                <div class="row g-3 div-forms border">
-                  <h4 class="titulo-div-forms mb-2">Información del Producto</h4>
-                  <div>
-                    <input class="form-control" type="text" id="nombre" v-model="productoModificar.producto_nombre"
-                      required>
+                <div class="modal-body">
+                  <div class="row g-3 div-forms">
+                    <div>
+                      <input class="form-control" type="text" id="nombre" v-model="productoModificar.producto_nombre"
+                        required />
+                    </div>
+                    <div>
+                      <textarea class="form-control" type="text" id="descripcion"
+                        v-model="productoModificar.producto_descripcion" placeholder="Descripción"></textarea>
+                    </div>
+                    <div>
+                      <select class="form-select" v-model="productoModificar.producto_categoria" id="" required>
+                        <option selected disabled>Categoría</option>
+                        <option v-for="categoria in categorias" :key="categoria.id" :value="categoria.categoria_nombre">
+                          {{ categoria.categoria_nombre }}
+                        </option>
+                      </select>
+                    </div>
+                    <div>
+                      <button type="button" class="btn btn-agregar" @click="agregarCategoriaModal">
+                        Agregar Categoría
+                      </button>
+                    </div>
+                    <div>
+                      <input class="form-control" type="number" id="precio" v-model="productoModificar.producto_precio"
+                        placeholder="Precio (sin $)" />
+                    </div>
+                    <div>
+                      <label class="form-label mr-2" for="imagen">Imagen (JPG)</label>
+                      <input class="form-control" type="file" name="imagen" id="imagen" accept=".jpg"
+                        @change="imagenSeleccionada" />
+                    </div>
                   </div>
-                  <div>
-                    <textarea class="form-control" type="text" id="descripcion"
-                      v-model="productoModificar.producto_descripcion" placeholder="Descripción"></textarea>
+                  <div class="modal-footer mt-2">
+                    <button type="button" class="btn" @click="cerrarModificarModal">Cerrar</button>
+                    <button class="btn btn-menu" type="submit">Modificar</button>
                   </div>
-                  <div>
-                    <select class="form-select" v-model="productoModificar.producto_categoria" id="" required>
-                      <option selected disabled>Categoría</option>
-                      <option v-for="categoria in categorias" :key="categoria.id" :value="categoria.categoria_nombre">{{
-                        categoria.categoria_nombre }}</option>
-                    </select>
-                  </div>
-                  <div>
-                    <button type="button" class="btn btn-agregar" data-bs-toggle="modal"
-                      data-bs-target="#agregarCategoria">
-                      Agregar Categoría
-                    </button>
-
-                  </div>
-                  <div>
-                    <input class="form-control" type="number" id="precio" v-model="productoModificar.producto_precio"
-                      placeholder="Precio (sin $)">
-                  </div>
-                  <div>
-                    <label class="form-label mr-2" for="imagen">Imagen (JPG)</label>
-                    <input class="form-control" type="file" name="imagen" id="imagen" accept=".jpg"
-                      @change="imagenSeleccionada">
-                  </div>
-                </div>
-                <div class="text-end">
-                  <button class="btn btn-menu botones mt-3" type="submit" data-bs-dismiss="modal" aria-label="Close">Modificar</button>
                 </div>
               </form>
             </div>
-
-
           </div>
         </div>
       </div>
 
       <!-- MODAL CATEGORIA -->
-      <div class="modal fade" id="agregarCategoria" tabindex="-1" aria-labelledby="agregarCategoriaLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content ">
-            <div class="modal-header">
-              <h1 class="modal-title fs-5" id="agregarCategoriaLabel">Nueva Categoría</h1>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      <div v-if="agregarCategoriaModalAbierto" class="modalCategoriaContainer">
+        <div class="modalCategoria">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content ">
+              <div class="modal-header pl-2">
+                <h1 class="modal-title fs-5" id="agregarCategoriaLabel">Nueva Categoría</h1>
+                <button type="button" class="btn-close" @click="cerrarCategoriaModal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body mt-2">
+                <form @submit.prevent="agregarCategoria">
+                  <input class="form-control" type="text" id="nombre" v-model="categoria_nombre"
+                    placeholder="Nombre de la Categoría" required />
+                  <div class="modal-footer mt-2">
+                    <button type="button" class="btn" @click="cerrarCategoriaModal">Cerrar</button>
+                    <button class="btn btn-agregar" type="submit">Agregar</button>
+                  </div>
+                </form>
+              </div>
             </div>
-            <div class="modal-body">
-              <form @submit.prevent="agregarCategoria">
-                <input class="form-control" type="text" id="nombre" v-model="categoria_nombre"
-                  placeholder="Nombre de la Categoría" required>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-target="#modificarProducto"
-                    data-bs-toggle="modal" data-bs-dismiss="modal">Cerrar</button>
-                  <button class="btn btn-primary" type="submit" data-bs-target="#modificarProducto" data-bs-toggle="modal"
-                    data-bs-dismiss="modal">Agregar</button>
-                </div>
-              </form>
-            </div>
-
           </div>
         </div>
       </div>
@@ -142,9 +147,9 @@
 </template>
 
 <script>
-import axios from 'axios';
-import NavbarComponent from './NavbarComponent.vue';
-import Swal from 'sweetalert2';
+import axios from "axios";
+import NavbarComponent from "./NavbarComponent.vue";
+import Swal from "sweetalert2";
 
 export default {
   components: {
@@ -152,21 +157,24 @@ export default {
   },
   data() {
     return {
+      categoriaSeleccionada: null,
+      cargando: true,
       productos: [], // Almacena los informes cargados desde el servidor
-      productoModificar: '',
-      busqueda: '',
-      usuario: localStorage.getItem('usuario'),
+      productoModificar: "",
+      busqueda: "",
+      usuario: localStorage.getItem("usuario"),
       producto: {
-        nombre: '',
-        descripcion: '',
-        categoria: 'Categoría',
-        precio: '',
-        imagen: '',
-        usuario: '',
+        nombre: "",
+        descripcion: "",
+        categoria: "Categoría",
+        precio: "",
+        imagen: "",
+        usuario: "",
       },
-      categoria_nombre: '',
+      categoria_nombre: "",
       categorias: [],
-      modalAbierto: false,
+      agregarCategoriaModalAbierto: false,
+      modificarModalAbierto: false,
     };
   },
   created() {
@@ -174,37 +182,73 @@ export default {
     this.fetchProductos();
   },
   computed: {
+    categoriasOrdenadas() {
+      // Obtiene las categorías únicas de los productos filtrados y las ordena alfabéticamente
+      return [...new Set(this.productosFiltrados.map(producto => producto.producto_categoria))].sort();
+    },
     productosFiltrados() {
-      // Filtra los informes basándose en el valor de busqueda
+      const quitarAcentos = (texto) => {
+        return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      };
+
+      // Filtra los productos basándose en el valor de búsqueda y producto_disponibilidad = 1
       return this.productos.filter(producto => {
         const nombre = producto.producto_nombre || '';
         const descripcion = producto.producto_descripcion || '';
         const categoria = producto.producto_categoria || '';
         const precio = producto.producto_precio || '';
+        // Quita los acentos de las letras antes de realizar la comparación
+        const busquedaSinAcentos = quitarAcentos(this.busqueda.toLowerCase());
         return (
-          nombre.toLowerCase().includes(this.busqueda.toLowerCase()) ||
-          descripcion.toLowerCase().includes(this.busqueda.toLowerCase()) ||
-          categoria.toLowerCase().includes(this.busqueda.toLowerCase()) ||
-          precio.toLowerCase().includes(this.busqueda.toLowerCase())
-          // Agrega más condiciones de búsqueda según tus necesidades
+          quitarAcentos(nombre.toLowerCase()).includes(busquedaSinAcentos) ||
+          quitarAcentos(descripcion.toLowerCase()).includes(busquedaSinAcentos) ||
+          quitarAcentos(categoria.toLowerCase()).includes(busquedaSinAcentos) ||
+          quitarAcentos(precio.toString().toLowerCase()).includes(busquedaSinAcentos)
         );
       });
     },
+    categoriasConProductosFiltrados() {
+      // Obtiene las categorías únicas de los productos filtrados
+      return [...new Set(this.productosFiltrados.map(producto => producto.producto_categoria))];
+    }
   },
   methods: {
-    async fetchCategorias(){
-
-      axios.get(`/categorias?usuario=${localStorage.getItem('usuario')}`)
+    cerrarModificarModal() {
+      this.modificarModalAbierto = false;
+    },
+    cerrarCategoriaModal() {
+      this.agregarCategoriaModalAbierto = false;
+    },
+    agregarCategoriaModal() {
+      this.agregarCategoriaModalAbierto = true;
+    },
+    toggleCategoria(categoria) {
+      if (this.categoriaSeleccionada === categoria) {
+        // Si la categoría seleccionada es la misma que se hizo clic, la contraemos
+        this.categoriaSeleccionada = null;
+      } else {
+        // De lo contrario, establecemos la categoría seleccionada como la categoría en la que se hizo clic
+        this.categoriaSeleccionada = categoria;
+      }
+    },
+    filteredProductos(categoria) {
+      // Filtra los productos basándose en la categoría y en el valor de disponibilidad
+      return this.productosFiltrados.filter(producto => producto.producto_categoria === categoria);
+    },
+    async fetchCategorias() {
+      axios
+        .get(`/categorias?usuario=${localStorage.getItem("usuario")}`)
         .then((response) => {
           this.categorias = response.data; // Asigna las categorías a la variable
         })
         .catch((error) => {
-          console.error('Error al obtener las categorías:', error);
+          console.error("Error al obtener las categorías:", error);
         });
     },
     modificar(producto) {
       this.fetchCategorias();
       this.productoModificar = producto;
+      this.modificarModalAbierto = true;
     },
     actualizarEstadoProducto(producto) {
       if (producto.producto_disponibilidad) {
@@ -213,12 +257,19 @@ export default {
         producto.producto_disponibilidad = 1;
       }
       // Realiza una solicitud para actualizar el estado en la base de datos
-      axios.put('/actualizarDisponibilidad', { productoId: producto.producto_id, nuevoEstado: producto.producto_disponibilidad })
+      axios
+        .put("/actualizarDisponibilidad", {
+          productoId: producto.producto_id,
+          nuevoEstado: producto.producto_disponibilidad,
+        })
         .then(() => {
           // Maneja la respuesta si es necesario
         })
         .catch((error) => {
-          console.error('Error al actualizar el estado en la base de datos:', error);
+          console.error(
+            "Error al actualizar el estado en la base de datos:",
+            error
+          );
 
           // Si hay un error, puedes revertir el estado del checkbox
           producto.producto_disponibilidad = !producto.producto_disponibilidad;
@@ -233,111 +284,125 @@ export default {
         this.productos = response.data;
       } catch (error) {
         console.error("Error al cargar los productos:", error);
+      } finally {
+        this.cargando = false;
       }
     },
     modificarProducto(producto) {
-      axios.put('/modificarProducto', { producto: producto }).then(() => {
-        const Toast = Swal.mixin({
-                toast: true,
-                position: 'bottom-end',
-                showConfirmButton: false,
-                timer: 2000,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                  toast.addEventListener('mouseenter', Swal.stopTimer)
-                  toast.addEventListener('mouseleave', Swal.resumeTimer)
-                }
-              })
+      axios
+        .put("/modificarProducto", { producto: producto })
+        .then(() => {
+          const Toast = Swal.mixin({
+            toast: true,
+            position: "bottom-end",
+            showConfirmButton: false,
+            timer: 2000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+              toast.addEventListener("mouseenter", Swal.stopTimer);
+              toast.addEventListener("mouseleave", Swal.resumeTimer);
+            },
+          });
 
-              Toast.fire({
-                icon: 'success',
-                title: 'Producto modificado.'
-              })
-            })
+          Toast.fire({
+            icon: "success",
+            title: "Producto modificado.",
+          });
+        })
         .catch((error) => {
-          console.error('Error al actualizar el estado en la base de datos:', error);
+          console.error(
+            "Error al actualizar el estado en la base de datos:",
+            error
+          );
         });
     },
     eliminar(productoId) {
       Swal.fire({
-        icon: 'info',
+        icon: "info",
         title: `<strong>¿Estas segur@?</strong>`,
         html: ``,
         showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonText: 'No, cancelar',
-        confirmButtonText: 'Sí, eliminar!'
+        confirmButtonColor: "#3085d6",
+        cancelButtonText: "No, cancelar",
+        confirmButtonText: "Sí, eliminar!",
       }).then((result) => {
         if (result.isConfirmed) {
-          axios.delete('/eliminarProducto', {
-            data: { productoId: productoId }
-          })
+          axios
+            .delete("/eliminarProducto", {
+              data: { productoId: productoId },
+            })
             .then(() => {
-              const index = this.productos.findIndex(producto => producto.producto_id === productoId);
+              const index = this.productos.findIndex(
+                (producto) => producto.producto_id === productoId
+              );
               if (index !== -1) {
                 this.productos.splice(index, 1);
               }
               const Toast = Swal.mixin({
                 toast: true,
-                position: 'bottom-end',
+                position: "bottom-end",
                 showConfirmButton: false,
                 timer: 3000,
                 timerProgressBar: true,
                 didOpen: (toast) => {
-                  toast.addEventListener('mouseenter', Swal.stopTimer)
-                  toast.addEventListener('mouseleave', Swal.resumeTimer)
-                }
-              })
+                  toast.addEventListener("mouseenter", Swal.stopTimer);
+                  toast.addEventListener("mouseleave", Swal.resumeTimer);
+                },
+              });
 
               Toast.fire({
-                icon: 'success',
-                title: 'Producto eliminado.'
-              })
+                icon: "success",
+                title: "Producto eliminado.",
+              });
             })
             .catch((error) => {
-              console.error('Error al eliminar el producto:', error);
+              console.error("Error al eliminar el producto:", error);
               Swal.fire({
-                icon: 'error',
-                title: 'Error al eliminar',
-                text: error.message // Usamos error.message para obtener el mensaje de error.
+                icon: "error",
+                title: "Error al eliminar",
+                text: error.message, // Usamos error.message para obtener el mensaje de error.
               });
             });
-
         }
-      })
+      });
     },
     agregarCategoria() {
-
-      axios.post('nuevaCategoria', { categoria_nombre: this.categoria_nombre, usuario_nombre: localStorage.getItem('usuario') }).then(() => {
-        // Agregar la nueva categoría a la lista de categorías
-        // Limpiar el campo de nombre de categoría
-        this.productoModificar.producto_categoria = this.categoria_nombre;
-        this.categoria_nombre = '';
-
-        // Opcional: Puedes seleccionar automáticamente la nueva categoría
-        const Toast = Swal.mixin({
-          toast: true,
-          position: 'bottom-end',
-          showConfirmButton: false,
-          timer: 3000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer)
-            toast.addEventListener('mouseleave', Swal.resumeTimer)
-          }
+      axios
+        .post("nuevaCategoria", {
+          categoria_nombre: this.categoria_nombre,
+          usuario_nombre: localStorage.getItem("usuario"),
         })
+        .then(() => {
+          // Agregar la nueva categoría a la lista de categorías
+          // Limpiar el campo de nombre de categoría
+          this.productoModificar.producto_categoria = this.categoria_nombre;
+          this.categoria_nombre = "";
 
-        Toast.fire({
-          icon: 'success',
-          title: 'Categoría agregada.'
+          // Opcional: Puedes seleccionar automáticamente la nueva categoría
+          const Toast = Swal.mixin({
+            toast: true,
+            position: "bottom-end",
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+              toast.addEventListener("mouseenter", Swal.stopTimer);
+              toast.addEventListener("mouseleave", Swal.resumeTimer);
+            },
+          });
+
+          Toast.fire({
+            icon: "success",
+            title: "Categoría agregada.",
+          });
+          this.agregarCategoriaModalAbierto = false;
         })
-        this.modalAbierto = true;
-      }).catch(() => {
-        Swal.fire({
-          icon: 'error',
-          text: 'No se pudo agregar la categoría.'
+        .catch((error) => {
+          Swal.fire({
+            icon: "error",
+            text: 'No se pudo agregar la categoría. ' + error.response.data.message,
+          });
         });
-      });
     },
     imagenSeleccionada(event) {
       const file = event.target.files[0];
@@ -351,14 +416,138 @@ export default {
         reader.readAsDataURL(file);
       }
     },
-
   },
-
-
 };
 </script>
 
 <style scoped>
+.btn-edit {
+  display: inline-block;
+  text-align: center;
+  color: white;
+  border: none;
+  box-shadow: 0.2px 0.2px 2px black !important;
+  border-radius: 1px;
+  background: linear-gradient(rgb(148, 193, 252), rgb(0, 90, 207)) !important;
+
+}
+
+.btn-edit:hover {
+  background: linear-gradient(rgb(148, 193, 252), rgb(0, 87, 168)) !important;
+}
+
+.btn-delete {
+  display: inline-block;
+  text-align: center;
+  color: white;
+  border: none;
+  box-shadow: 0.2px 0.2px 2px black !important;
+  border-radius: 1px;
+  background: linear-gradient(rgb(255, 175, 175), rgb(207, 0, 0)) !important;
+
+}
+
+.btn-delete:hover {
+  background: linear-gradient(rgb(255, 175, 175), rgb(168, 0, 0)) !important;
+}
+
+.categoria-productos {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.7s ease-in-out;
+  /* Duración y función de la transición */
+}
+
+/* Clase para activar la categoría seleccionada */
+.categoria-activa {
+  max-height: 1000px;
+  /* Altura máxima suficientemente grande para mostrar todos los productos */
+}
+
+.categoria-container {
+  padding: 5px;
+  border: 5px;
+  background-color: white;
+  border-radius: 20px;
+}
+
+.titulo-categoria {
+  font-size: 30px;
+  background: linear-gradient(to right, rgb(254, 255, 174), #ffffff);
+  width: 100%;
+  margin: 0px;
+  padding: 5px 10px;
+  cursor: pointer;
+
+}
+
+.tarjetaProducto {
+  border: 5px;
+  background-color: white;
+  border-radius: 10px;
+  display: inline-block;
+}
+
+.descripcion {
+  font-style: italic;
+}
+
+img {
+  object-fit: contain;
+}
+
+.imagen {
+  height: 100px;
+  width: 100px;
+  /* Ajustamos el tamaño de la imagen */
+  margin-right: 20px;
+  /* Añadimos un margen a la derecha */
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+
+.item-imagen {
+  width: 100px;
+  margin-right: 10px;
+}
+
+.item-container {
+  display: flex;
+  /* Utilizamos flexbox para posicionar los elementos */
+  align-items: center;
+  border-bottom: solid rgba(0, 0, 0, 0.2) 1px;
+  padding-bottom: 5px;
+}
+
+.item-texto-block {
+  width: 100%;
+  /* Hacemos que este bloque ocupe el espacio disponible */
+}
+
+.item-texto-block-start {
+  width: 80%;
+  /* Hacemos que este bloque ocupe el espacio disponible */
+}
+
+.item-precio {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.item-nombre {
+  font-size: 20px;
+}
+
+.item-descripcion {
+  font-size: 16px;
+  font-style: italic;
+}
+
+.item-texto-block-end {
+  text-align: center;
+  margin: auto;
+}
+
 .mauto {
   margin: auto !important;
   vertical-align: middle;
@@ -368,12 +557,15 @@ export default {
   display: flex;
   justify-content: space-between;
 }
-img{
-    object-fit:contain;
+
+img {
+  object-fit: contain;
 }
-.imagen{
-    height: 100px;
+
+.imagen {
+  height: 100px;
 }
+
 .ancho {
   min-height: 60vh;
   overflow: auto;
@@ -404,9 +596,17 @@ th {
   display: inline-flex;
   margin-top: auto;
 }
+
 .form-switch {
-    padding-left: 4em;
+  height: 2em !important;
+  margin-left: 16%;
 }
+
+.form-check-input {
+  height: 1.5em !important;
+  width: 2.5em !important;
+}
+
 @media screen and (max-width: 992px) {
   .ancho-busqueda {
     width: 180px;

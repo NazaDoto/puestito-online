@@ -6,6 +6,7 @@
                 <div class="caja">
                 <img src="/recursos/approve.png" width="100">
                     <h1>Pago Aprobado.</h1>
+                    Usuario registrado exitosamente. <br>
                     <router-link class="btn btn-menu mt-3" to="/u/login">Ingresar</router-link>
                 </div>
             </div>
@@ -15,6 +16,7 @@
                 <div class="caja">
                     <img src="/recursos/decline.png" width="100">                    
                     <h1>No se pudo realizar el pago.</h1>
+                    Usuario registrado exitosamente (cuenta gratis). <br>
                     <router-link class="btn btn-menu mt-3" to="/u/login">Volver</router-link>
                 </div>
             </div>
@@ -24,6 +26,7 @@
                 <div class="caja">
                     <img src="/recursos/pending.png" width="100">
                     <h1>Pago Pendiente.</h1>
+                    Usuario registrado exitosamente (cuenta gratis). <br>
                     <router-link class="btn btn-menu mt-3" to="/u/login">Volver</router-link>
                 </div>
             </div>
@@ -46,8 +49,8 @@ export default {
     },
     methods: {
         getStatus() {
-            this.estado = this.$route.query.status;
-            console.log(this.estado)
+            const datos = this.$route.query;
+            this.estado = datos.status;
         },
     }
 

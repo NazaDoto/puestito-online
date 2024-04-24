@@ -26,15 +26,17 @@
                     <div class="modalMapa mt-2" v-show="mapaMostrado2" style="height: 400px;">
                         <!-- Aquí iría todo lo relacionado con el mapa de Google Maps -->
                         <GMapMap style="height: 400px;" :center="mapCenter" :zoom="zoom" :options="options">
+                            <GMapMarker v-if="posicionActual" :position="posicionActual" :options="{icon:'/recursos/pinself.png'}" :title="'Estás aquí.'">
+                            </GMapMarker>
                             <GMapMarker v-for="(negocio, index) in negocios" :key="index" :position="negocio.location"
-                                :title="negocio.nombre" @click="openInfoWindow(index)">
+                                :title="negocio.nombre" @click="openInfoWindow(index)" :options="{icon:'/recursos/pin30.png'}" id="gmapm">
                                 <GMapInfoWindow v-if="infoWindowOpened == index" :options="infoWindow[index].options"
                                     :closeclick="true" @closeclick="openInfoWindow(null)">
                                     <div style="max-width: 150px;">
                                         <b style="font-size:20px;">{{ negocio.nombre }}</b><br>
                                         <div style="text-align:center;">
                                             <a style="text-decoration:none;color:white;font-size:12px;padding:4px 6px;"
-                                                :href="'https://nazadoto.com/' + negocio.usuario" target="_blank"><img
+                                                :href="'https://puestito.online/' + negocio.usuario" target="_blank"><img
                                                     src="/favicon.ico" width="20" alt=""></a>
                                             <a v-if="negocio.instagram" :href="negocio.instagram" target="blank"><img
                                                     style="margin:0px 10px" width='20'
@@ -70,7 +72,7 @@
                             </div>
                             <!-- Botón para dirigirse al menú -->
                             <div class="item-btn">
-                                <a class="cursor-pointer mt-1" @click="localizar(negocio, index)"><img src="/recursos/pin.png" width="30" alt=""></a>
+                                <a v-if="negocio.location !== null" class="cursor-pointer mt-1" @click="localizar(negocio, index)"><img src="/recursos/pin.png" width="30" alt=""></a>
                                 <router-link class="item-texto-block-end" :to="'/' + negocio.usuario" target="_blank">
                                     <img src="/favicon.ico" width="30" alt="">
                                 </router-link>
@@ -100,6 +102,7 @@ export default {
     name: 'MapaComponent',
     data() {
         return {
+            posicionActual: '',
             options: {
                 disableDefaultUI: true,
                 styles: [{
@@ -126,7 +129,6 @@ export default {
         this.fetchNegocios();
     },
     mounted(){
-        console.log(this.$route.params);
         if (this.$route.params){
             router.push('/', this.$route.params);
         }
@@ -166,7 +168,8 @@ export default {
                             lat: coords.coords.latitude,
                             lng: coords.coords.longitude
                         };
-                        this.mapCenter = position;
+                        this.mapCenter = this.posicionActual = position;
+                        
                     }, (error) => {
                         console.log('Error al geolocalizar. Inicializando en Plaza Libertad. ', error);
                     });

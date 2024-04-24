@@ -38,3 +38,9 @@ CREATE TABLE `categorias` (
   PRIMARY KEY (`categoria_id`),
   UNIQUE KEY `categoria_nombre` (`categoria_nombre`)
 ) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=latin1;
+
+create table facturas(
+factura_id bigint unique,
+factura_ext_ref varchar(100),
+factura_status varchar(32)
+);

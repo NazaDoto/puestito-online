@@ -3,6 +3,7 @@
         <NavbarComponent></NavbarComponent>
         <div class="container mt-4 mb-2">
             <h1 class="text-center">Nuevo Producto</h1>
+            
             <form @submit.prevent="nuevoProducto(this.producto)" enctype="multipart/form-data">
                 <div class="row g-3 div-forms border mt-2">
                     <h4 class="titulo-div-forms mb-2">Información del Producto</h4>
@@ -24,8 +25,7 @@
                         </select>
                     </div>
                     <div class="col-md-6 izq">
-                        <button type="button" class="btn btn-agregar" data-bs-toggle="modal"
-                            data-bs-target="#agregarCategoria">
+                        <button type="button" class="btn btn-agregar" @click="agregarCategoriaModal">
                             Agregar Categoría
                         </button>
                     </div>
@@ -35,7 +35,7 @@
                     </div>
                     <div class="col-md-6">
                         <label class="form-label mr-2" for="imagen">Imagen (JPG)</label>
-                        <input class="form-control" type="file" name="imagen" id="imagen" accept=".jpg"
+                        <input class="form-control mb-3" type="file" name="imagen" id="imagen" accept=".jpg"
                             @change="imagenSeleccionada($event)" />
                     </div>
                 </div>
@@ -45,45 +45,82 @@
                 </div>
             </form>
             <!-- Modal -->
-            <div class="modal fade" id="agregarCategoria" tabindex="-1" aria-labelledby="agregarCategoriaLabel"
-                aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content ">
-                        <div class="modal-header">
-                            <h1 class="modal-title fs-5" id="agregarCategoriaLabel">Nueva Categoría</h1>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <form @submit.prevent="agregarCategoria">
-                                <input class="form-control" type="text" id="nombre" v-model="categoria_nombre"
-                                    placeholder="Nombre de la Categoría" required />
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary"
-                                        data-bs-dismiss="modal">Cerrar</button>
-                                    <button class="btn btn-primary" type="submit"
-                                        data-bs-dismiss="modal">Agregar</button>
-                                </div>
-                            </form>
+            <div v-if="agregarCategoriaModalAbierto" class="modalCategoriaContainer">
+                <div class="modalCategoria">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content ">
+                            <div class="modal-header pl-2">
+                                <h1 class="modal-title fs-5" id="agregarCategoriaLabel">Nueva Categoría</h1>
+                                <button type="button" class="btn-close" @click="cerrarCategoriaModal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body mt-2">
+                                <form @submit.prevent="agregarCategoria">
+                                    <input class="form-control" type="text" id="nombre" v-model="categoria_nombre"
+                                        placeholder="Nombre de la Categoría" required />
+                                    <div class="modal-footer mt-2">
+                                        <button type="button" class="btn" @click="cerrarCategoriaModal">Cerrar</button>
+                                        <button class="btn btn-agregar" type="submit">Agregar</button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+            <!-- Modal IMPORTAR -->
+            <div class="modal fade" id="importar" tabindex="-1" aria-labelledby="importarLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content ">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="importarLabel">Importar desde Excel</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form @submit.prevent="importar">
+                            <div class="modal-body text-center">
+                                <p class="text-center">Asegurate de que en tu planilla de Excel existan las columnas con
+                                    encabezados <strong>"Producto"</strong>, en donde se encontrará
+                                    el nombre del producto, y <strong>"Precio"</strong>, en donde se encontrará el
+                                    precio del producto. <u>(Se ignorará el resto de columnas)</u>.
+                                    Más adelante podrás modificar la información de los mismos en la pestaña
+                                    <strong>"Listar Productos"</strong>.
+                                </p>
+                                <img class="m-auto" src="/recursos/ejemplo-xlsx.png" width="100%" alt="">
+                                <input class="form-control mt-4" accept=".xlsx, .xls" type="file" name="importar"
+                                    id="importar" @change="cargarImportacion" required>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn" data-bs-dismiss="modal">Cerrar</button>
+                                <button class="btn btn-menu" type="submit">Importar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
+        <div class="text-end">
+            <i> o importar listado desde Excel -></i>
+                <button type="button" class="btn btn-importar" data-bs-toggle="modal" data-bs-target="#importar">
+                   <img src="/recursos/xlsx.png" width="50" alt="" title="Importar desde Excel">
+                </button>
+            </div>
     </div>
 </template>
 
 <script>
-import router from '@/router';
 import NavbarComponent from './NavbarComponent.vue';
 import axios from 'axios';
 import Swal from 'sweetalert2';
-
+import * as XLSX from 'xlsx';
 export default {
     components: {
         NavbarComponent,
     },
     data() {
         return {
+            agregarCategoriaModalAbierto: false,
+            archivo: null,
+            usuario: '',
             producto: {
                 nombre: '',
                 descripcion: '',
@@ -103,8 +140,94 @@ export default {
         this.obtenerUsuario();
     },
     methods: {
+        cerrarCategoriaModal() {
+            this.agregarCategoriaModalAbierto = false;
+        },
+        agregarCategoriaModal() {
+            this.agregarCategoriaModalAbierto = true;
+        },
+        cargarImportacion(evento) {
+            this.archivo = evento.target.files[0];
+        },
+        async importar() {
+            if (!this.archivo) {
+                console.error('No se ha seleccionado ningún archivo');
+                return;
+            }
+
+            // Leer el archivo Excel
+            const reader = new FileReader();
+
+            reader.onload = async (e) => {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    // Obtener la primera hoja del libro de trabajo
+                    const sheetName = workbook.SheetNames[0];
+                    const sheet = workbook.Sheets[sheetName];
+
+                    // Convertir la hoja de cálculo a un objeto JSON
+                    const jsonData = XLSX.utils.sheet_to_json(sheet);
+
+                    // Procesar los datos y guardarlos en la base de datos
+                    await this.guardarProductos(jsonData);
+                } catch (error) {
+                    console.error('Error al leer el archivo:', error);
+                }
+            };
+
+            reader.readAsArrayBuffer(this.archivo);
+        },
+
+        async guardarProductos(data) {
+            // Iterar sobre los datos y guardarlos en la base de datos
+            try {
+
+                for (const item of data) {
+                    let precio = item['P. Venta'];
+
+                    // Verificar si el precio comienza con $ o € y eliminar el símbolo
+                    try {
+                        if (precio.startsWith('$') || precio.startsWith('€')) {
+                            precio = precio.replace('$', '').replace('€', '');
+                        }
+
+                        // Convertir una coma en punto si está presente en el precio
+                        if (precio.includes(',')) {
+                            precio = precio.replace(',', '.');
+                        }
+                    } catch { null }
+
+                    // Crear el objeto producto con el precio modificado
+                    const producto = {
+                        nombre: item['Producto'],
+                        precio: parseFloat(precio), // Convertir el precio a número flotante
+                        categoria: 'Varios',
+                        disponibilidad: 1,
+                        imagen: '',
+                        usuario: this.usuario
+                    };
+
+                    // Aquí deberías hacer una petición HTTP a tu servidor para guardar el producto en la base de datos
+                    // Por ejemplo, utilizando axios
+                    try {
+                        this.nuevoProducto(producto);
+                    } catch (error) {
+                        Swal.fire({
+                            icon: 'error',
+                            text: 'No se pudo agregar el producto.',
+                        });
+                    }
+                }
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    text: 'No se pudo agregar el producto. Verifica la información del Excel.' + error,
+                });
+            }
+        },
         obtenerUsuario() {
-            this.producto.usuario = localStorage.getItem('usuario');
+            this.producto.usuario = this.usuario = localStorage.getItem('usuario');
         },
         obtenerCategorias() {
             // Realizar una solicitud para obtener las categorías desde el servidor
@@ -149,7 +272,7 @@ export default {
                     });
                     this.modalAbierto = true;
                     setTimeout(function () {
-                        router.push('/u/nuevoProducto');
+                        location.reload();
                     }, 2000);
                 })
                 .catch(() => {
@@ -187,12 +310,12 @@ export default {
                         icon: 'success',
                         title: 'Categoría agregada.',
                     });
-                    this.modalAbierto = true;
+                    this.agregarCategoriaModalAbierto = false;
                 })
-                .catch(() => {
+                .catch((error) => {
                     Swal.fire({
                         icon: 'error',
-                        text: 'No se pudo agregar la categoría.',
+                        text: 'No se pudo agregar la categoría. ' + error.response.data.message,
                     });
                 });
         },
@@ -202,6 +325,8 @@ export default {
 
 
 <style scoped>
+
+
 textarea {
     margin: auto !important;
 }
@@ -214,22 +339,16 @@ textarea {
     margin: auto;
 }
 
-.btn-agregar {
-    background: linear-gradient( rgb(255, 251, 234), rgb(255, 240, 155)) !important;
-    box-shadow:0.2px 0.2px 2px white;
-    border:none;
-    border-radius: 1px;
-}
+
 
 .modal-footer {
     border-top: none;
 }
 
-.btn-agregar:hover {
-    background: linear-gradient( rgb(253, 247, 217), rgb(255, 236, 128)) !important;
-}
+
 
 .mr-2 {
     margin-right: 15px;
 }
+
 </style>

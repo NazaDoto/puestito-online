@@ -18,8 +18,8 @@
           <div class="col-md-8">
             <button type="submit" class="btn btn-entrar">Entrar</button>
           </div>
-          <router-link  to="/u/planes">Registrar Negocio</router-link>
-          <router-link  to="/">Volver</router-link>
+          <router-link to="/u/planes">Registrar Negocio</router-link>
+          <router-link to="/">Volver</router-link>
         </form>
       </div>
       <div class="derecha">
@@ -57,13 +57,15 @@ export default {
 
         // Maneja la respuesta del backend
         if (response.status === 200) {
+
+          const fecha = await axios.post('/comprobar-vencimiento', { usuario: response.data.nomUsuario });
+          const fechaVence = fecha.data;
           // Almacena el token en el almacenamiento local
           localStorage.setItem("token", response.data.token);
           localStorage.setItem("nombre", response.data.nombre);
           localStorage.setItem("usuario", response.data.nomUsuario);
-          const fechaVence = new Date(response.data.fechaVence);
-          
-          localStorage.setItem("año", fechaVence.getFullYear());
+
+          localStorage.setItem("año", fechaVence);
           // Redirige al usuario a la página de inicio (por ejemplo, /u/home)
           this.$router.push("/u/home");
           const Toast = Swal.mixin({
@@ -106,7 +108,7 @@ a {
   color: white;
   width: 50%;
   height: 60px;
-  background: linear-gradient( rgb(175, 210, 255), rgb(0, 90, 207)) !important;
+  background: linear-gradient(rgb(175, 210, 255), rgb(0, 90, 207)) !important;
   font-size: large;
   border: none;
   box-shadow: 0.5px 1px 4px black;
@@ -114,7 +116,7 @@ a {
 }
 
 .btn-entrar:hover {
-  background: linear-gradient( rgb(175, 210, 255), rgb(0, 87, 168)) !important;
+  background: linear-gradient(rgb(175, 210, 255), rgb(0, 87, 168)) !important;
 }
 
 h1.titulo {

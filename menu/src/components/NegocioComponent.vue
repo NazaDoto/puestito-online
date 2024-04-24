@@ -37,13 +37,12 @@
                             <img :src="negocio.imagen" alt="" class="img-negocio">
                             <div class="texto-superpuesto">BIENVENIDOS
                                 <div class="texto-superpuesto2">"{{ negocio.descripcion }}"</div>
-                                <div class="text-center">
-                                    <a :href="'https://www.google.com/maps/search/' + encodeURIComponent(negocio.direccion)" target="_blank"><img width='40' src="/recursos/pin.png"></a> <br>
-
+                                <div class="text-center redes">                                    
                                     <a v-if="negocio.instagram" class="mauto" :href="negocio.instagram"
-                                        target="blank"><img width='40' src="/recursos/instagram.png"></a>
+                                    target="blank"><img width='40' src="/recursos/instagram.png"></a>
                                     <a v-if="negocio.facebook" class="mauto" :href="negocio.facebook"
-                                        target="blank"><img width='36' src="/recursos/facebook.png"></a>
+                                    target="blank"><img width='36' src="/recursos/facebook.png"></a>
+                                    <a v-if="negocio.direccion" :href="'https://www.google.com/maps/search/' + encodeURIComponent(negocio.direccion)" target="_blank"><img width='40' src="/recursos/pin.png"></a>
                                 </div>
                             </div>
                         </div>
@@ -187,15 +186,19 @@
                     </div>
                     <form @submit.prevent="realizarPedido">
                         <div class="modal-body">
-                            <input type="text" class="form-control" placeholder="Nombre y Apellido (obligatorio)"
-                                v-model="pedido.nombre" required>
-                            <select class="form-control form-select mt-4" id="" v-model="pedido.medio" required>
+                            <label class="mt-2" for="nombre">Nombre y Apellido</label>
+                            <input type="text" id="nombre" class="form-control" placeholder="(obligatorio)"
+                            v-model="pedido.nombre" required>
+                            <label class="mt-2" for="medioPago">Medio de Pago</label>
+                            <select class="form-control form-select" id="medioPago" v-model="pedido.medio" required>
                                 <option value="Transferencia">Transferencia</option>
                                 <option value="Efectivo">Efectivo</option>
                             </select>
-                            <input type="text" class="form-control mt-4" placeholder="Dirección (opcional)"
-                                v-model="pedido.direccion">
-                            <input type="text" class="form-control mt-4" placeholder="Detalle del pedido (opcional)"
+                            <label class="mt-2" for="direccion">Dirección de entrega</label>
+                            <input type="text" id="direccion" class="form-control" placeholder="(opcional)"
+                            v-model="pedido.direccion">
+                            <label class="mt-2" for="detalles">Detalles del pedido</label>
+                            <input type="text" id="detalles" class="form-control" placeholder="(opcional)"
                                 v-model="pedido.detalle">
                         </div>
                         <div class="modal-footer">
@@ -311,8 +314,8 @@ export default {
 
             localStorage.setItem('pedido', JSON.stringify(this.pedido));
 
-            const mensaje = `¡Hola *${this.negocio.nombre}*! Quiero realizar un pedido:\n`;
-            const productos = this.carrito.map(producto => `*${producto.producto_nombre}:* $${producto.producto_precio} (${producto.cantidadSeleccionada})\n\n`);
+            const mensaje = `¡Hola *${this.negocio.nombre}*! \nQuiero realizar un pedido:\n`;
+            const productos = this.carrito.map(producto => `- *${producto.producto_nombre}:* $${producto.producto_precio} (${producto.cantidadSeleccionada})\n\n`);
             const total = `*Total: $${this.total}*\n\n`;
             let datos = `*Nombre:* ${this.pedido.nombre}\n*Medio de pago:* ${this.pedido.medio}\n`;
             this.pedido.direccion ? datos += `*Dirección:* ${this.pedido.direccion}\n` : this.pedido.detalle ? datos += `*Detalle:* ${this.pedido.detalle}\n\n¡Muchas gracias!` : datos += `\n¡Muchas gracias!`;
@@ -573,31 +576,39 @@ export default {
     position: relative;
     height: 100%;
 }
+.presentacion{
+    height: 90vh;
+}
 
 .img-negocio {
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: cover;
     filter: blur(6px);
     clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
 }
 
 .texto-superpuesto {
     position: absolute;
-    top: 50%;
+    top: 40%;
     left: 50%;
     transform: translate(-50%, -50%);
     font-size: 3rem;
     font-weight: bold;
     color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);    
     text-align: center;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+.redes{
+    position:absolute;
+    top:45vh;
+    width: 100%;
+    text-align: center;
 }
 
 .texto-superpuesto2 {
     font-size: 20px;
     color: white;
-    text-align: center;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
@@ -652,7 +663,6 @@ nav {
     margin: 0px;
     padding: 5px 10px;
     cursor: pointer;
-
 }
 
 .tarjetaProducto {
@@ -751,7 +761,6 @@ ul {
 .container2 {
     margin: 0px 30vw;
 }
-
 @media screen and (max-width: 992px) {
     .navbar{
         background: linear-gradient(to right, rgb(254, 255, 174), #ffffff);

@@ -1,12 +1,12 @@
 <template>
     <div>
         <NavbarComponent></NavbarComponent>
-        <div class="container mt-2 mb-2">
+        <div class="container mt-2 mb-2 text-center">
             <!-- Mostrar información del negocio -->
             <div v-if="negocio">
                 <div class="tarjeta-container">
-                    <div>
-                        <div class="titulo-categoria">Mi Perfil</div>
+                    <div class="row">
+                        <h1 class="text-center">Mi Perfil</h1>
                         <div class="p-2 text-center">
                             <div class="tarjetaProducto">
                                 <div v-if="negocio.imagen">
@@ -17,24 +17,59 @@
                                         <h3 class="izquierda">{{ negocio.nombre }}</h3>
 
                                     </div>
-                                    <hr class="mt-2 mb-2">
+                                    <table class="table table-light table-striped">
+                                        <thead>
+                                            <th></th>
+                                            <th></th>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <strong>Correo:</strong>
+                                                </td>
+                                                <td>{{ negocio.correo }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Teléfono:</strong></td>
+                                                <td>{{ negocio.telefono }}</td>                                                 
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Dirección:</strong></td>
+                                                <td>{{ negocio.direccion }}</td>                                                 
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Descripción:</strong></td>
+                                                <td>{{ negocio.descripcion }}</td>                                                 
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                     <div class="descripcion text-start">
-                                        <strong>Correo:</strong> {{ negocio.correo }} <br>
-                                        <strong>Teléfono:</strong> {{ negocio.telefono }} <br>
-                                        <strong>Dirección:</strong> {{ negocio.direccion }} <br>
-                                        <strong>Descripción:</strong> {{ negocio.descripcion }} <br>
                                         <div class="text-center">
-                                            <a v-if="negocio.instagram" class="mauto" :href="negocio.instagram" target="blank"><img width='40' src="/recursos/instagram.png"></a>
+                                            <a v-if="negocio.instagram" class="mauto" :href="negocio.instagram"
+                                                target="blank"><img width='40' src="/recursos/instagram.png"></a>
                                             <div v-else>Sin Instagram</div>
-                                            <a v-if="negocio.facebook" class="mauto" :href="negocio.facebook" target="blank"><img width='36' src="/recursos/facebook.png"></a>
+                                            <a v-if="negocio.facebook" class="mauto" :href="negocio.facebook"
+                                                target="blank"><img width='36' src="/recursos/facebook.png"></a>
                                             <div v-else>Sin Facebook</div>
                                         </div>
                                     </div>
                                     <button class="btn btn-menu derecha mt-2 mb-2" title="Modificar"
-                                        data-bs-toggle="modal" data-bs-target="#modificarProducto">Modificar</button>
+                                        data-bs-toggle="modal" data-bs-target="#modificarProducto">Modificar
+                                        Datos</button>
                                 </div>
                             </div>
+                            <br>
+                            <div v-if="fechaVence == '2100'">
+                                <h4 class="titulo-div-forms mb-2">Esta es una cuenta gratis.</h4>
+                                <hr class="mt-2 mb-2">
+                                <button @click="mejorarPlan" class="btn btn-menu derecha mb-2">Mejorar Plan</button>
+                            </div>
+                            <div v-else>
+                                <h4 class="titulo-div-forms mb-2">Esta es una cuenta Premium.</h4>
+                                <h4 class="titulo-div-forms mb-2">Vence: {{fechaVence}}</h4>
+                            </div>
                         </div>
+
                     </div>
                 </div>
 
@@ -50,36 +85,36 @@
                                     aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <form @submit.prevent="modificarPerfil(this.negocio)">
+                                <form @submit.prevent="modificarPerfil">
                                     <div class="row g-3 div-forms border">
                                         <h4 class="titulo-div-forms mb-2">Información del Negocio</h4>
                                         <div>
-                                            <input class="form-control" type="text" id="nombre" v-model="negocio.nombre"
+                                            <input class="form-control" type="text" id="nombre" v-model="negocioModificar.nombre"
                                                 placeholder="Nombre del Negocio" required>
                                         </div>
                                         <div>
                                             <input class="form-control" type="email" id="correo"
-                                                v-model="negocio.correo" placeholder="Correo">
+                                                v-model="negocioModificar.correo" placeholder="Correo">
                                         </div>
                                         <div>
                                             <input class="form-control" type="number" id="telefono"
-                                                v-model="negocio.telefono" placeholder="Teléfono">
+                                                v-model="negocioModificar.telefono" placeholder="Teléfono">
                                         </div>
                                         <div>
                                             <input class="form-control" type="text" id="direccion"
-                                                v-model="negocio.direccion" placeholder="Dirección" required>
+                                                v-model="negocioModificar.direccion" placeholder="Dirección">
                                         </div>
                                         <div>
                                             <input class="form-control" type="text" id="descripcion"
-                                                v-model="negocio.descripcion" placeholder="Descripción">
+                                                v-model="negocioModificar.descripcion" placeholder="Descripción">
                                         </div>
                                         <div>
                                             <input class="form-control" type="text" id="instagram"
-                                                v-model="negocio.instagram" placeholder="Instagram">
+                                                v-model="negocioModificar.instagram" placeholder="Instagram">
                                         </div>
                                         <div>
                                             <input class="form-control" type="text" id="facebook"
-                                                v-model="negocio.facebook" placeholder="Facebook">
+                                                v-model="negocioModificar.facebook" placeholder="Facebook">
                                         </div>
                                         <div>
                                             <label class="form-label mr-2" for="imagen">Imagen (JPG)</label>
@@ -88,8 +123,8 @@
                                         </div>
                                     </div>
                                     <div class="text-end">
-                                        <button class="btn btn-menu botones mt-3" type="submit"
-                                            data-bs-dismiss="modal" aria-label="Close">Modificar</button>
+                                        <button class="btn btn-menu botones mt-3" type="submit" data-bs-dismiss="modal"
+                                            >Modificar</button>
                                     </div>
                                 </form>
                             </div>
@@ -115,9 +150,11 @@ export default {
     },
     data() {
         return {
+            fechaVence: '',
             negocio: {
                 usuario: '',
                 nombre: '',
+                fechaVence: '',
                 correo: '',
                 telefono: '',
                 direccion: '',
@@ -126,6 +163,7 @@ export default {
                 instagram: '',
                 facebook: ''
             },
+            negocioModificar: '',
         };
     },
     mounted() {
@@ -135,9 +173,12 @@ export default {
         this.obtenerInformacionNegocio();
     },
     methods: {
-        modificarPerfil(negocio) {
-            axios.put('/modificarPerfil', { negocio: negocio }).then(() => {
-                localStorage.setItem('nombre', this.negocio.nombre);
+        mejorarPlan(){
+            router.push('/u/planes');
+        },
+        modificarPerfil() {
+            axios.put('/modificarPerfil', { negocio: this.negocioModificar }).then(() => {
+                localStorage.setItem('nombre', this.negocioModificar.nombre);
                 const Toast = Swal.mixin({
                     toast: true,
                     position: 'bottom-end',
@@ -155,7 +196,7 @@ export default {
                     title: 'Datos modificados.'
                 });
                 setTimeout(function () {
-                    router.push('/u/productos');
+                    location.reload();
                 }, 2000);
             })
                 .catch((error) => {
@@ -168,6 +209,9 @@ export default {
                 const response = await axios.get(`/miNegocio?usuario=${localStorage.getItem('usuario')}`);
                 // Actualiza la lista de informes con los datos recibidos
                 this.negocio = response.data;
+                this.negocioModificar = response.data;
+                const fechaVence = new Date(response.data.fechaVence);
+                this.fechaVence = fechaVence.getDate() + '/' + (Number(fechaVence.getMonth()) + 1 )+ '/' + fechaVence.getFullYear();
             } catch (error) {
                 console.error("Error al cargar los productos:", error);
             }
@@ -190,12 +234,19 @@ export default {
 </script>
 
 <style scoped>
-.mauto{
+.block{
+    display: block !important;
+    width: 400px;
+}
+
+.mauto {
     margin: 10px;
 }
-.socials-ico{
+
+.socials-ico {
     margin: 30px;
 }
+
 hr {
     margin: 0px;
 }
@@ -219,7 +270,6 @@ hr {
 .titulo-categoria {
     font-weight: bold;
     font-size: 30px;
-    font-style: italic;
 }
 
 .tarjetaProducto {

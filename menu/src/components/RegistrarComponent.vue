@@ -2,69 +2,88 @@
     <div>
         <NavbarAdminComponent v-if="usuario == 'admin'"></NavbarAdminComponent>
         <NavbarPublicoComponent v-else></NavbarPublicoComponent>
-        <div class="container mt-4 mb-2">
-            <div class="row g-3 mt-4 border">
+        <div v-if="cargandoPago" class="pantalla-carga text-center">
+            <div class="logo-carga">
+                <img class="logo-img" src="/favicon.ico" width="50" alt="" />
+                <div class="texto-carga">Procesando pago...</div>
+            </div>
+        </div>
+        <div v-else class="container mt-4 mb-2">
+            <div v-if="!usuario" class="row g-3 mt-4 border">
                 <form @submit.prevent="registrarNegocio" id="form-checkout">
-                    <div class="row g-3  border">
+                    <div class="row g-3 border">
                         <h4 class="titulo- mb-2">Información de acceso</h4>
                         <h4 class="subtitulo">Cómo ingresarás a la plataforma.</h4>
                         <div class="col-md-6">
-                            <input class="form-control" type="text" id="username" v-model="negocio.usuario"
-                                placeholder="Nombre de Usuario" required>
+                            <input :class="{ 'usuario-disponible': !usuarioDisponible }" class="form-control"
+                                type="text" id="username" v-model="negocio.usuario" @change="verificarDisponibilidad"
+                                placeholder="Nombre de Usuario" required />
                         </div>
                         <div class="col-md-6">
                             <input class="form-control" type="password" id="password" v-model="negocio.contraseña"
-                                placeholder="Contraseña" required>
+                                placeholder="Contraseña" required />
                         </div>
                         <h4 class="titulo- mb-2">Información del negocio</h4>
-                        <h4 class="subtitulo">Más adelante podés modificar esta información.</h4>
+                        <h4 class="subtitulo">
+                            Más adelante podés modificar esta información.
+                        </h4>
                         <div class="col-md-6">
                             <input class="form-control" type="text" id="nombre" v-model="negocio.nombre"
-                                placeholder="Nombre (Así aparecerás en la página)" required>
+                                placeholder="Nombre (Así aparecerás en la página)" required />
                         </div>
                         <div class="col-md-6">
                             <input class="form-control" type="text" id="descripcion" v-model="negocio.descripcion"
-                                placeholder="Descripción (Qué ofreces)">
+                                placeholder="Descripción (Qué ofreces)" />
                         </div>
                         <div class="col-md-6">
                             <input class="form-control" type="email" id="email" v-model="negocio.email"
-                                placeholder="Email" required>
+                                placeholder="Email" required />
                         </div>
                         <div class="col-md-6">
                             <input class="form-control" type="text" id="direccion" v-model="negocio.direccion"
-                                placeholder="Dirección (por ej. Libertad 20, Santiago del Estero, Argentina)">
+                                placeholder="Dirección (por ej. Libertad 20, Santiago del Estero, Argentina)" />
                         </div>
                         <div class="col-md-6">
                             <input class="form-control" type="number" id="telefono" v-model="negocio.telefono"
-                                placeholder="Teléfono (por ej. +5493855223287)">
+                                placeholder="Teléfono (por ej. +5493855223287)" />
                         </div>
                         <div class="col-md-6">
                             <input class="form-control" type="text" id="instagram" v-model="negocio.instagram"
-                                placeholder="Link de Instagram">
+                                placeholder="Link de Instagram" />
                         </div>
                         <div class="col-md-6">
                             <input class="form-control" type="text" id="facebook" v-model="negocio.facebook"
-                                placeholder="Link de Facebook">
+                                placeholder="Link de Facebook" />
                         </div>
                         <div class="col-md-6">
                             <label class="form-label text-center" for="imagen">Logo (JPG)</label>
                             <input class="form-control" type="file" name="imagen" id="imagen" accept=".jpg"
                                 @change="imagenSeleccionada($event)" required />
                         </div>
-                        <button v-if="!plan" class="btn btn-menu botones m-auto mb-2" type="submit">Contratar</button>
-                        <button v-else class="btn btn-menu botones m-auto mb-2" type="submit">Ir a Pagar</button>
+                        <button :disabled="!usuarioDisponible" v-if="!plan" class="btn btn-menu botones m-auto mb-2"
+                            type="submit">
+                            Contratar
+                        </button>
+                        <button :disabled="!usuarioDisponible" v-else class="btn btn-menu botones m-auto mb-2"
+                            type="submit">
+                            Ir a Pagar
+                        </button>
                     </div>
                 </form>
             </div>
-
+            <div v-else class="row g-3 mt-4 border">
+                <button class="btn btn-menu botones m-auto mb-2" type="submit" @click="registrarNegocio">
+                    Ir a Pagar
+                </button>
+            </div>
         </div>
     </div>
 </template>
 
 <script>
 import axios from "axios";
-import NavbarAdminComponent from './NavbarAdminComponent.vue';
-import Swal from 'sweetalert2';
+import NavbarAdminComponent from "./NavbarAdminComponent.vue";
+import Swal from "sweetalert2";
 import NavbarPublicoComponent from "./NavbarPublicoComponent.vue";
 import router from "@/router";
 
@@ -75,19 +94,24 @@ export default {
     },
     data() {
         return {
+            usuarioDisponible: true,
+            cargandoPago: false,
+            esperandoPago: true,
             plan: null,
+            ref: null,
+            usuario: "",
             negocio: {
-                usuario: '',
-                contraseña: '',
-                nombre: '',
-                fechaVence: '',
-                email: '',
-                imagen: '',
-                direccion: '',
-                telefono: '',
-                descripcion: '',
-                instagram: '',
-                facebook: '',
+                usuario: "",
+                contraseña: "",
+                nombre: "",
+                fechaVence: "",
+                email: "",
+                imagen: "",
+                direccion: "",
+                telefono: "",
+                descripcion: "",
+                instagram: "",
+                facebook: "",
             },
         };
     },
@@ -95,9 +119,27 @@ export default {
         this.obtenerPlan();
     },
     methods: {
+        async verificarDisponibilidad() {
+            try {
+                // Realizar la petición a la base de datos para verificar la disponibilidad del nombre de usuario
+                const response = await axios.post("/verificar-usuario", {
+                    usuario: this.negocio.usuario,
+                });
+                // Actualizar el estado de usuarioDisponible según la respuesta de la base de datos
+                this.usuarioDisponible = response.data;
+                if (!this.usuarioDisponible) {
+                    Swal.fire({
+                        icon: "error",
+                        text: "Ese usuario ya existe. Por favor elegí otro.",
+                    });
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        },
         async obtenerPlan() {
             this.plan = localStorage.getItem("plan");
-            console.log("RegistrarComponent: ", this.plan);
+            this.usuario = localStorage.getItem("usuario");
         },
         imagenSeleccionada(event) {
             const file = event.target.files[0];
@@ -111,99 +153,209 @@ export default {
                 reader.readAsDataURL(file);
             }
         },
-        resetForm() {
-            this.negocio.usuario = '';
-            this.negocio.contraseña = '';
-            this.negocio.nombre = '';
-            this.negocio.fechaVence = '';
-            this.negocio.email = '';
-            this.negocio.imagen = '';
-            this.negocio.direccion = '';
-            this.negocio.telefono = '';
-            this.negocio.direccion = '';
-            this.negocio.instagram = '';
-            this.negocio.facebook = '';
-        },
         async registrarNegocio() {
-            // Realizar una solicitud HTTP POST al servidor Express
             if (this.plan) {
-                localStorage.setItem("usuario", this.negocio.usuario);
-                try {
-                    const response = await axios.post('/facturar/crearOrden', { plan: this.plan });
-                    try {
-                        let fechaActual = new Date();
-                        const planMes = fechaActual.getMonth() - 1;
-                        fechaActual.setMonth(planMes + this.plan);
-                        this.negocio.fechaVence = fechaActual.toISOString().slice(0, 19).replace('T', ' ');
-                        window.open(await response.data.init_point, '_blank');
-                        await axios.post('/register', this.negocio).then(() => {
-                            router.push('/u/login');
-                            const Toast = Swal.mixin({
-                                toast: true,
-                                position: 'bottom-end',
-                                showConfirmButton: false,
-                                timer: 3000,
-                                timerProgressBar: true,
-                                didOpen: (toast) => {
-                                    toast.addEventListener('mouseenter', Swal.stopTimer)
-                                    toast.addEventListener('mouseleave', Swal.resumeTimer)
-                                }
-                            })
-
-                            Toast.fire({
-                                icon: 'success',
-                                title: 'Registro exitoso.'
-                            })
-                        }).catch(error => {
-                            Swal.fire({
-                                icon: 'error',
-                                text: error.response.data.message
-                            });
-                            console.error('Error al registrar usuario:', error);
-                        });
-                    } catch (error) {
-                        console.log(error)
+                this.cargandoPago = true;
+                if (this.usuario) {
+                    this.mejorarPlan();
+                } else {
+                    this.verificarDisponibilidad();
+                    if (this.usuarioDisponible) {
+                        this.usuario = this.negocio.usuario;
+                        this.contratarPlan();
                     }
-                } catch (error) {
-                    console.log(error)
                 }
             } else {
-                let fechaActual = new Date();
-                this.negocio.fechaVence = fechaActual.toISOString().slice(0, 19).replace('T', ' ');
-                await axios.post('/register', this.negocio).then(() => {
-                    router.push('/u/login');
+                this.verificarDisponibilidad();
+                if (this.usuarioDisponible) {
+                    this.usuario = this.negocio.usuario;
+                    this.registrarGratis();
+                }
+            }
+        },
+        async verificarPago() {
+            let estadoPago;
+            while (this.esperandoPago) {
+                await new Promise((resolve) => setTimeout(resolve, 5000));
+                const response = await axios.post("/facturar/verificarPago", {
+                    ref: this.ref,
+                });
+                estadoPago = response.data;
+                if (estadoPago === "approved") {
+                    break;
+                }
+            }
+            return estadoPago;
+        },
+        async mejorarPlan() {
+            const datos = await axios.post("/facturar/crearOrden", {
+                plan: this.plan,
+                usuario: this.usuario,
+            });
+            try {
+                window.open(await datos.data.response.init_point, "_blank");
+                this.ref = datos.data.response.external_reference;
+                const verificado = await this.verificarPago();
+                console.log(verificado);
+                if (verificado === "approved") {
+                    this.registrarMejora();
+                    this.cargandoPago = false;
+                } else {
+                    this.cargandoPago = false;
+                    Swal.fire({
+                        icon: "error",
+                        text: "No se pudo verificar el pago.",
+                    });
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        },
+        async contratarPlan() {
+            try {
+                const datos = await axios.post("/facturar/crearOrden", {
+                    plan: this.plan,
+                    usuario: this.usuario,
+                });
+                try {
+                    let fechaActual = new Date();
+                    const planMes = fechaActual.getMonth();
+                    fechaActual.setMonth(Number(planMes) + Number(this.plan));
+                    this.negocio.fechaVence = fechaActual
+                        .toISOString()
+                        .slice(0, 19)
+                        .replace("T", " ");
+                    window.open(await datos.data.response.init_point, "_blank");
+                    this.ref = datos.data.response.external_reference;
+                    const verificado = await this.verificarPago();
+                    if (verificado === "approved") {
+                        this.registrar();
+                        this.cargandoPago = false;
+                    } else {
+                        this.cargandoPago = false;
+                        Swal.fire({
+                            icon: "error",
+                            text: "No se pudo verificar el pago.",
+                        });
+                    }
+                } catch (error) {
+                    console.log(error);
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        },
+        async registrarMejora() {
+            let fechaActual = new Date();
+            const planMes = fechaActual.getMonth();
+            fechaActual.setMonth(Number(planMes) + Number(this.plan));
+            const añoNuevo = fechaActual.getFullYear();
+            fechaActual = fechaActual.toISOString().slice(0, 19).replace("T", " ");
+            try {
+                axios.put("/facturar/acreditar", {
+                    usuario: this.usuario,
+                    fecha: fechaActual,
+                });
+                //aqui cortaria el while
+                this.cargandoPago = false;
+                localStorage.setItem("año", añoNuevo);
+                router.push("/u/login");
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: "bottom-end",
+                    showConfirmButton: false,
+                    timer: 5000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener("mouseenter", Swal.stopTimer);
+                        toast.addEventListener("mouseleave", Swal.resumeTimer);
+                    },
+                });
+                Toast.fire({
+                    icon: "success",
+                    title: "Pago exitoso.",
+                });
+            } catch (error) {
+                console.log(error);
+            }
+        },
+        async registrarGratis() {
+            let fechaActual = new Date();
+            fechaActual.setFullYear(2100);
+            this.negocio.fechaVence = fechaActual
+                .toISOString()
+                .slice(0, 19)
+                .replace("T", " ");
+            this.registrar();
+        },
+        async registrar() {
+            await axios
+                .post("/register", this.negocio)
+                .then(() => {
+                    router.push("/u/login");
                     const Toast = Swal.mixin({
                         toast: true,
-                        position: 'bottom-end',
+                        position: "bottom-end",
                         showConfirmButton: false,
                         timer: 3000,
                         timerProgressBar: true,
                         didOpen: (toast) => {
-                            toast.addEventListener('mouseenter', Swal.stopTimer)
-                            toast.addEventListener('mouseleave', Swal.resumeTimer)
-                        }
-                    })
+                            toast.addEventListener("mouseenter", Swal.stopTimer);
+                            toast.addEventListener("mouseleave", Swal.resumeTimer);
+                        },
+                    });
 
                     Toast.fire({
-                        icon: 'success',
-                        title: 'Registro exitoso.'
-                    })
-                }).catch(error => {
-                    Swal.fire({
-                        icon: 'error',
-                        text: error.response.data.message
+                        icon: "success",
+                        title: "Registro exitoso.",
                     });
-                    console.error('Error al registrar usuario:', error);
+                })
+                .catch((error) => {
+                    Swal.fire({
+                        icon: "error",
+                        text: error.response.data.message,
+                    });
+                    console.error("Error al registrar usuario:", error);
                 });
-            }
-
-
         },
     },
 };
 </script>
 
 <style scoped>
+.usuario-disponible {
+    border-color: red;
+}
+
+.texto-carga {
+    font-style: italic;
+    margin: 20px;
+    color: grey;
+}
+
+.logo-carga {
+    margin-top: -10vh;
+}
+
+.logo-img {
+    animation: l2 2s infinite;
+}
+
+.pantalla-carga {
+    z-index: 2;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: calc(95vh);
+    background-color: white;
+    align-content: center;
+}
+
+.pantalla-carga:hover {
+    cursor: wait;
+}
+
 .form-control-fact {
     height: 40px;
 }
@@ -226,7 +378,6 @@ input.date {
     justify-content: center !important;
     align-items: center !important;
 }
-
 
 .botones {
     width: 40%;
