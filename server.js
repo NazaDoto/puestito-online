@@ -651,7 +651,7 @@ app.post('/facturar/crearOrden', async(req, res) => {
                 id: "ticket"
             }]
         },
-        notification_url: "https://puestito.online:3500/facturar/webhook",
+        notification_url: "https://puestito.online/api/facturar/webhook",
     }
 
 
@@ -695,6 +695,7 @@ app.put('/facturar/acreditar', (req, res) => {
 
 
 app.post('/facturar/webhook', async(req, res) => {
+    console.log('webjuk ', req.body)
     try {
         const datosPago = req.body;
         if (datosPago.type === 'payment') {
