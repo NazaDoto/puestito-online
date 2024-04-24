@@ -651,7 +651,7 @@ app.post('/facturar/crearOrden', async(req, res) => {
                 id: "ticket"
             }]
         },
-        notification_url: "https://puestito.online/api/facturar/webhook",
+        notification_url: "https://puestito.online:3500/facturar/webhook",
     }
 
 
