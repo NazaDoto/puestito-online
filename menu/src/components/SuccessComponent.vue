@@ -1,13 +1,21 @@
 <template>
     <div>
         <NavbarPublicoComponent></NavbarPublicoComponent>
+        <div v-if="cargando" class="pantalla-carga text-center">
+            <div class="logo-carga">
+                <img class="logo-img" src="/favicon.ico" width="50" alt="" />
+                <div class="texto-carga">Cargando...</div>
+            </div>
+        </div>
         <div v-if="estado == 'approved'">
             <div class="contenedor text-center">
                 <div class="caja">
                 <img src="/recursos/approve.png" width="100">
                     <h1>Pago Aprobado.</h1>
-                    Usuario registrado exitosamente. <br>
-                    <router-link class="btn btn-menu mt-3" to="/u/login">Ingresar</router-link>
+                    <p>
+                        Ya puedes cerrar esta ventana.
+                    </p>
+                    <button class="btn btn-menu mt-2" @click="cerrarVentana">Cerrar</button>
                 </div>
             </div>
         </div>
@@ -16,7 +24,6 @@
                 <div class="caja">
                     <img src="/recursos/decline.png" width="100">                    
                     <h1>No se pudo realizar el pago.</h1>
-                    Usuario registrado exitosamente (cuenta gratis). <br>
                     <router-link class="btn btn-menu mt-3" to="/u/login">Volver</router-link>
                 </div>
             </div>
@@ -26,7 +33,6 @@
                 <div class="caja">
                     <img src="/recursos/pending.png" width="100">
                     <h1>Pago Pendiente.</h1>
-                    Usuario registrado exitosamente (cuenta gratis). <br>
                     <router-link class="btn btn-menu mt-3" to="/u/login">Volver</router-link>
                 </div>
             </div>
@@ -37,23 +43,36 @@
 
 <script>
 import NavbarPublicoComponent from './NavbarPublicoComponent.vue';
+import axios from 'axios';
 export default {
     components: { NavbarPublicoComponent },
     data() {
         return {
             estado: '',
+            ref: '',
+            cargando: true,
         }
     },
     mounted() {
-        this.getStatus();
+        this.guardarPago();
     },
     methods: {
-        getStatus() {
-            const datos = this.$route.query;
-            this.estado = datos.status;
+        cerrarVentana(){
+            window.close()
+        },
+        async guardarPago() {
+            const id = this.$route.query;
+            try {
+                const response = await axios.post("/facturar/webhook", id);
+                this.estado = response.data;
+            } catch (error) {
+                console.log(error);
+            } finally{
+                this.cargando = false;
+            }
+
         },
     }
-
 }
 </script>
 

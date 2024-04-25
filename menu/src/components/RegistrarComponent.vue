@@ -194,9 +194,8 @@ export default {
             });
             try {
                 window.open(await datos.data.response.init_point, "_blank");
-                this.ref = datos.data.response.external_reference;
+                this.ref = JSON.parse(datos.data.response.external_reference);
                 const verificado = await this.verificarPago();
-                console.log(verificado);
                 if (verificado === "approved") {
                     this.registrarMejora();
                     this.cargandoPago = false;
@@ -226,7 +225,7 @@ export default {
                         .slice(0, 19)
                         .replace("T", " ");
                     window.open(await datos.data.response.init_point, "_blank");
-                    this.ref = datos.data.response.external_reference;
+                    this.ref = JSON.parse(datos.data.response.external_reference);
                     const verificado = await this.verificarPago();
                     if (verificado === "approved") {
                         this.registrar();
@@ -327,30 +326,7 @@ export default {
     border-color: red;
 }
 
-.texto-carga {
-    font-style: italic;
-    margin: 20px;
-    color: grey;
-}
 
-.logo-carga {
-    margin-top: -10vh;
-}
-
-.logo-img {
-    animation: l2 2s infinite;
-}
-
-.pantalla-carga {
-    z-index: 2;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: calc(95vh);
-    background-color: white;
-    align-content: center;
-}
 
 .pantalla-carga:hover {
     cursor: wait;

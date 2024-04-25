@@ -2,11 +2,10 @@
   <div>
 
     <div class="total">
-
       <div class="fondo text-center">
         <img src="/favicon.ico" width="100" alt="logo" class="mb-4">
         <h1 class="titulo">Puestito Online</h1>
-        <form class="row g-3" @submit.prevent="login">
+        <form class="row" @submit.prevent="login">
           <div class="width-size">
             <label for="usuario">Usuario</label>
             <input class="form-control mb-3" type="text" v-model="usuario" required />
@@ -18,11 +17,9 @@
           <div class="col-md-8">
             <button type="submit" class="btn btn-entrar">Entrar</button>
           </div>
-          <router-link to="/u/planes">Registrar Negocio</router-link>
-          <router-link to="/">Volver</router-link>
+          <router-link class="mt-4" to="/u/planes">Registrar Negocio</router-link>
+          <router-link class="mt-2" to="/">Volver</router-link>
         </form>
-      </div>
-      <div class="derecha">
       </div>
     </div>
   </div>
@@ -130,14 +127,11 @@ label {
 
 .total {
   width: 100vw;
+  height: calc(100vh - 56px);
+  background-color: #8cfbff;
 }
 
 .fondo {
-  position: absolute;
-  z-index: 1;
-  height: calc(100vh - 56px);
-  width: 30vw;
-  background-color: #8cfbff;
   display: block;
   justify-content: center;
   padding-top: 10vh;
@@ -145,21 +139,8 @@ label {
 
 form {
   justify-content: center;
-  margin: auto !important;
-}
-
-.derecha {
-  position: relative;
-  z-index: 0;
-  height: calc(100vh - 56px);
-  width: 80vw;
-  margin-left: 20vw;
-  /*background-image: url(../assets/imagen-fondo.jpg);*/
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: right;
-  background-color: rgb(22, 22, 41);
-  display: block;
+  width: 40vw;
+  margin: auto;
 }
 
 .titulo {
@@ -167,21 +148,23 @@ form {
 }
 
 .width-size {
-  width: 20vw;
+  width: 40vw;
 }
 
 @media screen and (max-width: 992px) {
+  form{
+    width: auto;
+  }
   .width-size {
     width: 80vw !important;
   }
 
-  .fondo {
-    width: 100vw;
-    height: calc(100vh - 115px);
+  .total {
+    height: calc(100vh - 56px);
   }
 
-  .derecha {
-    height: calc(100vh - 115px);
+  .fondo {
+    width: 100vw;
   }
 }
 </style>

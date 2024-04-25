@@ -763,10 +763,10 @@ ul {
 }
 @media screen and (max-width: 992px) {
     .navbar{
-        background: linear-gradient(to right, rgb(254, 255, 174), #ffffff);
+        background: linear-gradient(to right, rgb(228, 190, 109), #ffffff);
     }
     .navbar-brand{
-        font-size: 30px;
+        font-size: 20px;
     }
     .img-negocio {
         object-fit: cover;

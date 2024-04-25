@@ -618,8 +618,8 @@ const mercado = require('mercadopago');
 // Configurar Mercado Pago
 
 
-//const client = new mercado.MercadoPagoConfig({ accessToken: 'APP_USR-3974731186843034-040421-a31df430f192320ee94b04ac13d48f80-232808230' }); //prod
-const client = new mercado.MercadoPagoConfig({ accessToken: 'TEST-6756231137958668-041108-d71f41fe529ec1b71e76caf0a57c4334-1755754609' }); //prod
+const client = new mercado.MercadoPagoConfig({ accessToken: 'APP_USR-3974731186843034-040421-a31df430f192320ee94b04ac13d48f80-232808230' }); //prod
+//const client = new mercado.MercadoPagoConfig({ accessToken: 'TEST-6756231137958668-041108-d71f41fe529ec1b71e76caf0a57c4334-1755754609' }); //prod
 
 // Crear una instancia de Preference
 const pref = new mercado.Preference(client);
@@ -629,7 +629,7 @@ const payment = new mercado.Payment(client);
 app.post('/facturar/crearOrden', async(req, res) => {
     const orden = req.body;
     let time = new Date().toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' });
-    const ext_ref = time + ' - ' + orden.usuario;
+    const ext_ref = JSON.stringify({ usuario: orden.usuario, tiempo: time });
     const precios = {
         "1": 1500,
         "6": 7500,
@@ -651,7 +651,12 @@ app.post('/facturar/crearOrden', async(req, res) => {
                 id: "ticket"
             }]
         },
-        notification_url: "https://puestito.online:3500/facturar/webhook",
+        back_urls: {
+            "success": "https://puestito.online/u/registrar/return",
+            "failure": "https://puestito.online/u/registrar/return",
+            "pending": "https://puestito.online/u/registrar/return",
+        },
+        auto_return: 'approved',
     }
 
 
@@ -666,9 +671,9 @@ app.post('/facturar/crearOrden', async(req, res) => {
 });
 
 app.post('/facturar/verificarPago', async(req, res) => {
-    const ref = req.body.ref;
-    const query = 'SELECT * FROM facturas WHERE factura_ext_ref = ?';
-    connection.query(query, ref, (err, result) => {
+    const data = req.body;
+    const query = 'SELECT * FROM facturas WHERE factura_usuario = ? AND factura_tiempo = ?';
+    connection.query(query, [data.ref.usuario, data.ref.tiempo], (err, result) => {
         if (err) {
             console.log(err);
         } else {
@@ -695,50 +700,26 @@ app.put('/facturar/acreditar', (req, res) => {
 
 
 app.post('/facturar/webhook', async(req, res) => {
-    console.log('webjuk ', req.body.type)
-    try {
-        const datosPago = req.body;
-        if (datosPago.type === 'payment') {
-            try {
-                const datos = await payment.get({
-                    id: datosPago.data.id,
-                })
-
-                const queryVerificar = 'SELECT * FROM facturas WHERE factura_id = ?';
-                connection.query(queryVerificar, datos.id, (err, res) => {
-                    if (err) {
-                        console.log(err)
-                    } else {
-                        if (res.length) {
-                            const queryUpdate = 'UPDATE facturas SET factura_status = ? WHERE factura_id = ?';
-                            connection.query(queryUpdate, [datos.status, datos.id], (err, result) => {
-                                if (err) {
-                                    console.log(err)
-                                }
-                            })
-                        } else {
-                            const query = 'INSERT INTO facturas (factura_id, factura_ext_ref, factura_status) VALUES (?, ?, ?)';
-                            try {
-                                connection.query(query, [datos.id, datos.external_reference, datos.status], (err, result) => {
-                                    if (err) {
-                                        console.log(err)
-                                    }
-                                })
-                            } catch (error) {
-                                console.log('error');
-                            }
-                        }
-                    }
-                })
-
-
-            } catch (error) {
-                console.log(error)
-            }
+    const idPago = req.body.payment_id;
+    let estado;
+    if (idPago) {
+        try {
+            const datos = await payment.get({
+                id: idPago,
+            })
+            const ref = JSON.parse(datos.external_reference);
+            const queryInsertar = 'INSERT INTO facturas (factura_id, factura_status, factura_usuario, factura_tiempo) VALUES (?, ?, ?, ?)';
+            connection.query(queryInsertar, [datos.id, datos.status, ref.usuario, ref.tiempo], (err, res) => {
+                if (err) {
+                    console.log(err)
+                }
+            })
+            estado = datos.status;
+        } catch (error) {
+            console.log(error)
         }
-    } catch (error) {
-        console.log('Error: ', error);
     }
+    res.send(estado);
 });
 
 if (env == 'dev') {
