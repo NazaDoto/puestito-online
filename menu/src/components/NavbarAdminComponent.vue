@@ -13,9 +13,6 @@
                 <router-link class="nav-link" to="/u/home">Inicio</router-link>
               </li>
               <li class="test nav-item">
-                <router-link class="nav-link" to="/u/registrar">Nuevo Negocio</router-link>
-              </li>
-              <li class="test nav-item">
                 <router-link class="nav-link" to="/u/negocios">Listar Negocios</router-link>
               </li>
               

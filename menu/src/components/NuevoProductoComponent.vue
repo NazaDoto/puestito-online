@@ -41,7 +41,7 @@
                 </div>
 
                 <div>
-                    <button class="btn btn-menu botones mt-3" type="submit">Agregar</button>
+                    <button class="btn btn-menu botones mt-3" :disabled="!botonAgregarProductoEnabled" type="submit">Agregar</button>
                 </div>
             </form>
             <!-- Modal -->
@@ -118,6 +118,7 @@ export default {
     },
     data() {
         return {
+            botonAgregarProductoEnabled: true,
             agregarCategoriaModalAbierto: false,
             archivo: null,
             usuario: '',
@@ -252,6 +253,7 @@ export default {
             }
         },
         nuevoProducto(producto) {
+            this.botonAgregarProductoEnabled = false;
             axios.post('/nuevoProducto', { producto: producto })
                 .then(() => {
                     const Toast = Swal.mixin({

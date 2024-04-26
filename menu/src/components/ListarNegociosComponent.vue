@@ -28,6 +28,7 @@
             </div>
             <button class="btn btn-menu derecha mt-2 mb-2" title="Modificar" data-bs-toggle="modal"
               data-bs-target="#modificarProducto" @click="modificarNegocio(negocio)">Modificar</button>
+            <button class="btn btn-menu-danger derecha m-2" @click="eliminarNegocio(negocio.usuario)">Eliminar</button>
 
           </div>
           <div class="item-texto-block-end">
@@ -64,7 +65,7 @@
                 <h4 class="titulo-div-forms mb-2">Información del Usuario</h4>
                 <div>
                   <input class="form-control" type="text" id="nombre" v-model="negocioModificar.usuario"
-                    placeholder="Nombre de Usuario" required>
+                    placeholder="Nombre de Usuario" disabled>
                 </div>
                 <div>
                   <input class="form-control" type="password" id="nombre" v-model="negocioModificar.contraseña"
@@ -123,7 +124,6 @@
 </template>
 
 <script>
-import router from '@/router';
 import NavbarAdminComponent from './NavbarAdminComponent.vue';
 import axios from 'axios';
 import { format } from 'date-fns';
@@ -156,9 +156,48 @@ export default {
 
   },
   methods: {
+    eliminarNegocio(usuario) {
+      Swal.fire({
+        icon: "info",
+        title: `<strong>¿Estas segur@?</strong>`,
+        html: ``,
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonText: "No, cancelar",
+        confirmButtonText: "Sí, eliminar!",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          axios.delete('/eliminarNegocio', {data: {usuario: usuario}}).then(() => {
+            const Toast = Swal.mixin({
+              toast: true,
+              position: 'bottom-end',
+              showConfirmButton: false,
+              timer: 2000,
+              timerProgressBar: true,
+              didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+              }
+            })
+
+            Toast.fire({
+              icon: 'success',
+              title: 'Negocio eliminado.'
+            });
+            setTimeout(function () {
+              location.reload()
+            }, 2000);
+          })
+            .catch((error) => {
+              console.log('error')
+              console.error('Error al eliminar:', error);
+            });
+        }
+      });
+    },
     modificarPerfil(negocio) {
+      negocio.fechaVence  = new Date (negocio.fechaVence).toISOString().slice(0, 19).replace("T", " ");
       axios.put('/modificarPerfilAdmin', { negocio: negocio }).then(() => {
-        console.log('enviado')
         const Toast = Swal.mixin({
           toast: true,
           position: 'bottom-end',
@@ -176,7 +215,7 @@ export default {
           title: 'Datos modificados.'
         });
         setTimeout(function () {
-          router.push('/u/u/negocios');
+          location.reload();
         }, 2000);
       })
         .catch((error) => {

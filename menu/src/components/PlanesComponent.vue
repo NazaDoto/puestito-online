@@ -48,7 +48,7 @@
                                     1 Mes
                                 </div>
                                 <div class="precio-plan">
-                                    $1500
+                                    $2500
                                 </div>
                                 <button class="btn btn-menu" @click="elegirPlan(1)">CONTRATAR</button>
                             </div>
@@ -57,7 +57,7 @@
                                     6 Meses
                                 </div>
                                 <div class="precio-plan">
-                                    $7500
+                                    $12500
                                 </div>
                                 <button class="btn btn-menu" @click="elegirPlan(6)">CONTRATAR</button>
                             </div>
@@ -66,7 +66,7 @@
                                     12 Meses
                                 </div>
                                 <div class="precio-plan">
-                                    $15000
+                                    $20000
                                 </div>
                                 <button class="btn btn-menu" @click="elegirPlan(12)">CONTRATAR</button>
                             </div>

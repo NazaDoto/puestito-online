@@ -372,7 +372,8 @@ app.put('/modificarPerfil', (req, res) => {
 });
 app.put('/modificarPerfilAdmin', (req, res) => {
     const { negocio } = req.body;
-    query = 'UPDATE usuarios SET usuario_nombre = ?, usuario_contraseña = ?, usuario_nombre_negocio = ?, usuario_fecha_vencimiento = ?, usuario_correo = ?, usuario_telefono = ?, usuario_descripcion = ?, usuario_imagen = ?, usuario_direccion = ?, usuario_instagram = ?, usuario_facebook = ? WHERE usuario_nombre = ?';
+    console.log(negocio.fechaVence)
+    query = 'UPDATE usuarios SET  usuario_contraseña = ?, usuario_nombre_negocio = ?, usuario_fecha_vencimiento = ?, usuario_correo = ?, usuario_telefono = ?, usuario_descripcion = ?, usuario_imagen = ?, usuario_direccion = ?, usuario_instagram = ?, usuario_facebook = ? WHERE usuario_nombre = ?';
 
     if (negocio.contraseña) {
         const bcrypt = require('bcrypt');
@@ -382,7 +383,7 @@ app.put('/modificarPerfilAdmin', (req, res) => {
                 console.log(err)
             } else {
 
-                connection.query(query, [negocio.usuario, hash, negocio.nombre, negocio.fechaVence, negocio.correo, negocio.telefono, negocio.descripcion, negocio.imagen, negocio.direccion, negocio.instagram, negocio.facebook, negocio.usuario], (err, result) => {
+                connection.query(query, [hash, negocio.nombre, negocio.fechaVence, negocio.correo, negocio.telefono, negocio.descripcion, negocio.imagen, negocio.direccion, negocio.instagram, negocio.facebook, negocio.usuario], (err, result) => {
                     if (err) {
                         console.error('Error al modificar producto:', err);
                         res.status(500).json({ message: 'Error al modificar producto' });
@@ -393,8 +394,8 @@ app.put('/modificarPerfilAdmin', (req, res) => {
             }
         });
     } else {
-        query = 'UPDATE usuarios SET usuario_nombre = ?, usuario_nombre_negocio = ?, usuario_fecha_vencimiento = ?, usuario_correo = ?, usuario_telefono = ?, usuario_descripcion = ?, usuario_imagen = ?, usuario_direccion = ?, usuario_instagram = ?, usuario_facebook = ? WHERE usuario_nombre = ?';
-        connection.query(query, [negocio.usuario, negocio.nombre, negocio.fechaVence, negocio.correo, negocio.telefono, negocio.descripcion, negocio.imagen, negocio.direccion, negocio.instagram, negocio.facebook, negocio.usuario], (err, result) => {
+        query = 'UPDATE usuarios SET usuario_nombre_negocio = ?, usuario_fecha_vencimiento = ?, usuario_correo = ?, usuario_telefono = ?, usuario_descripcion = ?, usuario_imagen = ?, usuario_direccion = ?, usuario_instagram = ?, usuario_facebook = ? WHERE usuario_nombre = ?';
+        connection.query(query, [negocio.nombre, negocio.fechaVence, negocio.correo, negocio.telefono, negocio.descripcion, negocio.imagen, negocio.direccion, negocio.instagram, negocio.facebook, negocio.usuario], (err, result) => {
             if (err) {
                 console.error('Error al modificar producto:', err);
                 res.status(500).json({ message: 'Error al modificar producto' });
@@ -404,6 +405,39 @@ app.put('/modificarPerfilAdmin', (req, res) => {
         });
     }
 
+});
+
+app.delete('/eliminarNegocio', (req, res) => {
+    const usuario = req.body.usuario;
+    const queryProd = 'DELETE FROM productos WHERE usuario_nombre = ?';
+    const queryCat = 'DELETE FROM categorias WHERE usuario_nombre = ?';
+    const queryUsuario = 'DELETE FROM usuarios WHERE usuario_nombre = ?';
+    let response = '';
+    connection.query(queryProd, usuario, (er, res) => {
+        if (er) {
+            console.log(er);
+            response += 'No se pudo eliminar los productos del usuario. ' + er;
+        } else {
+            response += 'Se eliminaron los productos del usuario. ';
+        }
+    });
+    connection.query(queryCat, usuario, (er, res) => {
+        if (er) {
+            console.log(er);
+            response += 'No se pudo eliminar las categorias del usuario. ' + er;
+        } else {
+            response += 'Se eliminaron las categorias del usuario. ';
+        }
+    });
+    connection.query(queryUsuario, usuario, (er, res) => {
+        if (er) {
+            console.log(er);
+            response += 'No se pudo eliminar el usuario. ' + er;
+        } else {
+            response += 'Se elimino el usuario. '
+        }
+    });
+    res.send(response);
 });
 
 app.post('/nuevoProducto', (req, res) => {
@@ -631,9 +665,9 @@ app.post('/facturar/crearOrden', async(req, res) => {
     let time = new Date().toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' });
     const ext_ref = JSON.stringify({ usuario: orden.usuario, tiempo: time });
     const precios = {
-        "1": 1500,
-        "6": 7500,
-        "12": 15000
+        "1": 2500,
+        "6": 12500,
+        "12": 20000
     };
     const precioPlan = precios[orden.plan];
 
