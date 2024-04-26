@@ -1,6 +1,14 @@
 <template>
   <div>
     <NavbarAdminComponent></NavbarAdminComponent>
+    <div v-if="cargando" class="pantalla-carga text-center">
+            <div class="logo-carga">
+                <img class="logo-img" src="/favicon.ico" width="50" alt="">
+                <div class="texto-carga">
+                    Cargando negocios
+                </div>
+            </div>
+        </div>
     <div class="container mt-4 mb-2">
       <h1>Negocios</h1>
       <div class="izquierda ancho-busqueda">
@@ -134,6 +142,7 @@ export default {
   },
   data() {
     return {
+      cargando: true,
       negocios: [],
       busqueda: '',
       negocioModificar: {
