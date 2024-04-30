@@ -26,18 +26,20 @@
                     <div class="modalMapa mt-2" v-show="mapaMostrado2" style="height: 400px;">
                         <!-- Aquí iría todo lo relacionado con el mapa de Google Maps -->
                         <GMapMap style="height: 400px;" :center="mapCenter" :zoom="zoom" :options="options">
-                            <GMapMarker v-if="posicionActual" :position="posicionActual" :options="{icon:'/recursos/pinself.png'}" :title="'Estás aquí.'">
+                            <GMapMarker v-if="posicionActual" :position="posicionActual"
+                                :options="{ icon: '/recursos/pinself.png' }" :title="'Estás aquí.'">
                             </GMapMarker>
                             <GMapMarker v-for="(negocio, index) in negocios" :key="index" :position="negocio.location"
-                                :title="negocio.nombre" @click="openInfoWindow(index)" :options="{icon:'/recursos/pin30.png'}" id="gmapm">
+                                :title="negocio.nombre" @click="openInfoWindow(index)"
+                                :options="{ icon: '/recursos/pin30.png' }" id="gmapm">
                                 <GMapInfoWindow v-if="infoWindowOpened == index" :options="infoWindow[index].options"
                                     :closeclick="true" @closeclick="openInfoWindow(null)">
                                     <div style="max-width: 150px;">
                                         <b style="font-size:20px;">{{ negocio.nombre }}</b><br>
                                         <div style="text-align:center;">
                                             <a style="text-decoration:none;color:white;font-size:12px;padding:4px 6px;"
-                                                :href="'https://puestito.online/' + negocio.usuario" target="_blank"><img
-                                                    src="/favicon.ico" width="20" alt=""></a>
+                                                :href="'https://puestito.online/' + negocio.usuario"
+                                                target="_blank"><img src="/favicon.ico" width="20" alt=""></a>
                                             <a v-if="negocio.instagram" :href="negocio.instagram" target="blank"><img
                                                     style="margin:0px 10px" width='20'
                                                     src="/recursos/instagram.png"></a>
@@ -72,7 +74,9 @@
                             </div>
                             <!-- Botón para dirigirse al menú -->
                             <div class="item-btn">
-                                <a v-if="negocio.location !== null" class="cursor-pointer mt-1" @click="localizar(negocio, index)"><img src="/recursos/pin.png" width="30" alt=""></a>
+                                <a v-if="negocio.location !== null" class="cursor-pointer mt-1"
+                                    @click="localizar(negocio, index)"><img src="/recursos/pin.png" width="30"
+                                        alt=""></a>
                                 <router-link class="item-texto-block-end" :to="'/' + negocio.usuario" target="_blank">
                                     <img src="/favicon.ico" width="30" alt="">
                                 </router-link>
@@ -128,8 +132,8 @@ export default {
     created() {
         this.fetchNegocios();
     },
-    mounted(){
-        if (this.$route.params){
+    mounted() {
+        if (this.$route.params) {
             router.push('/', this.$route.params);
         }
     },
@@ -146,8 +150,14 @@ export default {
         },
     },
     methods: {
-        localizar(negocio, index){
-            this.mapaMostrado2 = true;
+        localizar(negocio, index) {
+            if (!this.mapaMostrado) {
+                this.mapaMostrado = true;
+                this.mapaMostrado2 = true;
+                this.$nextTick(() => {
+                    this.inicializarMapa();
+                });
+            }
             this.mapCenter = negocio.location;
             this.infoWindowOpened = index;
         },
@@ -168,8 +178,8 @@ export default {
                             lat: coords.coords.latitude,
                             lng: coords.coords.longitude
                         };
-                        this.mapCenter = this.posicionActual = position;
-                        
+                        this.posicionActual = position;
+
                     }, (error) => {
                         console.log('Error al geolocalizar. Inicializando en Plaza Libertad. ', error);
                     });
@@ -181,7 +191,10 @@ export default {
         async fetchNegocios() {
             try {
                 const response = await axios.get('/negocios');
-                this.negocios = response.data;
+                this.negocios = response.data.filter(negocio => {
+                    const fechaVencimiento = new Date(negocio.fechaVence);
+                    return fechaVencimiento.getFullYear() !== 2100;
+                });
                 this.infoWindow = Array(this.negocios.length).fill({
                     open: false,
                     options: {
@@ -203,6 +216,7 @@ export default {
                     this.mapaMostrado2 = true;
                     this.$nextTick(() => {
                         this.inicializarMapa();
+                        this.mapCenter = this.posicionActual;
                     });
                 } else {
                     this.mapaMostrado2 = true;
@@ -232,37 +246,12 @@ export default {
     margin: 20px;
     color: grey;
 }
-.cursor-pointer{
-    cursor:pointer;
-}
-.logo-carga {
-    margin-top: -10vh;
+
+.cursor-pointer {
+    cursor: pointer;
 }
 
-.logo-img {
-    animation: l2 2s infinite;
-}
 
-.pantalla-carga {
-    z-index: 2;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: calc(100vh);
-    background-color: white;
-    align-content: center;
-}
-
-.pantalla-carga:hover {
-    cursor: wait;
-}
-
-@keyframes l2 {
-    to {
-        transform: rotate(1turn)
-    }
-}
 
 .ancho-busqueda {
     width: 400px;
@@ -273,7 +262,6 @@ export default {
 
 .container2 {
     margin: 0px 30vw;
-    min-height: calc(100vh - 200px);
 }
 
 .navbar-brand {
@@ -345,7 +333,6 @@ ul {
     }
 
     .container2 {
-        min-height: calc(100vh - 200px);
         margin: 0px 10px;
     }
 }

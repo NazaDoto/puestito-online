@@ -77,6 +77,34 @@
                 </button>
             </div>
         </div>
+        <!--Modal Cropper-->
+        <div v-show="modalCropImage" class="modalCategoriaContainer  text-center ">
+            <div class="modalCategoria">
+                <div class="modal-dialog modal-dialog-centered ">
+                    <div class="modal-content ">
+                        <div class="modal-header pl-2">
+                            <h1 class="modal-title fs-5" id="agregarCategoriaLabel">Recortar Imagen</h1>
+                            <button type="button" class="btn-close" @click="cerrarCrop" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body mt-2 ">
+                            <div v-show="cargandoCropper" class="pantalla-cargas text-center">
+                                <div class="logo-carga">
+                                    <img class="logo-img" src="/favicon.ico" width="50" alt="">
+                                    <div class="texto-carga">
+                                        Cargando imagen
+                                    </div>
+                                </div>
+                            </div>
+                            <img ref="cropperImg" alt="Croppear">
+                        </div>
+                        <div class="modal-footer mt-2">
+                            <button type="button" class="btn" @click="cerrarCrop">Cerrar</button>
+                            <button class="btn btn-menu" @click="guardarImagenRecortada">Recortar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -86,6 +114,7 @@ import NavbarAdminComponent from "./NavbarAdminComponent.vue";
 import Swal from "sweetalert2";
 import NavbarPublicoComponent from "./NavbarPublicoComponent.vue";
 import router from "@/router";
+import Cropper from "cropperjs";
 
 export default {
     components: {
@@ -94,6 +123,10 @@ export default {
     },
     data() {
         return {
+            cargandoCropper: true,
+            modalCropImage: false,
+            cropper: null,
+            imageToCrop: '',
             usuarioDisponible: true,
             cargandoPago: false,
             esperandoPago: true,
@@ -119,6 +152,63 @@ export default {
         this.obtenerPlan();
     },
     methods: {
+        imagenSeleccionada(event) {
+            try {
+
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = async (e) => {
+                        this.imageToCrop = e.target.result;
+                        this.modalCropImage = true;
+                        let cropperCanvas = this.$refs.cropperImg;
+                        cropperCanvas.src = this.imageToCrop;
+                        this.$nextTick(() => {
+
+                            const canvasExiste = document.querySelector('cropper-canvas');
+                            if (canvasExiste) {
+                                canvasExiste.parentNode.removeChild(canvasExiste);
+                            }
+                            this.cropper = new Cropper(cropperCanvas, {
+                                template: `<cropper-canvas background style='height:50vh;'>
+                                    <cropper-image alt='Lol' rotatable=false>asd</cropper-image>
+                                        <cropper-shade hidden></cropper-shade>
+                                        <cropper-handle  action='move' plain></cropper-handle>
+                                        <cropper-selection initial-coverage='0.5' aspect-ratio='1' movable resizable zoomable>
+                                            <cropper-grid role='grid' covered></cropper-grid>
+                                            <cropper-crosshair centered></cropper-crosshair>
+                                            <cropper-handle action='move'
+                                                theme-color='rgba(255, 255, 255, 0.35)'></cropper-handle>
+                                            <cropper-handle action='ne-resize'></cropper-handle>
+                                            <cropper-handle action='nw-resize'></cropper-handle>
+                                            <cropper-handle action='se-resize'></cropper-handle>
+                                            <cropper-handle action='sw-resize'></cropper-handle>
+                                        </cropper-selection>
+                                    </cropper-canvas >` ,
+                            });
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                }
+            } catch (error) {
+                console.log(error)
+            } finally {
+                this.cargandoCropper = false;
+            }
+        },
+        cerrarCrop() {
+            this.modalCropImage = false;
+        },
+        async guardarImagenRecortada() {
+            try {
+                const canvas = await this.cropper.getCropperSelection().$toCanvas();
+                this.negocio.imagen = canvas.toDataURL();
+            } catch (error) {
+                console.error('Error al guardar la imagen recortada:', error);
+            } finally {
+                this.modalCropImage = false;
+            }
+        },
         async verificarDisponibilidad() {
             try {
                 // Realizar la petición a la base de datos para verificar la disponibilidad del nombre de usuario
@@ -140,18 +230,6 @@ export default {
         async obtenerPlan() {
             this.plan = localStorage.getItem("plan");
             this.usuario = localStorage.getItem("usuario");
-        },
-        imagenSeleccionada(event) {
-            const file = event.target.files[0];
-            if (file) {
-                // Utiliza FileReader para leer el contenido de la imagen como una URL de datos
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    // Al cargar la imagen, asigna la URL de datos a producto.imagen
-                    this.negocio.imagen = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
         },
         async registrarNegocio() {
             if (this.plan) {
@@ -280,7 +358,7 @@ export default {
         },
         async registrarGratis() {
             let fechaActual = new Date();
-            fechaActual.setFullYear(2100);
+            fechaActual.setMonth(fechaActual.getMonth() + 1);
             this.negocio.fechaVence = fechaActual
                 .toISOString()
                 .slice(0, 19)
@@ -322,6 +400,10 @@ export default {
 </script>
 
 <style scoped>
+.modalCategoria {
+    width: 60vw;
+}
+
 .usuario-disponible {
     border-color: red;
 }
@@ -364,5 +446,9 @@ input.date {
     margin-top: 5px;
 }
 
-/* Estilos CSS si es necesario */
+@media screen and (max-width: 992px) {
+    .modalCategoria {
+        width: 90vw;
+    }
+}
 </style>

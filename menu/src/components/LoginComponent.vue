@@ -17,8 +17,8 @@
           <div class="col-md-8">
             <button type="submit" class="btn btn-entrar">Entrar</button>
           </div>
-          <router-link class="mt-4" to="/u/planes">Registrar Negocio</router-link>
-          <router-link class="mt-2" to="/">Volver</router-link>
+          <router-link class="mt-4" to="/u/planes">¿Registrar Negocio?</router-link>
+          <router-link class="mt-4" to="/">Volver a Puestito Online</router-link>
         </form>
       </div>
     </div>
@@ -126,8 +126,7 @@ label {
 }
 
 .total {
-  width: 100vw;
-  height: calc(100vh - 56px);
+  height: calc(100svh - 56px);
   background-color: #8cfbff;
 }
 
@@ -148,7 +147,7 @@ form {
 }
 
 .width-size {
-  width: 40vw;
+  width: 30vw;
 }
 
 @media screen and (max-width: 992px) {
@@ -160,7 +159,7 @@ form {
   }
 
   .total {
-    height: calc(100vh - 56px);
+    height: calc(100svh - 56px);
   }
 
   .fondo {

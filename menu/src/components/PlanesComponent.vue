@@ -17,9 +17,9 @@
                                 </div>
                                 <ul class="text-start">
                                     <li>✅Menú online autoadministrable.</li>
-                                    <li>❌Visualización en nuestra plataforma.</li>
-                                    <li>❌Carrito y pedidos por WhatsApp.</li>
-                                    <li>❌Código QR para el menú.</li>
+                                    <li>⚠️Visualización en nuestra plataforma. (1 mes)</li>
+                                    <li>⚠️Carrito y pedidos por WhatsApp. (1 mes)</li>
+                                    <li>⚠️Código QR para el menú. (1 mes)</li>
                                 </ul>
                                 <button class="btn btn-menu" @click="elegirPlan('')">REGISTRAR</button>
                             </div>

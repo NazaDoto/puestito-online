@@ -375,7 +375,7 @@ export default {
                 const response = await axios.get(`/negocio?usuario=${this.nombreNegocio}`);
                 // Actualiza la lista de informes con los datos recibidos
                 this.negocio = response.data;
-                this.fetchProductos();
+                await this.fetchProductos();
             } catch (error) {
                 console.error("Error al cargar los productos:", error);
             } finally {
@@ -436,9 +436,7 @@ export default {
 
             } catch (error) {
                 console.error("Error al cargar los productos:", error);
-            } finally {
-                this.cargando = false; // Indicar que la carga ha terminado, independientemente del resultado
-            }
+            } 
         },
         filteredProductos(categoria) {
             // Filtra los productos basándose en la categoría y en el valor de disponibilidad

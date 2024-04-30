@@ -143,7 +143,7 @@ app.post('/comprobar-vencimiento', (req, res) => {
     const datos = req.body;
     let año; // Definir la variable año antes del callback de la consulta
 
-    query = 'SELECT usuario_fecha_vencimiento FROM usuarios WHERE usuario_nombre = ?';
+    query = 'SELECT usuario_fecha_vencimiento, usuario_fecha_alta FROM usuarios WHERE usuario_nombre = ?';
     connection.query(query, datos.usuario, (err, results) => {
         if (err) {
             console.log(err);
@@ -229,6 +229,7 @@ app.get('/negocios', async(req, res) => {
                         return {
                             usuario: negocio.usuario_nombre,
                             nombre: negocio.usuario_nombre_negocio,
+                            fechaVence: negocio.usuario_fecha_vencimiento,
                             direccion: negocio.usuario_direccion,
                             correo: negocio.usuario_correo,
                             telefono: negocio.usuario_telefono,
@@ -243,6 +244,7 @@ app.get('/negocios', async(req, res) => {
                         return {
                             usuario: negocio.usuario_nombre,
                             nombre: negocio.usuario_nombre_negocio,
+                            fechaVence: negocio.usuario_fecha_vencimiento,
                             direccion: negocio.usuario_direccion,
                             correo: negocio.usuario_correo,
                             telefono: negocio.usuario_telefono,

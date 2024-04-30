@@ -1,8 +1,10 @@
 <template>
     <div>
-        <router-view></router-view>
+        <div class="body">
+            <router-view></router-view>
+        </div>
         <PieComponent />
-
+        
     </div>
 </template>
 
@@ -30,13 +32,16 @@ export default {
 </script>
 
 <style>
+.body{
+    min-height: calc(100svh  - 56px)!important;
+}
 .pl-2 {
     padding-left: 10px;
 }
 
 .modalCategoriaContainer {
     position: absolute;
-    z-index: 3;
+    z-index: 1233;
     top: 0;
     left: 0;
     width: 100vw;

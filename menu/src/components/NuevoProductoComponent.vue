@@ -3,7 +3,7 @@
         <NavbarComponent></NavbarComponent>
         <div class="container mt-4 mb-2">
             <h1 class="text-center">Nuevo Producto</h1>
-            
+
             <form @submit.prevent="nuevoProducto(this.producto)" enctype="multipart/form-data">
                 <div class="row g-3 div-forms border mt-2">
                     <h4 class="titulo-div-forms mb-2">Información del Producto</h4>
@@ -41,9 +41,38 @@
                 </div>
 
                 <div>
-                    <button class="btn btn-menu botones mt-3" :disabled="!botonAgregarProductoEnabled" type="submit">Agregar</button>
+                    <button class="btn btn-menu botones mt-3" :disabled="!botonAgregarProductoEnabled"
+                        type="submit">Agregar</button>
                 </div>
             </form>
+            <!--Modal Cropper-->
+            <div v-show="modalCropImage" class="modalCategoriaContainer  text-center ">
+                <div class="modalCategoria">
+                    <div class="modal-dialog modal-dialog-centered ">
+                        <div class="modal-content ">
+                            <div class="modal-header pl-2">
+                                <h1 class="modal-title fs-5" id="agregarCategoriaLabel">Recortar Imagen</h1>
+                                <button type="button" class="btn-close" @click="cerrarCrop" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body mt-2 ">
+                                <div v-show="cargandoCropper" class="pantalla-cargas text-center">
+                                    <div class="logo-carga">
+                                        <img class="logo-img" src="/favicon.ico" width="50" alt="">
+                                        <div class="texto-carga">
+                                            Cargando imagen
+                                        </div>
+                                    </div>
+                                </div>
+                                <img ref="cropperImg" alt="Croppear">
+                            </div>
+                            <div class="modal-footer mt-2">
+                                <button type="button" class="btn" @click="cerrarCrop">Cerrar</button>
+                                <button class="btn btn-menu" @click="guardarImagenRecortada">Recortar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <!-- Modal -->
             <div v-if="agregarCategoriaModalAbierto" class="modalCategoriaContainer">
                 <div class="modalCategoria">
@@ -78,9 +107,11 @@
                         </div>
                         <form @submit.prevent="importar">
                             <div class="modal-body text-center">
-                                <p class="text-center">Asegurate de que en tu planilla de Excel existan las columnas con
+                                <p class="text-center">Asegurate de que en tu planilla de Excel existan las
+                                    columnas con
                                     encabezados <strong>"Producto"</strong>, en donde se encontrará
-                                    el nombre del producto, y <strong>"P. Venta"</strong>, en donde se encontrará el
+                                    el nombre del producto, y <strong>"P. Venta"</strong>, en donde se
+                                    encontrará el
                                     precio del producto. <u>(Se ignorará el resto de columnas)</u>.
                                     Más adelante podrás modificar la información de los mismos en la pestaña
                                     <strong>"Listar Productos"</strong>.
@@ -100,10 +131,10 @@
         </div>
         <div class="text-end">
             <i> o importar listado desde Excel -></i>
-                <button type="button" class="btn btn-importar" data-bs-toggle="modal" data-bs-target="#importar">
-                   <img src="/recursos/xlsx.png" width="50" alt="" title="Importar desde Excel">
-                </button>
-            </div>
+            <button type="button" class="btn btn-importar" data-bs-toggle="modal" data-bs-target="#importar">
+                <img src="/recursos/xlsx.png" width="50" alt="" title="Importar desde Excel">
+            </button>
+        </div>
     </div>
 </template>
 
@@ -112,12 +143,17 @@ import NavbarComponent from './NavbarComponent.vue';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
+import Cropper from 'cropperjs';
 export default {
     components: {
         NavbarComponent,
     },
     data() {
         return {
+            cargandoCropper: true,
+            cropper: null,
+            imageToCrop: '',
+            modalCropImage: false,
             botonAgregarProductoEnabled: true,
             agregarCategoriaModalAbierto: false,
             archivo: null,
@@ -240,18 +276,67 @@ export default {
                     console.error('Error al obtener las categorías:', error);
                 });
         },
+        iniciarCropper() {
+
+        },
         imagenSeleccionada(event) {
-            const file = event.target.files[0];
-            if (file) {
-                // Utiliza FileReader para leer el contenido de la imagen como una URL de datos
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    // Al cargar la imagen, asigna la URL de datos a producto.imagen
-                    this.producto.imagen = e.target.result;
-                };
-                reader.readAsDataURL(file);
+            try {
+
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = async (e) => {
+                        this.imageToCrop = e.target.result;
+                        this.modalCropImage = true;
+                        let cropperCanvas = this.$refs.cropperImg;
+                        cropperCanvas.src = this.imageToCrop;
+                        this.$nextTick(() => {
+
+                            const canvasExiste = document.querySelector('cropper-canvas');
+                            if (canvasExiste) {
+                                canvasExiste.parentNode.removeChild(canvasExiste);
+                            }
+                            this.cropper = new Cropper(cropperCanvas, {
+                                template: `<cropper-canvas background style='height:50vh;'>
+                                    <cropper-image alt='Lol' rotatable=false>asd</cropper-image>
+                                        <cropper-shade hidden></cropper-shade>
+                                        <cropper-handle  action='move' plain></cropper-handle>
+                                        <cropper-selection initial-coverage='0.5' aspect-ratio='1' movable resizable zoomable>
+                                            <cropper-grid role='grid' covered></cropper-grid>
+                                            <cropper-crosshair centered></cropper-crosshair>
+                                            <cropper-handle action='move'
+                                                theme-color='rgba(255, 255, 255, 0.35)'></cropper-handle>
+                                            <cropper-handle action='ne-resize'></cropper-handle>
+                                            <cropper-handle action='nw-resize'></cropper-handle>
+                                            <cropper-handle action='se-resize'></cropper-handle>
+                                            <cropper-handle action='sw-resize'></cropper-handle>
+                                        </cropper-selection>
+                                    </cropper-canvas >` ,
+                            });
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                }
+            } catch (error) {
+                console.log(error)
+            } finally {
+                this.cargandoCropper = false;
             }
         },
+        cerrarCrop() {
+            this.modalCropImage = false;
+        },
+        async guardarImagenRecortada() {
+            try {
+                const canvas = await this.cropper.getCropperSelection().$toCanvas();
+                this.producto.imagen = canvas.toDataURL();
+            } catch (error) {
+                console.error('Error al guardar la imagen recortada:', error);
+            } finally {
+                this.modalCropImage = false;
+            }
+        },
+
         nuevoProducto(producto) {
             this.botonAgregarProductoEnabled = false;
             axios.post('/nuevoProducto', { producto: producto })
@@ -322,12 +407,30 @@ export default {
                 });
         },
     },
+    mounted() {
+    },
 };
 </script>
 
 
 <style scoped>
+.pantalla-cargas {
+    position: absolute;
+    z-index: 5;
+    width: 100%;
+    height: 50vh;
+    background-color: white;
+    align-content: center;
+}
 
+.imgCropper {
+    display: block;
+    max-width: 100%;
+}
+
+.modalCategoria {
+    width: 60vw;
+}
 
 textarea {
     margin: auto !important;
@@ -353,4 +456,9 @@ textarea {
     margin-right: 15px;
 }
 
+@media screen and (max-width: 992px) {
+    .modalCategoria {
+    width: 90vw;
+}
+}
 </style>
