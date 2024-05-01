@@ -11,25 +11,31 @@
                 </div>
             </div>
             <div v-else>
+                <label for="rubro">Buscar por rubro</label>
+                <select class="ancho-busqueda form-select" name="rubro" id="rubro" v-model="rubro">
+                    <option value="Todos" selected>Todos</option>
+                    <option v-for="(rubro, index) in rubrosUnicos" :key="index" :value="rubro">{{ rubro }}</option>
+                </select>
+
                 <div class="mt-2">
-                    <h1>¿Qué estás buscando?</h1>
-                    <div class="izquierda ancho-busqueda">
-                        <input class="form-control barra-busqueda" v-model="busqueda" type="text" name="busqueda" id=""
-                            placeholder="Buscar" title="Ingrese una palabra clave...">
-                    </div>
-                    <button class="btn btn-menu derecha" @click="mostrarMapa">{{ !mapaMostrado2 ? 'Ver Mapa' :
+                    <input class="form-control" v-model="busqueda" type="text" name="busqueda" id=""
+                        placeholder="Buscar por nombre" title="Ingrese una palabra clave...">
+                </div>
+                <div class="flex">
+                    <button type="button" class="btn btn-limpiar" @click="limpiarBusqueda" aria-label="Close">Limpiar
+                        búsqueda</button>
+                    <button class="btn btn-menu inline2 mt-2" @click="mostrarMapa">{{ !mapaMostrado2 ? 'Ver Mapa' :
                         `Ocultar
                         Mapa`}}</button>
                 </div>
-
-                <div class="negocios-body">
+                <div class="negocios-body mt-3">
                     <div class="modalMapa mt-2" v-show="mapaMostrado2" style="height: 400px;">
                         <!-- Aquí iría todo lo relacionado con el mapa de Google Maps -->
                         <GMapMap style="height: 400px;" :center="mapCenter" :zoom="zoom" :options="options">
                             <GMapMarker v-if="posicionActual" :position="posicionActual"
                                 :options="{ icon: '/recursos/pinself.png' }" :title="'Estás aquí.'">
                             </GMapMarker>
-                            <GMapMarker v-for="(negocio, index) in negocios" :key="index" :position="negocio.location"
+                            <GMapMarker v-for="(negocio, index) in negociosFiltrados" :key="index" :position="negocio.location"
                                 :title="negocio.nombre" @click="openInfoWindow(index)"
                                 :options="{ icon: '/recursos/pin30.png' }" id="gmapm">
                                 <GMapInfoWindow v-if="infoWindowOpened == index" :options="infoWindow[index].options"
@@ -49,15 +55,17 @@
                                         <p style="margin:5px 0px"><b>Dirección:</b> {{ negocio.direccion }}</p>
                                         <p style="margin:5px 0px"><b>Correo:</b> {{ negocio.correo }}</p>
                                         <p style="margin:5px 0px"><b>Teléfono:</b> {{ negocio.telefono }}</p>
-                                        <p style="text-align:center;margin:7px 0px">"{{ negocio.descripcion }}"</p>
+                                        <p style="text-align:center;margin:7px 0px;">"{{ negocio.descripcion }}"</p>
                                     </div>
                                 </GMapInfoWindow>
                             </GMapMarker>
                         </GMapMap>
                     </div>
 
+                    <div v-for="(grupo, rubro) in negociosAgrupados" :key="rubro">
+                    <div class="titulo-rubro">{{ rubro }}</div>
                     <ul>
-                        <li class="item-container mt-2" v-for="(negocio, index) in negociosFiltrados" :key="index">
+                        <li class="item-container mt-2" v-for="(negocio, index) in grupo" :key="index">
                             <div class="item-imagen">
                                 <div v-if="negocio.imagen">
                                     <img class="imagen" :src="negocio.imagen" alt=" ">
@@ -83,6 +91,8 @@
                             </div>
                         </li>
                     </ul>
+                </div>
+
                     <div v-if="negociosFiltrados.length === 0" class="text-center mt-3">
                         No se encontraron resultados para esa búsqueda.
                     </div>
@@ -124,6 +134,7 @@ export default {
             zoom: 14,
             negocios: [],
             busqueda: '',
+            rubro: 'Todos',
             mapaMostrado: false,
             mapaMostrado2: false,
             cargando: true
@@ -139,17 +150,62 @@ export default {
     },
     computed: {
         negociosFiltrados() {
-            return this.negocios.filter(negocio => {
-                const nombre = negocio.nombre || '';
-                const descripcion = negocio.descripcion || '';
-                return (
-                    nombre.toLowerCase().includes(this.busqueda.toLowerCase()) ||
-                    descripcion.toLowerCase().includes(this.busqueda.toLowerCase())
-                );
+            let negociosFiltrados = this.negocios;
+
+            // Filtrar por rubro si no se seleccionó "Todos"
+            if (this.rubro !== 'Todos') {
+                negociosFiltrados = negociosFiltrados.filter(negocio => negocio.rubro === this.rubro);
+            }
+
+            // Filtrar por búsqueda si se ingresó algo en el cuadro de búsqueda
+            if (this.busqueda !== '') {
+                const busquedaMinuscula = this.busqueda.toLowerCase();
+                negociosFiltrados = negociosFiltrados.filter(negocio => {
+                    const nombre = negocio.nombre ? negocio.nombre.toLowerCase() : '';
+                    const descripcion = negocio.descripcion ? negocio.descripcion.toLowerCase() : '';
+                    const rubro = negocio.rubro ? negocio.rubro.toLowerCase() : '';
+                    return (
+                        nombre.includes(busquedaMinuscula) ||
+                        descripcion.includes(busquedaMinuscula) ||
+                        rubro.includes(busquedaMinuscula)
+                    );
+                });
+            }
+
+            return negociosFiltrados;
+        },
+        negociosAgrupados() {
+        const grupos = {};
+        this.negociosFiltrados.forEach(negocio => {
+            if (!grupos[negocio.rubro]) {
+                grupos[negocio.rubro] = [];
+            }
+            grupos[negocio.rubro].push(negocio);
+        });
+
+        // Ordenar los grupos alfabéticamente por rubro
+        const rubrosOrdenados = Object.keys(grupos).sort();
+        const gruposOrdenados = {};
+        rubrosOrdenados.forEach(rubro => {
+            gruposOrdenados[rubro] = grupos[rubro];
+        });
+
+        return gruposOrdenados;
+    },
+
+        rubrosUnicos() {
+            const rubros = new Set();
+            this.negocios.forEach(negocio => {
+                rubros.add(negocio.rubro);
             });
+            return Array.from(rubros);
         },
     },
     methods: {
+        limpiarBusqueda() {
+            this.busqueda = '';
+            this.rubro = 'Todos';
+        },
         localizar(negocio, index) {
             if (!this.mapaMostrado) {
                 this.mapaMostrado = true;
@@ -230,6 +286,43 @@ export default {
 </script>
 
 <style scoped>
+.titulo-rubro {
+    font-size: 22px;
+    background: linear-gradient(to right, rgb(133, 184, 248), #ffffff);
+    width: 100%;
+    margin: 0px;
+    padding: 5px 15px;
+}
+.btn-limpiar {
+    display: block;
+    margin-top: 10px;
+    background: linear-gradient(rgb(255, 255, 255), rgb(214, 214, 214)) !important;
+    border: none;
+    border-radius: 1px;
+}
+
+.btn-limpiar:hover {
+    background: linear-gradient(rgb(242, 242, 242), rgb(201, 201, 201)) !important;
+    cursor: pointer;
+}
+
+.flex {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.inline {
+    display: inline-flex;
+}
+
+.mauto {
+    margin: auto;
+}
+
+.inline2 {
+    margin-left: auto;
+}
+
 .popup {
     position: absolute;
     top: 10px;
@@ -251,13 +344,13 @@ export default {
     cursor: pointer;
 }
 
-
-
 .ancho-busqueda {
-    width: 400px;
-    height: 50px;
-    display: block;
-    margin-top: auto;
+    width: 60%;
+}
+
+.ancho-busqueda2 {
+
+    width: 35%;
 }
 
 .container2 {
@@ -277,11 +370,10 @@ ul {
 }
 
 .item-container {
-    box-shadow: 0.5px 1px 4px;
+    box-shadow: 0.2px 0.2px 2px;
     margin: 10px 0px;
-    border: 5px;
+    border-radius: 1px;
     background-color: white;
-    border-radius: 10px;
     display: flex;
     align-items: center;
 }
@@ -290,8 +382,6 @@ ul {
     height: 100px;
     width: 100px;
     margin-right: 20px;
-    border-top-left-radius: 10px;
-    border-bottom-left-radius: 10px;
 }
 
 .item-texto-block {
@@ -304,7 +394,7 @@ ul {
 }
 
 .item-descripcion {
-    font-size: 18px;
+    font-size: 14px;
 }
 
 .item-direccion {
@@ -329,7 +419,11 @@ ul {
 
 @media screen and (max-width: 992px) {
     .ancho-busqueda {
-        width: 200px;
+        width: 50vw;
+    }
+
+    .ancho-busqueda2 {
+        width: 40vw;
     }
 
     .container2 {

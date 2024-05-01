@@ -181,7 +181,7 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Tus datos</h5>
+                        <h5 class="modal-title">Información del pedido</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <form @submit.prevent="realizarPedido">
@@ -683,9 +683,6 @@ img {
     width: 100px;
     /* Ajustamos el tamaño de la imagen */
     margin-right: 20px;
-    /* Añadimos un margen a la derecha */
-    border-top-left-radius: 10px;
-    border-bottom-left-radius: 10px;
 }
 
 

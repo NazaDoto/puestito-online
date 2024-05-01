@@ -64,7 +64,7 @@
       </div>
 
       <!-- MODAL MODIFICAR-->
-      <div v-if="modificarModalAbierto" class="modalCategoriaContainer">
+      <div v-if="modificarModalAbierto" class="modalCategoriaContainer" :style="{ height: modalHeight + 'px' }">
         <div class="modalCategoria">
           <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -145,32 +145,32 @@
 
       <!--Modal Cropper-->
       <div v-show="modalCropImage" class="modalCategoriaContainer  text-center ">
-                <div class="modalCategoria">
-                    <div class="modal-dialog modal-dialog-centered ">
-                        <div class="modal-content ">
-                            <div class="modal-header pl-2">
-                                <h1 class="modal-title fs-5" id="agregarCategoriaLabel">Recortar Imagen</h1>
-                                <button type="button" class="btn-close" @click="cerrarCrop" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body mt-2 ">
-                                <div v-show="cargandoCropper" class="pantalla-cargas text-center">
-                                    <div class="logo-carga">
-                                        <img class="logo-img" src="/favicon.ico" width="50" alt="">
-                                        <div class="texto-carga">
-                                            Cargando imagen
-                                        </div>
-                                    </div>
-                                </div>
-                                <img ref="cropperImg" alt="Croppear">
-                            </div>
-                            <div class="modal-footer mt-2">
-                                <button type="button" class="btn" @click="cerrarCrop">Cerrar</button>
-                                <button class="btn btn-menu" @click="guardarImagenRecortada">Recortar</button>
-                            </div>
-                        </div>
+        <div class="modalCategoria">
+          <div class="modal-dialog modal-dialog-centered ">
+            <div class="modal-content ">
+              <div class="modal-header pl-2">
+                <h1 class="modal-title fs-5" id="agregarCategoriaLabel">Recortar Imagen</h1>
+                <button type="button" class="btn-close" @click="cerrarCrop" aria-label="Close"></button>
+              </div>
+              <div class="modal-body mt-2 ">
+                <div v-show="cargandoCropper" class="pantalla-cargas text-center">
+                  <div class="logo-carga">
+                    <img class="logo-img" src="/favicon.ico" width="50" alt="">
+                    <div class="texto-carga">
+                      Cargando imagen
                     </div>
+                  </div>
                 </div>
+                <img ref="cropperImg" alt="Croppear">
+              </div>
+              <div class="modal-footer mt-2">
+                <button type="button" class="btn" @click="cerrarCrop">Cerrar</button>
+                <button class="btn btn-menu" @click="guardarImagenRecortada">Recortar</button>
+              </div>
             </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -187,9 +187,9 @@ export default {
   data() {
     return {
       cargandoCropper: true,
-            cropper: null,
-            imageToCrop: '',
-            modalCropImage: false,
+      cropper: null,
+      imageToCrop: '',
+      modalCropImage: false,
       categoriaSeleccionada: null,
       cargando: true,
       productos: [], // Almacena los informes cargados desde el servidor
@@ -208,6 +208,7 @@ export default {
       categorias: [],
       agregarCategoriaModalAbierto: false,
       modificarModalAbierto: false,
+      modalHeight: '',
     };
   },
   created() {
@@ -281,6 +282,12 @@ export default {
     modificar(producto) {
       this.fetchCategorias();
       this.productoModificar = producto;
+      // Obtener la altura del body
+      const bodyHeight = document.body.clientHeight;
+
+      // Establecer la altura del contenedor modal
+      this.modalHeight = bodyHeight;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       this.modificarModalAbierto = true;
     },
     actualizarEstadoProducto(producto) {
@@ -322,8 +329,7 @@ export default {
       }
     },
     modificarProducto(producto) {
-      axios
-        .put("/modificarProducto", { producto: producto })
+      axios.put("/modificarProducto", { producto: producto })
         .then(() => {
           this.modificarModalAbierto = false;
           const Toast = Swal.mixin({
@@ -439,24 +445,24 @@ export default {
         });
     },
     imagenSeleccionada(event) {
-            try {
+      try {
 
-                const file = event.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = async (e) => {
-                        this.imageToCrop = e.target.result;
-                        this.modalCropImage = true;
-                        let cropperCanvas = this.$refs.cropperImg;
-                        cropperCanvas.src = this.imageToCrop;
-                        this.$nextTick(() => {
+        const file = event.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = async (e) => {
+            this.imageToCrop = e.target.result;
+            this.modalCropImage = true;
+            let cropperCanvas = this.$refs.cropperImg;
+            cropperCanvas.src = this.imageToCrop;
+            this.$nextTick(() => {
 
-                            const canvasExiste = document.querySelector('cropper-canvas');
-                            if (canvasExiste) {
-                                canvasExiste.parentNode.removeChild(canvasExiste);
-                            }
-                            this.cropper = new Cropper(cropperCanvas, {
-                                template: `<cropper-canvas background style='height:50vh;'>
+              const canvasExiste = document.querySelector('cropper-canvas');
+              if (canvasExiste) {
+                canvasExiste.parentNode.removeChild(canvasExiste);
+              }
+              this.cropper = new Cropper(cropperCanvas, {
+                template: `<cropper-canvas background style='height:50vh;'>
                                     <cropper-image alt='Lol' rotatable=false>asd</cropper-image>
                                         <cropper-shade hidden></cropper-shade>
                                         <cropper-handle  action='move' plain></cropper-handle>
@@ -471,30 +477,30 @@ export default {
                                             <cropper-handle action='sw-resize'></cropper-handle>
                                         </cropper-selection>
                                     </cropper-canvas >` ,
-                            });
-                        });
-                    };
-                    reader.readAsDataURL(file);
-                }
-            } catch (error) {
-                console.log(error)
-            } finally {
-                this.cargandoCropper = false;
-            }
-        },
-        cerrarCrop() {
-            this.modalCropImage = false;
-        },
-        async guardarImagenRecortada() {
-            try {
-                const canvas = await this.cropper.getCropperSelection().$toCanvas();
-                this.productoModificar.producto_imagen = canvas.toDataURL();
-            } catch (error) {
-                console.error('Error al guardar la imagen recortada:', error);
-            } finally {
-                this.modalCropImage = false;
-            }
-        },
+              });
+            });
+          };
+          reader.readAsDataURL(file);
+        }
+      } catch (error) {
+        console.log(error)
+      } finally {
+        this.cargandoCropper = false;
+      }
+    },
+    cerrarCrop() {
+      this.modalCropImage = false;
+    },
+    async guardarImagenRecortada() {
+      try {
+        const canvas = await this.cropper.getCropperSelection().$toCanvas();
+        this.productoModificar.producto_imagen = canvas.toDataURL();
+      } catch (error) {
+        console.error('Error al guardar la imagen recortada:', error);
+      } finally {
+        this.modalCropImage = false;
+      }
+    },
   },
 };
 </script>
@@ -581,8 +587,6 @@ img {
   /* Ajustamos el tamaño de la imagen */
   margin-right: 20px;
   /* Añadimos un margen a la derecha */
-  border-top-left-radius: 10px;
-  border-bottom-left-radius: 10px;
 }
 
 .item-imagen {
@@ -685,17 +689,19 @@ th {
   height: 1.5em !important;
   width: 2.5em !important;
 }
+
 .modalCategoria {
-    width: 60vw;
+  width: 60vw;
 }
 
 @media screen and (max-width: 992px) {
   .ancho-busqueda {
     width: 180px;
   }
+
   .modalCategoria {
     width: 90vw;
-}
+  }
 }
 
 /* Agrega estilos CSS según tus preferencias */

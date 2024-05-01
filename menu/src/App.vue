@@ -42,12 +42,13 @@ export default {
 .modalCategoriaContainer {
     position: absolute;
     z-index: 1233;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
+    margin:0;
+    padding:0;
+    top:0;
+    left:0;
+    width: 100%;
+    height: 100%;
     background-color: rgba(0, 0, 0, 0.8);
-    align-content: center;
 }
 
 .modalCategoria {
@@ -96,8 +97,9 @@ export default {
 }
 
 .barra-busqueda {
-    box-shadow: 0.2px 0.2px 2px;
-    border-radius: 1px;
+    border:none;
+    box-shadow: 0.2px 0.2px 2px !important;
+    border-radius: 1px !important;
 }
 
 .texto-carga {

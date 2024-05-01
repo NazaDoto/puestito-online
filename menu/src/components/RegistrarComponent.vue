@@ -33,7 +33,39 @@
                         </div>
                         <div class="col-md-6">
                             <input class="form-control" type="text" id="descripcion" v-model="negocio.descripcion"
-                                placeholder="Descripción (Qué ofreces)" />
+                                placeholder="Descripción (40 caracteres)" maxlength="40"/>
+                        </div>
+                        <div class="col-md-6">
+                            <select class="form-select" name="rubro" id="rubro" v-model="negocio.rubro">
+                                <option value="Elegí tu rubro" disabled>Elegí tu rubro</option>
+                                <option value="Artesanías">Artesanías</option>
+                                <option value="Bar/Restaurante">Bar/Restaurante</option>
+                                <option value="Carnicería">Carnicería</option>
+                                <option value="Consultorio">Consultorio</option>
+                                <option value="Estética">Estética</option>
+                                <option value="Farmacia">Farmacia</option>
+                                <option value="Ferretería">Ferretería</option>
+                                <option value="Fiambrería">Fiambrería</option>
+                                <option value="Florería">Florería</option>
+                                <option value="Heladería">Heladería</option>
+                                <option value="Indumentaria">Indumentaria</option>
+                                <option value="Inmobiliaria">Inmobiliaria</option>
+                                <option value="Juguetería">Juguetería</option>
+                                <option value="Librería">Librería</option>
+                                <option value="Limpieza">Limpieza</option>
+                                <option value="Panadería">Panadería</option>
+                                <option value="Peluquería">Peluquería</option>
+                                <option value="Polirubro">Polirubro</option>
+                                <option value="Pollería">Pollería</option>
+                                <option value="Repostería">Repostería</option>
+                                <option value="Rotisería">Rotisería</option>
+                                <option value="Reparación/mantenimiento">Reparación/mantenimiento</option>
+                                <option value="Servicios">Servicios</option>
+                                <option value="Supermercado">Supermercado</option>
+                                <option value="Tecnología">Tecnología</option>
+                                <option value="Verdulería">Verdulería</option>
+                                <option value="Veterinaria/Forrajería">Veterinaria/Forrajería</option>
+                            </select>
                         </div>
                         <div class="col-md-6">
                             <input class="form-control" type="email" id="email" v-model="negocio.email"
@@ -60,9 +92,9 @@
                             <input class="form-control" type="file" name="imagen" id="imagen" accept=".jpg"
                                 @change="imagenSeleccionada($event)" required />
                         </div>
-                        <button :disabled="!usuarioDisponible" v-if="!plan" class="btn btn-menu botones m-auto mb-2"
+                        <button :disabled="!usuarioDisponible" v-if="!plan" class="btn btn-menu botones m-auto"
                             type="submit">
-                            Contratar
+                            Registrar
                         </button>
                         <button :disabled="!usuarioDisponible" v-else class="btn btn-menu botones m-auto mb-2"
                             type="submit">
@@ -145,13 +177,21 @@ export default {
                 descripcion: "",
                 instagram: "",
                 facebook: "",
+                rubro: "Elegí tu rubro"
             },
         };
     },
     mounted() {
         this.obtenerPlan();
+        this.checkAuthentication();
     },
     methods: {
+        checkAuthentication() {
+            const isAuthenticated = !!localStorage.getItem("token");/* Agrega aquí tu lógica para verificar si el usuario está autenticado */
+            if (isAuthenticated) {
+                this.$router.push("/u/home");
+            }
+        },
         imagenSeleccionada(event) {
             try {
 
@@ -227,6 +267,17 @@ export default {
                 console.error(error);
             }
         },
+        verificarRubro(){
+            if (this.negocio.rubro == "Elegí tu rubro"){
+                Swal.fire({
+                        icon: "error",
+                        text: "Por favor selecciona un rubro.",
+                    });
+                    return false;
+            }else{
+                return true;
+            }
+        },
         async obtenerPlan() {
             this.plan = localStorage.getItem("plan");
             this.usuario = localStorage.getItem("usuario");
@@ -237,17 +288,23 @@ export default {
                 if (this.usuario) {
                     this.mejorarPlan();
                 } else {
-                    this.verificarDisponibilidad();
-                    if (this.usuarioDisponible) {
-                        this.usuario = this.negocio.usuario;
-                        this.contratarPlan();
+                    if(this.verificarRubro()){
+                        
+                        this.verificarDisponibilidad();
+                        if (this.usuarioDisponible) {
+                            this.usuario = this.negocio.usuario;
+                            this.contratarPlan();
+                        }
                     }
                 }
             } else {
-                this.verificarDisponibilidad();
-                if (this.usuarioDisponible) {
-                    this.usuario = this.negocio.usuario;
-                    this.registrarGratis();
+                if(this.verificarRubro()){
+                    
+                    this.verificarDisponibilidad();
+                    if (this.usuarioDisponible) {
+                        this.usuario = this.negocio.usuario;
+                        this.registrarGratis();
+                    }
                 }
             }
         },

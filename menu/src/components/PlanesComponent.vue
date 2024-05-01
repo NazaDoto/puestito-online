@@ -16,12 +16,15 @@
                                     Gratis
                                 </div>
                                 <ul class="text-start">
-                                    <li>✅Menú online autoadministrable.</li>
-                                    <li>⚠️Visualización en nuestra plataforma. (1 mes)</li>
-                                    <li>⚠️Carrito y pedidos por WhatsApp. (1 mes)</li>
-                                    <li>⚠️Código QR para el menú. (1 mes)</li>
+                                    <li>✅ Menú online autoadministrable.</li>
+                                    <li>⚠️ Visualización en nuestra plataforma.</li>
+                                    <li>⚠️ Carrito y pedidos por WhatsApp.</li>
+                                    <li>⚠️ Código QR para el menú.</li>
                                 </ul>
-                                <button class="btn btn-menu" @click="elegirPlan('')">REGISTRAR</button>
+
+                                <button class="btn btn-menu mt-2" @click="elegirPlan('')">REGISTRAR</button>
+                                <div class="gris mt-2">⚠️ = 1 mes gratis
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -34,10 +37,10 @@
                         </div>
                         <div class="mt-2 p-2 text-center">
                             <ul class="text-start">
-                                <li>✅Menú online autoadministrable.</li>
-                                <li>✅Visualización en nuestra plataforma.</li>
-                                <li>✅Carrito y pedidos por WhatsApp.</li>
-                                <li>✅Código QR para el menú.</li>
+                                <li>✅ Menú online autoadministrable.</li>
+                                <li>✅ Visualización en nuestra plataforma.</li>
+                                <li>✅ Carrito y pedidos por WhatsApp.</li>
+                                <li>✅ Código QR para el menú.</li>
                             </ul>
                         </div>
                     </div>
@@ -82,24 +85,24 @@
 import router from '@/router';
 import NavbarPublicoComponent from './NavbarPublicoComponent.vue'
 export default {
-    data(){
-        return{
-            usuario:'',
+    data() {
+        return {
+            usuario: '',
         }
     },
     components: {
         NavbarPublicoComponent,
     },
-    mounted(){
+    mounted() {
         this.usuario = localStorage.getItem("usuario");
     },
     methods: {
         elegirPlan(plan) {
-            if (plan){
+            if (plan) {
                 localStorage.setItem("plan", plan);
-                console.log("PlanesComponent: ",localStorage.getItem("plan"))
+                console.log("PlanesComponent: ", localStorage.getItem("plan"))
                 router.push('/u/registrar');
-            } else{
+            } else {
                 console.log('plan nulo')
                 localStorage.clear();
                 router.push('/u/registrar');
@@ -110,6 +113,10 @@ export default {
 </script>
 
 <style scoped>
+.gris {
+    color: grey;
+}
+
 li {
     list-style-type: none;
 }

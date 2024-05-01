@@ -181,7 +181,7 @@ export default {
               toast: true,
               position: 'bottom-end',
               showConfirmButton: false,
-              timer: 2000,
+              timer: 1000,
               timerProgressBar: true,
               didOpen: (toast) => {
                 toast.addEventListener('mouseenter', Swal.stopTimer)
@@ -195,7 +195,7 @@ export default {
             });
             setTimeout(function () {
               location.reload()
-            }, 2000);
+            }, 1000);
           })
             .catch((error) => {
               console.log('error')
@@ -211,7 +211,7 @@ export default {
           toast: true,
           position: 'bottom-end',
           showConfirmButton: false,
-          timer: 2000,
+          timer: 1000,
           timerProgressBar: true,
           didOpen: (toast) => {
             toast.addEventListener('mouseenter', Swal.stopTimer)
@@ -225,7 +225,7 @@ export default {
         });
         setTimeout(function () {
           location.reload();
-        }, 2000);
+        }, 1000);
       })
         .catch((error) => {
           console.log('error')

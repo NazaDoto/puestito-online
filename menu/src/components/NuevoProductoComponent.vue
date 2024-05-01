@@ -338,36 +338,43 @@ export default {
         },
 
         nuevoProducto(producto) {
-            this.botonAgregarProductoEnabled = false;
-            axios.post('/nuevoProducto', { producto: producto })
-                .then(() => {
-                    const Toast = Swal.mixin({
-                        toast: true,
-                        position: 'bottom-end',
-                        showConfirmButton: false,
-                        timer: 2000,
-                        timerProgressBar: true,
-                        didOpen: (toast) => {
-                            toast.addEventListener('mouseenter', Swal.stopTimer);
-                            toast.addEventListener('mouseleave', Swal.resumeTimer);
-                        },
+            if(producto.categoria == 'Categoría'){
+                Swal.fire({
+                            icon: 'error',
+                            text: 'Elegí o agregá una categoría.',
+                        });
+            } else{
+                this.botonAgregarProductoEnabled = false;
+                axios.post('/nuevoProducto', { producto: producto })
+                    .then(() => {
+                        const Toast = Swal.mixin({
+                            toast: true,
+                            position: 'bottom-end',
+                            showConfirmButton: false,
+                            timer: 2000,
+                            timerProgressBar: true,
+                            didOpen: (toast) => {
+                                toast.addEventListener('mouseenter', Swal.stopTimer);
+                                toast.addEventListener('mouseleave', Swal.resumeTimer);
+                            },
+                        });
+    
+                        Toast.fire({
+                            icon: 'success',
+                            title: 'Producto agregado.',
+                        });
+                        this.modalAbierto = true;
+                        setTimeout(function () {
+                            location.reload();
+                        }, 2000);
+                    })
+                    .catch(() => {
+                        Swal.fire({
+                            icon: 'error',
+                            text: 'No se pudo agregar el producto.',
+                        });
                     });
-
-                    Toast.fire({
-                        icon: 'success',
-                        title: 'Producto agregado.',
-                    });
-                    this.modalAbierto = true;
-                    setTimeout(function () {
-                        location.reload();
-                    }, 2000);
-                })
-                .catch(() => {
-                    Swal.fire({
-                        icon: 'error',
-                        text: 'No se pudo agregar el producto.',
-                    });
-                });
+            }
 
         },
 

@@ -75,7 +75,7 @@ app.put('/modificarVencimiento', (req, res) => {
 });
 
 app.post('/register', (req, res) => {
-    const { usuario, contraseña, nombre, fechaVence, email, imagen, direccion, telefono, descripcion, instagram, facebook } = req.body;
+    const { usuario, contraseña, nombre, fechaVence, email, imagen, direccion, telefono, descripcion, instagram, facebook, rubro } = req.body;
 
     // Hashea la contraseña antes de almacenarla en la base de datos
     bcrypt.hash(contraseña, saltRounds, (err, hash) => {
@@ -84,8 +84,8 @@ app.post('/register', (req, res) => {
             res.status(500).json({ message: 'Error al registrar usuario' });
         } else {
             // Guarda el hash en la base de datos junto con el usuario
-            const query = 'INSERT INTO usuarios (usuario_nombre, usuario_contraseña, usuario_nombre_negocio, usuario_fecha_vencimiento, usuario_correo, usuario_imagen, usuario_direccion, usuario_telefono, usuario_descripcion, usuario_instagram, usuario_facebook) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-            connection.query(query, [usuario, hash, nombre, fechaVence, email, imagen, direccion, telefono, descripcion, instagram, facebook], (err, result) => {
+            const query = 'INSERT INTO usuarios (usuario_nombre, usuario_contraseña, usuario_nombre_negocio, usuario_fecha_vencimiento, usuario_correo, usuario_imagen, usuario_direccion, usuario_telefono, usuario_descripcion, usuario_instagram, usuario_facebook, usuario_rubro) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+            connection.query(query, [usuario, hash, nombre, fechaVence, email, imagen, direccion, telefono, descripcion, instagram, facebook, rubro], (err, result) => {
                 if (err) {
                     if (err.code == 'ER_DUP_ENTRY') {
                         res.status(500).json({ message: 'Ya existe este usuario. Por favor elige otro nombre de usuario.' });
@@ -213,7 +213,7 @@ const googleMapsClient = require('@google/maps').createClient({
 app.get('/negocios', async(req, res) => {
     try {
         // Consultar la base de datos para obtener la información de los negocios
-        const query = "SELECT usuario_nombre, usuario_nombre_negocio, usuario_fecha_vencimiento, usuario_direccion, usuario_correo, usuario_telefono, usuario_descripcion, usuario_imagen, usuario_instagram, usuario_facebook FROM usuarios WHERE usuario_nombre != 'admin'";
+        const query = "SELECT usuario_nombre, usuario_nombre_negocio, usuario_fecha_vencimiento, usuario_direccion, usuario_correo, usuario_telefono, usuario_descripcion, usuario_imagen, usuario_instagram, usuario_facebook, usuario_rubro FROM usuarios WHERE usuario_nombre != 'admin'";
         connection.query(query, async(error, results) => {
             if (error) {
                 console.error('Error al obtener los negocios de la base de datos:', error);
@@ -237,6 +237,7 @@ app.get('/negocios', async(req, res) => {
                             imagen: negocio.usuario_imagen,
                             instagram: negocio.usuario_instagram,
                             facebook: negocio.usuario_facebook,
+                            rubro: negocio.usuario_rubro,
                             location: location
                         };
                     } catch (error) {
@@ -252,6 +253,7 @@ app.get('/negocios', async(req, res) => {
                             imagen: negocio.usuario_imagen,
                             instagram: negocio.usuario_instagram,
                             facebook: negocio.usuario_facebook,
+                            rubro: negocio.usuario_rubro,
                             location: null
                         };
                     }
@@ -274,7 +276,7 @@ app.get('/negocios', async(req, res) => {
 
 app.get('/miNegocio', (req, res) => {
     const usuario = req.query.usuario;
-    const query = "SELECT usuario_nombre_negocio,  usuario_fecha_vencimiento, usuario_correo, usuario_telefono, usuario_descripcion, usuario_imagen, usuario_direccion, usuario_instagram, usuario_facebook FROM usuarios WHERE usuario_nombre = ?";
+    const query = "SELECT usuario_nombre_negocio,  usuario_fecha_vencimiento, usuario_correo, usuario_telefono, usuario_descripcion, usuario_imagen, usuario_direccion, usuario_instagram, usuario_facebook, usuario_rubro FROM usuarios WHERE usuario_nombre = ?";
     // Ejecutar la consulta
     connection.query(query, usuario, (error, results) => {
         if (error) {
@@ -298,6 +300,7 @@ app.get('/miNegocio', (req, res) => {
             imagen: results[0].usuario_imagen,
             instagram: results[0].usuario_instagram,
             facebook: results[0].usuario_facebook,
+            rubro: results[0].usuario_rubro,
         });
     });
 });
@@ -362,8 +365,8 @@ app.get('/negocio', (req, res) => {
 app.put('/modificarPerfil', (req, res) => {
     const { negocio } = req.body;
     console.log(negocio)
-    query = 'UPDATE usuarios SET usuario_nombre_negocio = ?, usuario_correo = ?, usuario_telefono = ?, usuario_descripcion = ?, usuario_imagen = ?, usuario_direccion = ?, usuario_instagram = ?, usuario_facebook = ? WHERE usuario_nombre = ?';
-    connection.query(query, [negocio.nombre, negocio.correo, negocio.telefono, negocio.descripcion, negocio.imagen, negocio.direccion, negocio.instagram, negocio.facebook, negocio.usuario], (err, result) => {
+    query = 'UPDATE usuarios SET usuario_nombre_negocio = ?, usuario_correo = ?, usuario_telefono = ?, usuario_descripcion = ?, usuario_imagen = ?, usuario_direccion = ?, usuario_instagram = ?, usuario_facebook = ?, usuario_rubro = ? WHERE usuario_nombre = ?';
+    connection.query(query, [negocio.nombre, negocio.correo, negocio.telefono, negocio.descripcion, negocio.imagen, negocio.direccion, negocio.instagram, negocio.facebook, negocio.rubro, negocio.usuario], (err, result) => {
         if (err) {
             console.error('Error al modificar producto:', err);
             res.status(500).json({ message: 'Error al modificar producto' });
@@ -375,7 +378,7 @@ app.put('/modificarPerfil', (req, res) => {
 app.put('/modificarPerfilAdmin', (req, res) => {
     const { negocio } = req.body;
     console.log(negocio.fechaVence)
-    query = 'UPDATE usuarios SET  usuario_contraseña = ?, usuario_nombre_negocio = ?, usuario_fecha_vencimiento = ?, usuario_correo = ?, usuario_telefono = ?, usuario_descripcion = ?, usuario_imagen = ?, usuario_direccion = ?, usuario_instagram = ?, usuario_facebook = ? WHERE usuario_nombre = ?';
+    query = 'UPDATE usuarios SET  usuario_contraseña = ?, usuario_nombre_negocio = ?, usuario_fecha_vencimiento = ?, usuario_correo = ?, usuario_telefono = ?, usuario_descripcion = ?, usuario_imagen = ?, usuario_direccion = ?, usuario_instagram = ?, usuario_facebook = ?, usuario_rubro = ? WHERE usuario_nombre = ?';
 
     if (negocio.contraseña) {
         const bcrypt = require('bcrypt');
@@ -385,7 +388,7 @@ app.put('/modificarPerfilAdmin', (req, res) => {
                 console.log(err)
             } else {
 
-                connection.query(query, [hash, negocio.nombre, negocio.fechaVence, negocio.correo, negocio.telefono, negocio.descripcion, negocio.imagen, negocio.direccion, negocio.instagram, negocio.facebook, negocio.usuario], (err, result) => {
+                connection.query(query, [hash, negocio.nombre, negocio.fechaVence, negocio.correo, negocio.telefono, negocio.descripcion, negocio.imagen, negocio.direccion, negocio.instagram, negocio.facebook, negocio.rubro, negocio.usuario], (err, result) => {
                     if (err) {
                         console.error('Error al modificar producto:', err);
                         res.status(500).json({ message: 'Error al modificar producto' });
@@ -396,8 +399,8 @@ app.put('/modificarPerfilAdmin', (req, res) => {
             }
         });
     } else {
-        query = 'UPDATE usuarios SET usuario_nombre_negocio = ?, usuario_fecha_vencimiento = ?, usuario_correo = ?, usuario_telefono = ?, usuario_descripcion = ?, usuario_imagen = ?, usuario_direccion = ?, usuario_instagram = ?, usuario_facebook = ? WHERE usuario_nombre = ?';
-        connection.query(query, [negocio.nombre, negocio.fechaVence, negocio.correo, negocio.telefono, negocio.descripcion, negocio.imagen, negocio.direccion, negocio.instagram, negocio.facebook, negocio.usuario], (err, result) => {
+        query = 'UPDATE usuarios SET usuario_nombre_negocio = ?, usuario_fecha_vencimiento = ?, usuario_correo = ?, usuario_telefono = ?, usuario_descripcion = ?, usuario_imagen = ?, usuario_direccion = ?, usuario_instagram = ?, usuario_facebook = ?, usuario_rubro = ? WHERE usuario_nombre = ?';
+        connection.query(query, [negocio.nombre, negocio.fechaVence, negocio.correo, negocio.telefono, negocio.descripcion, negocio.imagen, negocio.direccion, negocio.instagram, negocio.facebook, negocio.rubro, negocio.usuario], (err, result) => {
             if (err) {
                 console.error('Error al modificar producto:', err);
                 res.status(500).json({ message: 'Error al modificar producto' });

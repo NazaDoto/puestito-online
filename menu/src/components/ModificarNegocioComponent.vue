@@ -50,6 +50,10 @@
                                                 <td><strong>Descripción:</strong></td>
                                                 <td>{{ negocio.descripcion }}</td>
                                             </tr>
+                                            <tr>
+                                                <td><strong>Rubro:</strong></td>
+                                                <td>{{ negocio.rubro }}</td>
+                                            </tr>
                                         </tbody>
                                     </table>
                                     <div class="descripcion text-start">
@@ -109,7 +113,40 @@
                                         </div>
                                         <div>
                                             <input class="form-control" type="text" id="descripcion"
-                                                v-model="negocioModificar.descripcion" placeholder="Descripción">
+                                                v-model="negocioModificar.descripcion" placeholder="Descripción" maxlength="40">
+                                        </div>
+                                        <div>
+                                            <select class="form-select" name="rubro" id="rubro" v-model="negocioModificar.rubro">
+                                                <option value="Elegí tu rubro" selected disabled>Elegí tu rubro</option>
+                                                <option value="Artesanías">Artesanías</option>
+                                                <option value="Bar/Restaurante">Bar/Restaurante</option>
+                                                <option value="Carnicería">Carnicería</option>
+                                                <option value="Consultorio">Consultorio</option>
+                                                <option value="Estética">Estética</option>
+                                                <option value="Farmacia">Farmacia</option>
+                                                <option value="Ferretería">Ferretería</option>
+                                                <option value="Fiambrería">Fiambrería</option>
+                                                <option value="Florería">Florería</option>
+                                                <option value="Heladería">Heladería</option>
+                                                <option value="Indumentaria">Indumentaria</option>
+                                                <option value="Inmobiliaria">Inmobiliaria</option>
+                                                <option value="Juguetería">Juguetería</option>
+                                                <option value="Librería">Librería</option>
+                                                <option value="Limpieza">Limpieza</option>
+                                                <option value="Panadería">Panadería</option>
+                                                <option value="Peluquería">Peluquería</option>
+                                                <option value="Polirubro">Polirubro</option>
+                                                <option value="Pollería">Pollería</option>
+                                                <option value="Repostería">Repostería</option>
+                                                <option value="Rotisería">Rotisería</option>
+                                                <option value="Reparación/mantenimiento">Reparación/mantenimiento
+                                                </option>
+                                                <option value="Servicios">Servicios</option>
+                                                <option value="Supermercado">Supermercado</option>
+                                                <option value="Tecnología">Tecnología</option>
+                                                <option value="Verdulería">Verdulería</option>
+                                                <option value="Veterinaria/Forrajería">Veterinaria/Forrajería</option>
+                                            </select>
                                         </div>
                                         <div>
                                             <input class="form-control" type="text" id="instagram"
@@ -199,7 +236,8 @@ export default {
                 descripcion: '',
                 imagen: '',
                 instagram: '',
-                facebook: ''
+                facebook: '',
+                rubro: '',
             },
             negocioModificar: '',
         };
