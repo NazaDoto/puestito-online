@@ -135,7 +135,7 @@ label {
 }
 
 .total {
-  height: calc(100svh - 56px);
+  height: calc(100svh - 41.1px);
   background-color: #8cfbff;
 }
 
@@ -169,7 +169,7 @@ form {
   }
 
   .total {
-    height: calc(100svh - 56px);
+    height: calc(100svh - 41.1px);
   }
 
   .fondo {
