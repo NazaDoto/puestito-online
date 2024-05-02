@@ -223,7 +223,8 @@ export default {
         return {
             categoriaSeleccionada: null,
             mostrarModal: true,
-            nombreNegocio: '', // Variable para almacenar el nombre de usuario del negocio
+            nombreUsuario: '', // Variable para almacenar el nombre de usuario del negocio
+            nombreNegocio: '',
             productos: [],      // Array para almacenar los productos del negocio
             busqueda: '',
             negocio: {
@@ -249,7 +250,7 @@ export default {
     },
     mounted() {
         // Obtener el nombre de usuario de la URL
-        this.nombreNegocio = this.$route.params.nombreNegocio;
+        this.nombreUsuario = this.$route.params.nombreUsuario;
         // Lógica para obtener los productos del negocio con el nombre de usuario dado
         this.obtenerInformacionNegocio();
         
@@ -391,8 +392,9 @@ export default {
         async obtenerInformacionNegocio() {
             try {
                 // Realiza una solicitud HTTP GET para obtener los informes desde el servidor
-                const response = await axios.get(`/negocio?usuario=${this.nombreNegocio}`);
+                const response = await axios.get(`/negocio?usuario=${this.nombreUsuario}`);
                 // Actualiza la lista de informes con los datos recibidos
+                this.nombreNegocio = response.data.nombre;
                 this.negocio = response.data;
                 await this.fetchProductos();
             } catch (error) {
