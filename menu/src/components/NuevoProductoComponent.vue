@@ -110,7 +110,7 @@
                                 <p class="text-center">Asegurate de que en tu planilla de Excel existan las
                                     columnas con
                                     encabezados <strong>"Producto"</strong>, en donde se encontrará
-                                    el nombre del producto, y <strong>"P. Venta"</strong>, en donde se
+                                    el nombre del producto, y <strong>"Precio"</strong>, en donde se
                                     encontrará el
                                     precio del producto. <u>(Se ignorará el resto de columnas)</u>.
                                     Más adelante podrás modificar la información de los mismos en la pestaña
@@ -221,7 +221,7 @@ export default {
             try {
 
                 for (const item of data) {
-                    let precio = item['P. Venta'];
+                    let precio = item['Precio'];
 
                     // Verificar si el precio comienza con $ o € y eliminar el símbolo
                     try {
