@@ -83,15 +83,15 @@
                         </div>
                         <div class="col-md-6">
                             <input class="form-control" type="number" id="telefono" v-model="negocio.telefono"
-                                placeholder="Teléfono (por ej. 5493855223287)" />
+                                placeholder="Teléfono (con característica incluída, por ej. 5493855223287)" />
                         </div>
                         <div class="col-md-6">
                             <input class="form-control" type="text" id="instagram" v-model="negocio.instagram"
-                                placeholder="Link de Instagram" />
+                                placeholder="Link de Instagram (por ej. https://instagram.com/puestito.online)" />
                         </div>
                         <div class="col-md-6">
                             <input class="form-control" type="text" id="facebook" v-model="negocio.facebook"
-                                placeholder="Link de Facebook" />
+                                placeholder="Link de Facebook (por ej. https://facebook.com/puestito.online)" />
                         </div>
                         <div class="col-md-6">
                             <label class="form-label text-center" for="imagen">Logo (JPG/PNG)</label>
