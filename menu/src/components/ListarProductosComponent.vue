@@ -21,8 +21,8 @@
             <div class="flex">
               <div class="titulo-categoria" @click="toggleCategoria(categoria)">{{ categoria }}</div>
               <div class="flex-end">
-                <button class="btn-edit p-2" title="Modificar" @click="abrirModificarCategoriaModal(categoria)"><img width="20"
-                    src="/recursos/edit.png" alt=""></button>
+                <button class="btn-edit p-2" title="Modificar" @click="abrirModificarCategoriaModal(categoria)"><img
+                    width="20" src="/recursos/edit.png" alt=""></button>
               </div>
             </div>
             <div :class="{ 'categoria-productos': true, 'categoria-activa': categoriaSeleccionada === categoria }">
@@ -155,7 +155,8 @@
             <div class="modal-content ">
               <div class="modal-header pl-2">
                 <h1 class="modal-title fs-5" id="agregarCategoriaLabel">Modificar Categoría</h1>
-                <button type="button" class="btn-close" @click="cerrarModificarCategoriaModal" aria-label="Close"></button>
+                <button type="button" class="btn-close" @click="cerrarModificarCategoriaModal"
+                  aria-label="Close"></button>
               </div>
               <div class="modal-body mt-2">
                 <form @submit.prevent="modificarCategoria">
@@ -235,7 +236,7 @@ export default {
       },
       categoria_nombre: "",
       categoriaVieja: "",
-      categoriaNueva:"",
+      categoriaNueva: "",
       categorias: [],
       agregarCategoriaModalAbierto: false,
       modificarModalAbierto: false,
@@ -281,8 +282,9 @@ export default {
   methods: {
     modificarCategoria() {
       try {
-        axios.put('/modificarCategoria', {usuario: this.usuario, categoriaVieja: this.categoriaVieja, categoriaNueva: this.categoriaNueva});
-        const Toast = Swal.mixin({
+        axios.put('/modificarCategoria', { usuario: this.usuario, categoriaVieja: this.categoriaVieja, categoriaNueva: this.categoriaNueva }).then(() => {
+
+          const Toast = Swal.mixin({
             toast: true,
             position: "bottom-end",
             showConfirmButton: false,
@@ -297,12 +299,15 @@ export default {
             icon: "success",
             title: "Categoría modificada.",
           });
+        }).catch((error) => {
+          Swal.fire({
+            icon: 'error',
+            text: 'No se pudo modificar la categoría. ' + error.response.data.message,
+          });
+        })
       } catch (error) {
-        Swal.fire({
-          icon: 'error',
-          text: 'No se pudo modificar la categoría. ' + error.response.data.message,
-        });
-      } finally{
+        console.log(error);
+      } finally {
         this.modificarCategoriaModalAbierto = false;
         location.reload();
       }
@@ -314,14 +319,14 @@ export default {
       this.agregarCategoriaModalAbierto = false;
     },
     agregarCategoriaModal() {
-      window.scrollTo({top:0, behavior: 'smooth'});
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       this.agregarCategoriaModalAbierto = true;
     },
     cerrarModificarCategoriaModal() {
       this.modificarCategoriaModalAbierto = false;
     },
     abrirModificarCategoriaModal(categoria) {
-      window.scrollTo({top:0, behavior: 'smooth'});
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       this.modificarCategoriaModalAbierto = true;
       this.categoriaVieja = this.categoriaNueva = categoria;
     },
