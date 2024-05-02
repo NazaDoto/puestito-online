@@ -89,7 +89,7 @@
                                         placeholder="Nombre de la Categoría" required />
                                     <div class="modal-footer mt-2">
                                         <button type="button" class="btn" @click="cerrarCategoriaModal">Cerrar</button>
-                                        <button class="btn btn-agregar" type="submit">Agregar</button>
+                                        <button class="btn btn-agregar" type="submit" :disabled="!botonAgregarCategoriaEnabled">Agregar</button>
                                     </div>
                                 </form>
                             </div>
@@ -155,6 +155,7 @@ export default {
             imageToCrop: '',
             modalCropImage: false,
             botonAgregarProductoEnabled: true,
+            botonAgregarCategoriaEnabled: true,
             agregarCategoriaModalAbierto: false,
             archivo: null,
             usuario: '',
@@ -379,39 +380,46 @@ export default {
         },
 
         agregarCategoria() {
-            axios.post('nuevaCategoria', { categoria_nombre: this.categoria_nombre, usuario_nombre: localStorage.getItem('usuario') })
-                .then(() => {
-                    // Agregar la nueva categoría a la lista de categorías
-                    this.obtenerCategorias();
-                    // Limpiar el campo de nombre de categoría
-                    this.producto.categoria = this.categoria_nombre;
-                    this.categoria_nombre = '';
-
-                    // Opcional: Puedes seleccionar automáticamente la nueva categoría
-                    const Toast = Swal.mixin({
-                        toast: true,
-                        position: 'bottom-end',
-                        showConfirmButton: false,
-                        timer: 3000,
-                        timerProgressBar: true,
-                        didOpen: (toast) => {
-                            toast.addEventListener('mouseenter', Swal.stopTimer);
-                            toast.addEventListener('mouseleave', Swal.resumeTimer);
-                        },
+            try {
+                this.botonAgregarCategoriaEnabled = false;
+                axios.post('nuevaCategoria', { categoria_nombre: this.categoria_nombre, usuario_nombre: localStorage.getItem('usuario') })
+                    .then(() => {
+                        // Agregar la nueva categoría a la lista de categorías
+                        this.obtenerCategorias();
+                        // Limpiar el campo de nombre de categoría
+                        this.producto.categoria = this.categoria_nombre;
+                        this.categoria_nombre = '';
+    
+                        // Opcional: Puedes seleccionar automáticamente la nueva categoría
+                        const Toast = Swal.mixin({
+                            toast: true,
+                            position: 'bottom-end',
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true,
+                            didOpen: (toast) => {
+                                toast.addEventListener('mouseenter', Swal.stopTimer);
+                                toast.addEventListener('mouseleave', Swal.resumeTimer);
+                            },
+                        });
+    
+                        Toast.fire({
+                            icon: 'success',
+                            title: 'Categoría agregada.',
+                        });
+                        this.agregarCategoriaModalAbierto = false;
+                    })
+                    .catch((error) => {
+                        Swal.fire({
+                            icon: 'error',
+                            text: 'No se pudo agregar la categoría. ' + error.response.data.message,
+                        });
                     });
-
-                    Toast.fire({
-                        icon: 'success',
-                        title: 'Categoría agregada.',
-                    });
-                    this.agregarCategoriaModalAbierto = false;
-                })
-                .catch((error) => {
-                    Swal.fire({
-                        icon: 'error',
-                        text: 'No se pudo agregar la categoría. ' + error.response.data.message,
-                    });
-                });
+            } catch (error) {
+                console.log(error)
+            } finally{
+                this.botonAgregarCategoriaEnabled = true;
+            }
         },
     },
     mounted() {
