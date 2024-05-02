@@ -432,7 +432,7 @@ export default {
         async fetchProductos() {
             try {
                 // Realiza una solicitud HTTP GET para obtener los productos desde el servidor
-                const response = await axios.get(`/productos?usuario=${this.nombreNegocio}`);
+                const response = await axios.get(`/productos?usuario=${this.nombreUsuario}`);
                 const productosFiltradosDisponibles = response.data.filter(producto => producto.producto_disponibilidad);
                 // Ordena los productos alfabéticamente por el nombre
                 const productosOrdenados = productosFiltradosDisponibles.sort((a, b) => {
