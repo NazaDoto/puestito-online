@@ -16,14 +16,14 @@
                                     Gratis
                                 </div>
                                 <ul class="text-start">
-                                    <li>✅ Menú online autoadministrable.</li>
+                                    <li>✅ Página + Menú online autoadministrable.</li>
                                     <li>⚠️ Visualización en nuestra plataforma.</li>
                                     <li>⚠️ Carrito y pedidos por WhatsApp.</li>
                                     <li>⚠️ Código QR para el menú.</li>
                                 </ul>
 
+                                <div class="gris mt-2">⚠️ = 1 mes gratis <br>
                                 <button class="btn btn-menu mt-2" @click="elegirPlan('')">REGISTRAR</button>
-                                <div class="gris mt-2">⚠️ = 1 mes gratis
                                 </div>
                             </div>
                         </div>
@@ -37,7 +37,7 @@
                         </div>
                         <div class="mt-2 p-2 text-center">
                             <ul class="text-start">
-                                <li>✅ Menú online autoadministrable.</li>
+                                <li>✅ Página + Menú online autoadministrable.</li>
                                 <li>✅ Visualización en nuestra plataforma.</li>
                                 <li>✅ Carrito y pedidos por WhatsApp.</li>
                                 <li>✅ Código QR para el menú.</li>

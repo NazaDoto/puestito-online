@@ -40,10 +40,10 @@
 
           </div>
           <div class="item-texto-block-end">
-            <a v-if="negocio.instagram" class="m-2" :href="negocio.instagram" target="blank"><img width='40'
+            <a v-if="negocio.instagram" class="m-2" :href="'https://instagram.com/'+negocio.instagram" target="blank"><img width='40'
                 src="/recursos/instagram.png"></a>
             <div v-else>Sin Instagram</div>
-            <a v-if="negocio.facebook" class="m-2" :href="negocio.facebook" target="blank"><img width='36'
+            <a v-if="negocio.facebook" class="m-2" :href="'https://facebook.com/'+negocio.facebook" target="blank"><img width='36'
                 src="/recursos/facebook.png"></a>
             <div v-else>Sin Facebook</div>
           </div>

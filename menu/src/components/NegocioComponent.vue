@@ -38,9 +38,9 @@
                             <div class="texto-superpuesto">BIENVENIDOS
                                 <div class="texto-superpuesto2">"{{ negocio.descripcion }}"</div>
                                 <div class="text-center redes">
-                                    <a v-if="negocio.instagram" class="mauto" :href="negocio.instagram"
+                                    <a v-if="negocio.instagram" class="mauto" :href="'https://instagram.com/'+negocio.instagram"
                                         target="blank"><img width='40' src="/recursos/instagram.png"></a>
-                                    <a v-if="negocio.facebook" class="mauto" :href="negocio.facebook"
+                                    <a v-if="negocio.facebook" class="mauto" :href="'https://facebook.com/'+negocio.facebook"
                                         target="blank"><img width='36' src="/recursos/facebook.png"></a>
                                     <a v-if="negocio.direccion"
                                         :href="'https://www.google.com/maps/search/' + encodeURIComponent(negocio.direccion)"

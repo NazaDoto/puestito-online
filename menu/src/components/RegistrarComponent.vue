@@ -35,7 +35,7 @@
                         </h4>
                         <div class="col-md-6">
                             <input class="form-control" type="text" id="nombre" v-model="negocio.nombre"
-                                placeholder="Nombre (Así aparecerás en la página)" required />
+                                placeholder="Nombre del Negocio" required />
                         </div>
                         <div class="col-md-6">
                             <input class="form-control" type="text" id="descripcion" v-model="negocio.descripcion"
@@ -83,15 +83,15 @@
                         </div>
                         <div class="col-md-6">
                             <input class="form-control" type="number" id="telefono" v-model="negocio.telefono"
-                                placeholder="Teléfono (con característica incluída, por ej. 5493855223287)" />
+                                placeholder="Teléfono (completo, por ej. 5493855223287)" />
                         </div>
                         <div class="col-md-6">
                             <input class="form-control" type="text" id="instagram" v-model="negocio.instagram"
-                                placeholder="Link de Instagram (por ej. https://instagram.com/puestito.online)" />
+                                placeholder="Usuario de Instagram (por ej. puestito.online)" />
                         </div>
                         <div class="col-md-6">
                             <input class="form-control" type="text" id="facebook" v-model="negocio.facebook"
-                                placeholder="Link de Facebook (por ej. https://facebook.com/puestito.online)" />
+                                placeholder="Usuario de Facebook (por ej. puestito.online)" />
                         </div>
                         <div class="col-md-6">
                             <label class="form-label text-center" for="imagen">Logo (JPG/PNG)</label>
