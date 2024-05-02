@@ -250,7 +250,7 @@ export default {
     },
     mounted() {
         // Obtener el nombre de usuario de la URL
-        this.nombreUsuario = this.$route.params.nombreUsuario;
+        this.nombreUsuario = this.$route.params.nombreNegocio;
         // Lógica para obtener los productos del negocio con el nombre de usuario dado
         this.obtenerInformacionNegocio();
         
@@ -394,8 +394,8 @@ export default {
                 // Realiza una solicitud HTTP GET para obtener los informes desde el servidor
                 const response = await axios.get(`/negocio?usuario=${this.nombreUsuario}`);
                 // Actualiza la lista de informes con los datos recibidos
-                this.nombreNegocio = response.data.nombre;
                 this.negocio = response.data;
+                this.nombreNegocio = response.data.nombre;
                 await this.fetchProductos();
             } catch (error) {
                 console.error("Error al cargar los productos:", error);
