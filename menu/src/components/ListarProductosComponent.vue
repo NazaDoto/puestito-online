@@ -281,7 +281,6 @@ export default {
   },
   methods: {
     modificarCategoria() {
-      try {
         axios.put('/modificarCategoria', { usuario: this.usuario, categoriaVieja: this.categoriaVieja, categoriaNueva: this.categoriaNueva }).then(() => {
 
           const Toast = Swal.mixin({
@@ -299,18 +298,16 @@ export default {
             icon: "success",
             title: "Categoría modificada.",
           });
+          this.modificarCategoriaModalAbierto = false;
+          location.reload();
         }).catch((error) => {
           Swal.fire({
             icon: 'error',
             text: 'No se pudo modificar la categoría. ' + error.response.data.message,
           });
         })
-      } catch (error) {
-        console.log(error);
-      } finally {
-        this.modificarCategoriaModalAbierto = false;
-        location.reload();
-      }
+       
+      
     },
     cerrarModificarModal() {
       this.modificarModalAbierto = false;
