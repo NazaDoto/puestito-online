@@ -280,34 +280,33 @@ export default {
     }
   },
   methods: {
-    modificarCategoria() {
-        axios.put('/modificarCategoria', { usuario: this.usuario, categoriaVieja: this.categoriaVieja, categoriaNueva: this.categoriaNueva }).then(() => {
+    async modificarCategoria() {
+      await axios.put('/modificarCategoria', { usuario: this.usuario, categoriaVieja: this.categoriaVieja, categoriaNueva: this.categoriaNueva }).then(() => {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: "bottom-end",
+          showConfirmButton: false,
+          timer: 1000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener("mouseenter", Swal.stopTimer);
+            toast.addEventListener("mouseleave", Swal.resumeTimer);
+          },
+        });
+        Toast.fire({
+          icon: "success",
+          title: "Categoría modificada.",
+        });
+        this.modificarCategoriaModalAbierto = false;
+        location.reload();
+      }).catch((error) => {
+        Swal.fire({
+          icon: 'error',
+          text: 'No se pudo modificar la categoría. ' + error.response.data.message,
+        });
+      })
 
-          const Toast = Swal.mixin({
-            toast: true,
-            position: "bottom-end",
-            showConfirmButton: false,
-            timer: 1000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-              toast.addEventListener("mouseenter", Swal.stopTimer);
-              toast.addEventListener("mouseleave", Swal.resumeTimer);
-            },
-          });
-          Toast.fire({
-            icon: "success",
-            title: "Categoría modificada.",
-          });
-          this.modificarCategoriaModalAbierto = false;
-          location.reload();
-        }).catch((error) => {
-          Swal.fire({
-            icon: 'error',
-            text: 'No se pudo modificar la categoría. ' + error.response.data.message,
-          });
-        })
-       
-      
+
     },
     cerrarModificarModal() {
       this.modificarModalAbierto = false;
