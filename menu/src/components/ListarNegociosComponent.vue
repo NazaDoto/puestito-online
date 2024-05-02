@@ -113,8 +113,8 @@
                     placeholder="Facebook">
                 </div>
                 <div>
-                  <label class="form-label mr-2" for="imagen">Imagen (JPG)</label>
-                  <input class="form-control" type="file" name="imagen" id="imagen" accept=".jpg"
+                  <label class="form-label mr-2" for="imagen">Imagen (JPG/PNG)</label>
+                  <input class="form-control" type="file" name="imagen" id="imagen" accept="image/jpeg, image/png"
                     @change="imagenSeleccionada">
                 </div>
               </div>

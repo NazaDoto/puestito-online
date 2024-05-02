@@ -7,7 +7,7 @@ import VueGoogleMaps from '@fawmi/vue-google-maps';
 const env = 'prod';
 
 if (env == 'dev') {
-    axios.defaults.baseURL = 'http://192.168.1.10:3500';
+    axios.defaults.baseURL = 'http://192.168.1.235:3500';
 } else {
 
     axios.defaults.baseURL = 'https://puestito.online:3500';

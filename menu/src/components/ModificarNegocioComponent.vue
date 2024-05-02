@@ -163,9 +163,9 @@
                                                 v-model="negocioModificar.facebook" placeholder="Facebook">
                                         </div>
                                         <div>
-                                            <label class="form-label mr-2" for="imagen">Imagen (JPG)</label>
+                                            <label class="form-label mr-2" for="imagen">Imagen (JPG/PNG)</label>
                                             <input class="form-control" type="file" name="imagen" id="imagen"
-                                                accept=".jpg" @change="imagenSeleccionada">
+                                                accept="image/jpeg, image/png" @change="imagenSeleccionada">
                                         </div>
                                     </div>
                                     <div class="text-end">

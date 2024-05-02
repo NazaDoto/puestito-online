@@ -87,6 +87,7 @@
                   <div v-if="negocio.imagen">
                     <img class="imagen" :src="negocio.imagen" alt=" " />
                   </div>
+                  <div v-else style="margin-left:10px"></div>
                 </div>
                 <!-- Nombre del negocio -->
                 <div class="item-texto-block">

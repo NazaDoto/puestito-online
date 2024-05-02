@@ -94,8 +94,8 @@
                                 placeholder="Link de Facebook" />
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label text-center" for="imagen">Logo (JPG)</label>
-                            <input class="form-control" type="file" name="imagen" id="imagen" accept=".jpg"
+                            <label class="form-label text-center" for="imagen">Logo (JPG/PNG)</label>
+                            <input class="form-control" type="file" name="imagen" id="imagen" accept="image/jpeg, image/png"
                                 @change="imagenSeleccionada($event)" required />
                         </div>
                         <button :disabled="!usuarioDisponible" v-if="!plan" class="btn btn-menu botones m-auto"

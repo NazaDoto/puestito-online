@@ -34,8 +34,8 @@
                             placeholder="Precio (sin $)" />
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label mr-2" for="imagen">Imagen (JPG)</label>
-                        <input class="form-control mb-3" type="file" name="imagen" id="imagen" accept=".jpg"
+                        <label class="form-label mr-2" for="imagen">Imagen (JPG/PNG)</label>
+                        <input class="form-control mb-3" type="file" name="imagen" id="imagen" accept="image/jpeg, image/png"
                             @change="imagenSeleccionada($event)" />
                     </div>
                 </div>

@@ -37,12 +37,14 @@
                             <img :src="negocio.imagen" alt="" class="img-negocio">
                             <div class="texto-superpuesto">BIENVENIDOS
                                 <div class="texto-superpuesto2">"{{ negocio.descripcion }}"</div>
-                                <div class="text-center redes">                                    
+                                <div class="text-center redes">
                                     <a v-if="negocio.instagram" class="mauto" :href="negocio.instagram"
-                                    target="blank"><img width='40' src="/recursos/instagram.png"></a>
+                                        target="blank"><img width='40' src="/recursos/instagram.png"></a>
                                     <a v-if="negocio.facebook" class="mauto" :href="negocio.facebook"
-                                    target="blank"><img width='36' src="/recursos/facebook.png"></a>
-                                    <a v-if="negocio.direccion" :href="'https://www.google.com/maps/search/' + encodeURIComponent(negocio.direccion)" target="_blank"><img width='40' src="/recursos/pin.png"></a>
+                                        target="blank"><img width='36' src="/recursos/facebook.png"></a>
+                                    <a v-if="negocio.direccion"
+                                        :href="'https://www.google.com/maps/search/' + encodeURIComponent(negocio.direccion)"
+                                        target="_blank"><img width='40' src="/recursos/pin.png"></a>
                                 </div>
                             </div>
                         </div>
@@ -188,7 +190,7 @@
                         <div class="modal-body">
                             <label class="mt-2" for="nombre">Nombre y Apellido</label>
                             <input type="text" id="nombre" class="form-control" placeholder="(obligatorio)"
-                            v-model="pedido.nombre" required>
+                                v-model="pedido.nombre" required>
                             <label class="mt-2" for="medioPago">Medio de Pago</label>
                             <select class="form-control form-select" id="medioPago" v-model="pedido.medio" required>
                                 <option value="Transferencia">Transferencia</option>
@@ -196,14 +198,14 @@
                             </select>
                             <label class="mt-2" for="direccion">Dirección de entrega</label>
                             <input type="text" id="direccion" class="form-control" placeholder="(opcional)"
-                            v-model="pedido.direccion">
+                                v-model="pedido.direccion">
                             <label class="mt-2" for="detalles">Detalles del pedido</label>
                             <input type="text" id="detalles" class="form-control" placeholder="(opcional)"
                                 v-model="pedido.detalle">
                         </div>
                         <div class="modal-footer">
-                            <button type="submit" class="ver-carrito-btn2" :disabled="!carrito.length > 0"
-                                >Realizar pedido</button>
+                            <button type="submit" class="ver-carrito-btn2" :disabled="!carrito.length > 0">Realizar
+                                pedido</button>
                         </div>
                     </form>
                 </div>
@@ -214,6 +216,7 @@
 
 <script>
 import axios from 'axios';
+import Swal from 'sweetalert2';
 export default {
     data() {
         return {
@@ -248,6 +251,7 @@ export default {
         this.nombreNegocio = this.$route.params.nombreNegocio;
         // Lógica para obtener los productos del negocio con el nombre de usuario dado
         this.obtenerInformacionNegocio();
+        
     },
     computed: {
         categoriasOrdenadas() {
@@ -319,7 +323,7 @@ export default {
             const total = `*Total: $${this.total}*\n\n`;
             let datos = `*Nombre:* ${this.pedido.nombre}\n*Medio de pago:* ${this.pedido.medio}\n`;
             this.pedido.direccion ? datos += `*Dirección:* ${this.pedido.direccion}\n` : this.pedido.detalle ? datos += `*Detalle:* ${this.pedido.detalle}\n\n¡Muchas gracias!` : datos += `\n¡Muchas gracias!`;
-            
+
 
             // Concatenamos el mensaje con la lista de productos y el total
             const mensajeCompleto = mensaje + productos.join('') + total + datos;
@@ -338,8 +342,15 @@ export default {
             const numeroWhatsapp = `${baseLink}?phone=${this.negocio.telefono}&text=${encodeURIComponent(mensajeCompleto)}`;
             sessionStorage.clear();
             // Finalmente, abrimos una nueva ventana del navegador con el enlace generado
-            location.reload(1);
-            window.open(numeroWhatsapp);
+            try{
+                window.open(numeroWhatsapp);
+                location.reload(1);
+            } catch(error){
+                Swal.fire({
+                            icon: 'error',
+                            text: 'Por favor habilita las ventanas emergentes para ir a WhatsApp.' + error.response.data.message,
+                        });
+            }
         },
         agregarAlCarrito(producto) {
             const index = this.carrito.findIndex(item => item.producto_id === producto.producto_id);
@@ -436,7 +447,7 @@ export default {
 
             } catch (error) {
                 console.error("Error al cargar los productos:", error);
-            } 
+            }
         },
         filteredProductos(categoria) {
             // Filtra los productos basándose en la categoría y en el valor de disponibilidad
@@ -574,7 +585,8 @@ export default {
     position: relative;
     height: 100%;
 }
-.presentacion{
+
+.presentacion {
     height: 90vh;
 }
 
@@ -594,12 +606,13 @@ export default {
     font-size: 3rem;
     font-weight: bold;
     color: white;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);    
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
     text-align: center;
 }
-.redes{
-    position:absolute;
-    top:45vh;
+
+.redes {
+    position: absolute;
+    top: 45vh;
     width: 100%;
     text-align: center;
 }
@@ -756,13 +769,16 @@ ul {
 .container2 {
     margin: 0px 30vw;
 }
+
 @media screen and (max-width: 992px) {
-    .navbar{
+    .navbar {
         background: linear-gradient(to right, rgb(228, 190, 109), #ffffff);
     }
-    .navbar-brand{
+
+    .navbar-brand {
         font-size: 20px;
     }
+
     .img-negocio {
         object-fit: cover;
         height: 100%;
