@@ -18,7 +18,13 @@
       <div class="ancho mt-2">
         <div class="mt-2" v-for="(categoria, index) in categoriasOrdenadas" :key="index" :id="categoria">
           <div v-if="filteredProductos(categoria)">
-            <div class="titulo-categoria" @click="toggleCategoria(categoria)">{{ categoria }}</div>
+            <div class="flex">
+              <div class="titulo-categoria" @click="toggleCategoria(categoria)">{{ categoria }}</div>
+              <div class="flex-end">
+                <button class="btn-edit p-2" title="Modificar" @click="abrirModificarCategoriaModal(categoria)"><img width="20"
+                    src="/recursos/edit.png" alt=""></button>
+              </div>
+            </div>
             <div :class="{ 'categoria-productos': true, 'categoria-activa': categoriaSeleccionada === categoria }">
               <div class="p-2">
                 <div class="item-container mt-2" v-for="(producto, index) in filteredProductos(categoria)" :key="index">
@@ -119,7 +125,7 @@
         </div>
       </div>
 
-      <!-- MODAL CATEGORIA -->
+      <!-- MODAL AGREGAR CATEGORIA -->
       <div v-if="agregarCategoriaModalAbierto" class="modalCategoriaContainer">
         <div class="modalCategoria">
           <div class="modal-dialog modal-dialog-centered">
@@ -135,6 +141,29 @@
                   <div class="modal-footer mt-2">
                     <button type="button" class="btn" @click="cerrarCategoriaModal">Cerrar</button>
                     <button class="btn btn-agregar" type="submit">Agregar</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- MODAL MODIFICAR CATEGORIA -->
+      <div v-if="modificarCategoriaModalAbierto" class="modalCategoriaContainer">
+        <div class="modalCategoria">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content ">
+              <div class="modal-header pl-2">
+                <h1 class="modal-title fs-5" id="agregarCategoriaLabel">Modificar Categoría</h1>
+                <button type="button" class="btn-close" @click="cerrarModificarCategoriaModal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body mt-2">
+                <form @submit.prevent="modificarCategoria">
+                  <input class="form-control" type="text" id="nombre" v-model="categoriaNueva"
+                    placeholder="Nombre de la Categoría" required />
+                  <div class="modal-footer mt-2">
+                    <button type="button" class="btn" @click="cerrarModificarCategoriaModal">Cerrar</button>
+                    <button class="btn btn-agregar" type="submit">Modificar</button>
                   </div>
                 </form>
               </div>
@@ -205,9 +234,12 @@ export default {
         usuario: "",
       },
       categoria_nombre: "",
+      categoriaVieja: "",
+      categoriaNueva:"",
       categorias: [],
       agregarCategoriaModalAbierto: false,
       modificarModalAbierto: false,
+      modificarCategoriaModalAbierto: false,
       modalHeight: '',
     };
   },
@@ -247,6 +279,34 @@ export default {
     }
   },
   methods: {
+    modificarCategoria() {
+      try {
+        axios.put('/modificarCategoria', {usuario: this.usuario, categoriaVieja: this.categoriaVieja, categoriaNueva: this.categoriaNueva});
+        const Toast = Swal.mixin({
+            toast: true,
+            position: "bottom-end",
+            showConfirmButton: false,
+            timer: 1000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+              toast.addEventListener("mouseenter", Swal.stopTimer);
+              toast.addEventListener("mouseleave", Swal.resumeTimer);
+            },
+          });
+          Toast.fire({
+            icon: "success",
+            title: "Categoría modificada.",
+          });
+      } catch (error) {
+        Swal.fire({
+          icon: 'error',
+          text: 'No se pudo modificar la categoría. ' + error.response.data.message,
+        });
+      } finally{
+        this.modificarCategoriaModalAbierto = false;
+        location.reload();
+      }
+    },
     cerrarModificarModal() {
       this.modificarModalAbierto = false;
     },
@@ -254,7 +314,16 @@ export default {
       this.agregarCategoriaModalAbierto = false;
     },
     agregarCategoriaModal() {
+      window.scrollTo({top:0, behavior: 'smooth'});
       this.agregarCategoriaModalAbierto = true;
+    },
+    cerrarModificarCategoriaModal() {
+      this.modificarCategoriaModalAbierto = false;
+    },
+    abrirModificarCategoriaModal(categoria) {
+      window.scrollTo({top:0, behavior: 'smooth'});
+      this.modificarCategoriaModalAbierto = true;
+      this.categoriaVieja = this.categoriaNueva = categoria;
     },
     toggleCategoria(categoria) {
       if (this.categoriaSeleccionada === categoria) {

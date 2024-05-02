@@ -169,7 +169,6 @@ export default {
             },
             categoria_nombre: '',
             categorias: [],
-            modalAbierto: false,
         };
     },
     created() {
@@ -182,6 +181,7 @@ export default {
             this.agregarCategoriaModalAbierto = false;
         },
         agregarCategoriaModal() {
+            window.scrollTo({top:0, behavior: 'smooth'});
             this.agregarCategoriaModalAbierto = true;
         },
         cargarImportacion(evento) {
@@ -364,7 +364,6 @@ export default {
                             icon: 'success',
                             title: 'Producto agregado.',
                         });
-                        this.modalAbierto = true;
                         setTimeout(function () {
                             location.reload();
                         }, 2000);

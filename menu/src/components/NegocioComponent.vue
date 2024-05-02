@@ -105,8 +105,9 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="ver-carrito-btn" v-if="carrito.length > 0">
-                                <button data-bs-toggle="modal" data-bs-target="#modalCarrito">Ver Carrito ${{ total
+                            <div class="ver-carrito" v-if="carrito.length > 0">
+                                <button class="btn-close mr-2" @click="limpiarCarrito"></button>
+                                <button class="ver-carrito-btn" data-bs-toggle="modal" data-bs-target="#modalCarrito">Ver Carrito ${{ total
                                     }}</button>
                             </div>
                             <div v-if="productosFiltrados.length === 0" class="text-center mt-3">
@@ -340,7 +341,6 @@ export default {
 
             // Construir el enlace completo
             const numeroWhatsapp = `${baseLink}?phone=${this.negocio.telefono}&text=${encodeURIComponent(mensajeCompleto)}`;
-            sessionStorage.clear();
             // Finalmente, abrimos una nueva ventana del navegador con el enlace generado
             try{
                 window.open(numeroWhatsapp);
@@ -379,6 +379,14 @@ export default {
             }
             sessionStorage.setItem('carrito', JSON.stringify(this.carrito));
             sessionStorage.setItem('total', JSON.stringify(this.total));
+        },
+        limpiarCarrito(){
+            sessionStorage.clear();
+            this.carrito = [];
+            this.total = 0;
+            this.productos.forEach((producto)=>{
+                producto.cantidadSeleccionada = 0;
+            });
         },
         async obtenerInformacionNegocio() {
             try {
@@ -506,12 +514,13 @@ export default {
 .btn-menos:hover {
     cursor: pointer;
 }
-
-.ver-carrito-btn button {
+.ver-carrito{
     position: fixed;
     bottom: 20px;
     right: 20px;
     z-index: 2;
+}
+.ver-carrito-btn {
     background: linear-gradient(rgb(148, 193, 252), rgb(0, 90, 207)) !important;
     color: white;
     padding: 10px 20px;
@@ -521,7 +530,7 @@ export default {
     cursor: pointer;
 }
 
-.ver-carrito-btn button:hover {
+.ver-carrito-btn:hover {
     background: linear-gradient(rgb(148, 193, 252), rgb(0, 87, 168)) !important;
 
 }
@@ -540,7 +549,9 @@ export default {
     background: linear-gradient(rgb(148, 193, 252), rgb(0, 87, 168)) !important;
 
 }
-
+.mr-2{
+    margin-right: 10px;
+}
 .texto-carga {
     font-style: italic;
     margin: 20px;

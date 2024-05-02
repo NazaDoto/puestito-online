@@ -546,6 +546,22 @@ app.post('/nuevaCategoria', (req, res) => {
 
 });
 
+app.put('/modificarCategoria', (req, res) => {
+    const data = req.body;
+    const query = "UPDATE categorias SET categoria_nombre = ? WHERE categoria_nombre = ? AND usuario_nombre = ?";
+    const queryProductos = "UPDATE productos SET producto_categoria = ? WHERE producto_categoria = ? AND usuario_nombre = ?"
+    connection.query(query, [data.categoriaNueva, data.categoriaVieja, data.usuario], (er, res) => {
+        if (er) {
+            console.log(er);
+        }
+    })
+    connection.query(queryProductos, [data.categoriaNueva, data.categoriaVieja, data.usuario], (er, res) => {
+        if (er) {
+            console.log(er);
+        }
+    })
+});
+
 app.get("/productos", (req, res) => {
     // Realiza una consulta a la base de datos para obtener los informes
     const usuario = req.query.usuario;

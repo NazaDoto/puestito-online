@@ -83,7 +83,7 @@
                         </div>
                         <div class="col-md-6">
                             <input class="form-control" type="number" id="telefono" v-model="negocio.telefono"
-                                placeholder="Teléfono (por ej. +5493855223287)" />
+                                placeholder="Teléfono (por ej. 5493855223287)" />
                         </div>
                         <div class="col-md-6">
                             <input class="form-control" type="text" id="instagram" v-model="negocio.instagram"
