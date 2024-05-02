@@ -313,6 +313,7 @@ export default {
                     reader.onload = async (e) => {
                         this.imageToCrop = e.target.result;
                         this.modalCropImage = true;
+                        window.scrollTo({top:0,behavior:'smooth'})
                         let cropperCanvas = this.$refs.cropperImg;
                         cropperCanvas.src = this.imageToCrop;
                         this.$nextTick(() => {
