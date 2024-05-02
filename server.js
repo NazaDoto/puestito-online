@@ -18,7 +18,7 @@ const https = require("https"),
 
 
 
-const env = "dev";
+const env = "prod";
 
 
 app.use(bodyParser.json({ limit: '50mb' }));
