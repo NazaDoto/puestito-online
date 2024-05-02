@@ -1,6 +1,12 @@
 <template>
     <div>
         <NavbarComponent></NavbarComponent>
+        <div v-if="obteniendoInfo" class="pantalla-carga text-center">
+      <div class="logo-carga">
+        <img class="logo-img" src="/favicon.ico" width="50" alt="" />
+        <div class="texto-carga">Cargando información</div>
+      </div>
+    </div>
         <div class="container mt-2 mb-2 text-center">
             <!-- Mostrar información del negocio -->
             <div v-if="negocio">
@@ -220,6 +226,7 @@ export default {
     },
     data() {
         return {
+            obteniendoInfo: false,
             cargandoCropper: true,
             modalCropImage: false,
             cropper: null,
@@ -281,6 +288,7 @@ export default {
         },
         async obtenerInformacionNegocio() {
             try {
+                this.obteniendoInfo = true;
                 // Realiza una solicitud HTTP GET para obtener los informes desde el servidor
                 const response = await axios.get(`/miNegocio?usuario=${localStorage.getItem('usuario')}`);
                 // Actualiza la lista de informes con los datos recibidos
@@ -291,6 +299,8 @@ export default {
                 this.fechaVence = fechaVence.getDate() + '/' + (Number(fechaVence.getMonth()) + 1) + '/' + fechaVence.getFullYear();
             } catch (error) {
                 console.error("Error al cargar los productos:", error);
+            } finally{
+                this.obteniendoInfo = false;
             }
 
         },

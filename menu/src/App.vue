@@ -10,7 +10,9 @@
 
 <script>
 import PieComponent from './components/PieComponent.vue';
-
+import '@popperjs/core';
+import 'bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
 export default {
     name: 'App',
     components: {

@@ -1,6 +1,11 @@
 <template>
   <div>
-
+    <div v-if="ingresando" class="pantalla-carga text-center">
+      <div class="logo-carga">
+        <img class="logo-img" src="/favicon.ico" width="50" alt="" />
+        <div class="texto-carga">Ingresando</div>
+      </div>
+    </div>
     <div class="total">
       <div class="fondo text-center">
         <img src="/favicon.ico" width="100" alt="logo" class="mb-4">
@@ -33,6 +38,7 @@ export default {
   },
   data() {
     return {
+      ingresando: false,
       usuario: "",
       contraseña: "",
     };
@@ -46,6 +52,7 @@ export default {
     },
     async login() {
       try {
+        this.ingresando = true;
         // Realiza una solicitud HTTP para iniciar sesión en el backend
         const response = await axios.post("/login", {
           usuario: this.usuario,
@@ -87,6 +94,8 @@ export default {
           icon: 'error',
           text: 'Usuario/contraseña incorrectos.'
         });
+      } finally {
+        this.ingresando = false;
       }
     }
   },
@@ -151,9 +160,10 @@ form {
 }
 
 @media screen and (max-width: 992px) {
-  form{
+  form {
     width: auto;
   }
+
   .width-size {
     width: 80vw !important;
   }

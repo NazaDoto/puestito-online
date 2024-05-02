@@ -8,6 +8,12 @@
                 <div class="texto-carga">Procesando pago...</div>
             </div>
         </div>
+        <div v-if="cargandoRegistro" class="pantalla-carga text-center">
+            <div class="logo-carga">
+                <img class="logo-img" src="/favicon.ico" width="50" alt="" />
+                <div class="texto-carga">Registrando...</div>
+            </div>
+        </div>
         <div v-else class="container mt-4 mb-2">
             <div v-if="!usuario" class="row g-3 mt-4 border">
                 <form @submit.prevent="registrarNegocio" id="form-checkout">
@@ -155,6 +161,7 @@ export default {
     },
     data() {
         return {
+            cargandoRegistro: false,
             cargandoCropper: true,
             modalCropImage: false,
             cropper: null,
@@ -194,13 +201,13 @@ export default {
         },
         imagenSeleccionada(event) {
             try {
-
                 const file = event.target.files[0];
                 if (file) {
                     const reader = new FileReader();
                     reader.onload = async (e) => {
                         this.imageToCrop = e.target.result;
                         this.modalCropImage = true;
+                        window.scrollTo({top: 0, behavior: 'smooth'})
                         let cropperCanvas = this.$refs.cropperImg;
                         cropperCanvas.src = this.imageToCrop;
                         this.$nextTick(() => {
@@ -283,6 +290,7 @@ export default {
             this.usuario = localStorage.getItem("usuario");
         },
         async registrarNegocio() {
+            this.cargandoRegistro = true;
             if (this.plan) {
                 this.cargandoPago = true;
                 if (this.usuario) {
@@ -450,6 +458,8 @@ export default {
                         text: error.response.data.message,
                     });
                     console.error("Error al registrar usuario:", error);
+                }).finally(() => {
+                    this.cargandoRegistro = false;
                 });
         },
     },
