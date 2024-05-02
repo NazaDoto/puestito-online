@@ -550,14 +550,18 @@ app.put('/modificarCategoria', (req, res) => {
     const data = req.body;
     const query = "UPDATE categorias SET categoria_nombre = ? WHERE categoria_nombre = ? AND usuario_nombre = ?";
     const queryProductos = "UPDATE productos SET producto_categoria = ? WHERE producto_categoria = ? AND usuario_nombre = ?"
-    connection.query(query, [data.categoriaNueva, data.categoriaVieja, data.usuario], (er, res) => {
+    connection.query(query, [data.categoriaNueva, data.categoriaVieja, data.usuario], (er, resp) => {
         if (er) {
-            console.log(er);
+            res.status(500).json({ message: 'Error al modificar producto' });
+        } else {
+            res.status(200).json({ message: 'Producto modificado exitosamente' });
         }
     })
     connection.query(queryProductos, [data.categoriaNueva, data.categoriaVieja, data.usuario], (er, res) => {
         if (er) {
-            console.log(er);
+            res.status(500).json({ message: 'Error al modificar producto' });
+        } else {
+            res.status(200).json({ message: 'Producto modificado exitosamente' });
         }
     })
 });
