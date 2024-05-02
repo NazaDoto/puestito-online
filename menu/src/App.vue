@@ -35,7 +35,7 @@ export default {
 
 <style>
 .body{
-    min-height: calc(100svh  - 56px)!important;
+    min-height: calc(100svh  - 41.4px)!important;
 }
 .pl-2 {
     padding-left: 10px;
