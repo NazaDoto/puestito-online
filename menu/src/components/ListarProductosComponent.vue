@@ -297,14 +297,14 @@ export default {
           icon: "success",
           title: "Categoría modificada.",
         });
+        setTimeout(function () {
+              location.reload()
+            }, 1000);
       }).catch((error) => {
         Swal.fire({
           icon: 'error',
           text: 'No se pudo modificar la categoría. ' + error.response.data.message,
         });
-        setTimeout(function () {
-              location.reload()
-            }, 1000);
       }).finally(()=>{
         this.modificarCategoriaModalAbierto = false;        
       });
