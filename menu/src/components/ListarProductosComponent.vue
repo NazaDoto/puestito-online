@@ -302,6 +302,9 @@ export default {
           icon: 'error',
           text: 'No se pudo modificar la categoría. ' + error.response.data.message,
         });
+        setTimeout(function () {
+              location.reload()
+            }, 1000);
       }).finally(()=>{
         this.modificarCategoriaModalAbierto = false;        
       });
