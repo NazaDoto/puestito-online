@@ -196,9 +196,9 @@ export default {
         restrictInput(event) {
     const input = event.target.value;
     // Expresión regular para buscar espacios y ciertos símbolos
-    const restrictedChars = /[\s!@#$%^&*()_+=[\]{};':"\\|,<>?`¨~¡/°¬¿]/g;
+    const restrictedChars = /[\s!@#$%^&*()_+=[\]{};':"\\|,<>?`´¨~¡/°¬¿]/g;
     if (restrictedChars.test(input)) {
-        event.target.value = input.replace(restrictedChars, '');
+        this.negocio.usuario = this.negocio.usuario.substring(0, this.negocio.usuario.length - 1);
     }
 }
 ,

@@ -13,7 +13,7 @@
         <form class="row" @submit.prevent="login">
           <div class="width-size">
             <label for="usuario">Usuario</label>
-            <input class="form-control mb-3" type="text" v-model="usuario" required />
+            <input class="form-control mb-3" type="text" v-model="usuario" required @input="restrictInput"/>
           </div>
           <div class="width-size">
             <label for="contraseña">Contraseña</label>
@@ -44,6 +44,15 @@ export default {
     };
   },
   methods: {
+    restrictInput(event) {
+    const input = event.target.value;
+    // Expresión regular para buscar espacios y ciertos símbolos
+    const restrictedChars = /[\s!@#$%^&*()_+=[\]{};':"\\|,<>?`´¨~¡/°¬¿]/g;
+    if (restrictedChars.test(input)) {
+        this.usuario = this.usuario.substring(0, this.usuario.length - 1);
+    }
+}
+,
     checkAuthentication() {
       const isAuthenticated = !!localStorage.getItem("token");/* Agrega aquí tu lógica para verificar si el usuario está autenticado */
       if (isAuthenticated) {
