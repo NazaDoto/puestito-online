@@ -34,6 +34,12 @@ export default {
 </script>
 
 <style>
+body{
+    background-image: url('../public/recursos/patron.png');
+    background-color:#fafafa;
+    background-size:contain;
+    background-repeat: repeat;
+}
 .body{
     min-height: calc(100svh  - 41.4px)!important;
 }
@@ -140,6 +146,11 @@ export default {
 }
 
 @media screen and (max-width: 992px) {
+    body{
+        background-image:url('../public/recursos/patron2.png');
+        background-size:contain;
+        background-repeat: repeat;
+    }
     .modalCategoria {
     width: 90vw;
 }

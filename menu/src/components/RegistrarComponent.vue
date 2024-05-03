@@ -22,8 +22,8 @@
                         <h4 class="subtitulo">Cómo ingresarás a la plataforma.</h4>
                         <div class="col-md-6">
                             <input :class="{ 'usuario-disponible': !usuarioDisponible }" class="form-control"
-                                type="text" id="username" v-model="negocio.usuario" @change="verificarDisponibilidad"
-                                placeholder="Nombre de Usuario" required />
+       type="text" id="username" v-model="negocio.usuario" @input="restrictInput"
+       @change="verificarDisponibilidad" placeholder="Nombre de Usuario" required />
                         </div>
                         <div class="col-md-6">
                             <input class="form-control" type="password" id="password" v-model="negocio.contraseña"
@@ -193,6 +193,15 @@ export default {
         this.checkAuthentication();
     },
     methods: {
+        restrictInput(event) {
+    const input = event.target.value;
+    // Expresión regular para buscar espacios y ciertos símbolos
+    const restrictedChars = /[\s!@#$%^&*()_+=[\]{};':"\\|,<>?`¨~¡/°¬¿]/g;
+    if (restrictedChars.test(input)) {
+        event.target.value = input.replace(restrictedChars, '');
+    }
+}
+,
         checkAuthentication() {
             const isAuthenticated = !!localStorage.getItem("token");/* Agrega aquí tu lógica para verificar si el usuario está autenticado */
             if (isAuthenticated) {

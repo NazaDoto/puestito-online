@@ -137,6 +137,10 @@ label {
 .total {
   height: calc(100svh - 41.1px);
   background-color: #8cfbff;
+  background-image:url('../../public/recursos/patron.png');
+        background-size:contain;
+        background-repeat: repeat;
+        background-blend-mode:soft-light;
 }
 
 .fondo {
@@ -167,9 +171,15 @@ form {
   .width-size {
     width: 80vw !important;
   }
-
+body{
+  background-color: white;
+}
   .total {
     height: calc(100svh - 41.1px);
+        background-image:url('../../public/recursos/patron2.png');
+        background-size:100%;
+        background-repeat: repeat;
+        background-blend-mode:soft-light;
   }
 
   .fondo {

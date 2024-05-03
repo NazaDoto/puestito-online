@@ -1,5 +1,5 @@
 <template>
-    <nav class="navbar navbar-light bg-light">
+    <nav class="navbar">
         <!-- Logo -->
         <router-link class="navbar-brand" to="/">
             <img src="/favicon.ico" width="30" height="30" class="d-inline-block align-top" alt="">
@@ -33,6 +33,7 @@ export default {
 .navbar {
     padding-left: 20px;
     padding-right: 20px;
+    background-color: none !important;
 }
 
 a {
