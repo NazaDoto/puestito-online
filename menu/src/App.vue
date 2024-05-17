@@ -34,13 +34,34 @@ export default {
 </script>
 
 <style>
+html{
+    overflow-y: auto;
+}
+/* width */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    
+    background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
 body{
-    background-image: url('../public/recursos/patron.png');
-    background-color:#fafafa;
-    background-size:contain;
-    background-repeat: repeat;
+    background-color:#f0f0f0;
 }
 .body{
+    width:calc(100svw - 5px);
     min-height: calc(100svh  - 41.4px)!important;
 }
 .pl-2 {
@@ -67,25 +88,40 @@ body{
     border-radius: 10px;
 }
 
+.btn-limpiar {
+  display: block;
+  background: linear-gradient(rgb(255, 255, 255),
+      rgb(214, 214, 214)) !important;
+  border: none;
+  border-radius: 2px;
+}
 
+.btn-limpiar:hover {
+  background: linear-gradient(rgb(242, 242, 242),
+      rgb(201, 201, 201)) !important;
+  cursor: pointer;
+}
 .btn-menu {
     color: white;
     border: none;
-    box-shadow: 0.2px 0.2px 2px black !important;
-    border-radius: 1px;
+    border-radius: 2px;
     background: linear-gradient(#94c1fc, #005acf) !important;
     min-width: 100px;
 }
 
 .btn-menu:hover {
     background: linear-gradient(rgb(148, 193, 252), rgb(0, 87, 168)) !important;
+    color: white;
 }
+.btn-menu:focus{
+    color:white !important;
+}
+
 
 .btn-menu-danger {
     color: white;
     border: none;
-    box-shadow: 0.2px 0.2px 2px black !important;
-    border-radius: 1px;
+    border-radius: 2px;
     background: linear-gradient(#ffafaf, #cf0000) !important;
 }
 
@@ -129,8 +165,8 @@ body{
     position: absolute;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: calc(100vh);
+    width: 100svw;
+    height: 100svh;
     background-color: white;
     align-content: center;
 }
@@ -146,13 +182,13 @@ body{
 }
 
 @media screen and (max-width: 992px) {
-    body{
-        background-image:url('../public/recursos/patron2.png');
-        background-size:contain;
-        background-repeat: repeat;
-    }
+    
     .modalCategoria {
     width: 90vw;
+}
+.body{
+    width:100svw;
+
 }
 }
 </style>

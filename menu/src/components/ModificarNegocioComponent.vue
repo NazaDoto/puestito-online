@@ -16,28 +16,36 @@
                         <div class="p-2 text-center">
                             <div class="tarjetaProducto">
                                 <div v-if="añoVence == '2100'" class="textoTarjeta">
-                                    <h4 class="titulo-div-forms mb-2">Esta es una cuenta gratis.</h4>
-                                    <button @click="mejorarPlan" class="btn btn-agregar mb-2">Mejorar
+                                    <h4 class="titulo-div-forms mb-2 mt-2">Esta es una cuenta gratis.</h4>
+                                    <button @click="mejorarPlan" class="btn btn-agregar">Mejorar
                                         Plan</button>
                                 </div>
                                 <div v-else class="textoTarjeta">
-                                    <h4 class="titulo-div-forms mb-2">Esta es una cuenta Premium.</h4>
-                                    <h4 class="titulo-div-forms mb-2">Vence: {{ fechaVence }}</h4>
+                                    <h4 class="titulo-div-forms mb-2 mt-2">Esta es una cuenta Premium.</h4>
+                                    <h4 class="titulo-div-forms">Vence: {{ fechaVence }}</h4>
                                 </div>
+                                <hr class="m-2">
                                 <div v-if="negocio.imagen">
+                                    <strong>Logo:</strong> <br>
                                     <img class="imagen" :src="negocio.imagen" alt=" ">
                                 </div>
+                                <div v-if="negocio.portada">
+                                    <strong>Portada:</strong>  <br>
+                                    <img class="imagen" :src="negocio.portada" alt=" ">
+                                </div>
                                 <div class="textoTarjeta">
-                                    <div class="flex mt-2 ">
-                                        <h3 class="izquierda">{{ negocio.nombre }}</h3>
-
-                                    </div>
                                     <table class="table table-light table-striped">
                                         <thead>
                                             <th></th>
                                             <th></th>
                                         </thead>
                                         <tbody>
+                                            <tr>
+                                                <td>
+                                                    <strong>Nombre:</strong>
+                                                </td>
+                                                <td>{{negocio.nombre}}</td>
+                                            </tr>
                                             <tr>
                                                 <td>
                                                     <strong>Correo:</strong>
@@ -59,6 +67,14 @@
                                             <tr>
                                                 <td><strong>Rubro:</strong></td>
                                                 <td>{{ negocio.rubro }}</td>
+                                            </tr>
+                                            <tr v-if="negocio.instagram">
+                                            <td><strong>Instagram:</strong></td>
+                                            <td>{{ negocio.instagram }}</td>
+                                            </tr>
+                                            <tr v-if="negocio.facebook">
+                                            <td><strong>Facebook:</strong></td>
+                                            <td>{{ negocio.facebook }}</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -98,30 +114,36 @@
                             </div>
                             <div class="modal-body">
                                 <form @submit.prevent="modificarPerfil">
-                                    <div class="row g-3 div-forms border">
+                                    <div class="row g-3 div-forms border text-start">
                                         <h4 class="titulo-div-forms mb-2">Información del Negocio</h4>
                                         <div>
-                                            <input class="form-control" type="text" id="nombre"
-                                                v-model="negocioModificar.nombre" placeholder="Nombre del Negocio"
-                                                required>
+                                            <label class="form-label" for="nombre">Nombre</label>
+                                            <input class="form-control" type="text" id="nombre" name="nombre"
+                                            v-model="negocioModificar.nombre" placeholder="Nombre del Negocio"
+                                            required>
                                         </div>
                                         <div>
+                                            <label class="form-label" for="correo">Correo</label>
                                             <input class="form-control" type="email" id="correo"
-                                                v-model="negocioModificar.correo" placeholder="Correo">
+                                            v-model="negocioModificar.correo" placeholder="Correo">
                                         </div>
                                         <div>
+                                            <label class="form-label" for="telefono">Teléfono</label>
                                             <input class="form-control" type="number" id="telefono"
-                                                v-model="negocioModificar.telefono" placeholder="Teléfono">
+                                            v-model="negocioModificar.telefono" placeholder="Teléfono">
                                         </div>
                                         <div>
+                                            <label class="form-label" for="direccion">Dirección</label>
                                             <input class="form-control" type="text" id="direccion"
-                                                v-model="negocioModificar.direccion" placeholder="Dirección">
+                                            v-model="negocioModificar.direccion" placeholder="Dirección">
                                         </div>
                                         <div>
+                                            <label class="form-label" for="descripcion">Descripción</label>
                                             <input class="form-control" type="text" id="descripcion"
-                                                v-model="negocioModificar.descripcion" placeholder="Descripción" maxlength="40">
+                                            v-model="negocioModificar.descripcion" placeholder="Descripción" maxlength="40">
                                         </div>
                                         <div>
+                                            <label class="form-label" for="rubro">Rubro</label>
                                             <select class="form-select" name="rubro" id="rubro" v-model="negocioModificar.rubro">
                                                 <option value="Elegí tu rubro" selected disabled>Elegí tu rubro</option>
                                                 <option value="Artesanías">Artesanías</option>
@@ -155,17 +177,24 @@
                                             </select>
                                         </div>
                                         <div>
+                                            <label class="form-label" for="instagram">Instagram</label>
                                             <input class="form-control" type="text" id="instagram"
-                                                v-model="negocioModificar.instagram" placeholder="Instagram">
+                                            v-model="negocioModificar.instagram" placeholder="Instagram">
                                         </div>
                                         <div>
+                                            <label class="form-label" for="facebook">Facebook</label>
                                             <input class="form-control" type="text" id="facebook"
-                                                v-model="negocioModificar.facebook" placeholder="Facebook">
+                                            v-model="negocioModificar.facebook" placeholder="Facebook">
                                         </div>
                                         <div>
-                                            <label class="form-label mr-2" for="imagen">Imagen (JPG/PNG)</label>
+                                            <label class="form-label mr-2" for="imagen">Logo (JPG/PNG)</label>
                                             <input class="form-control" type="file" name="imagen" id="imagen"
                                                 accept="image/jpeg, image/png" @change="imagenSeleccionada">
+                                        </div>
+                                        <div>
+                                            <label class="form-label mr-2" for="portada">Portada (JPG/PNG)</label>
+                                            <input class="form-control" type="file" name="portada" id="portada"
+                                                accept="image/jpeg, image/png" @change="portadaSeleccionada">
                                         </div>
                                     </div>
                                     <div class="text-end">
@@ -233,19 +262,7 @@ export default {
             imageToCrop: '',
             fechaVence: '',
             añoVence: '',
-            negocio: {
-                usuario: '',
-                nombre: '',
-                fechaVence: '',
-                correo: '',
-                telefono: '',
-                direccion: '',
-                descripcion: '',
-                imagen: '',
-                instagram: '',
-                facebook: '',
-                rubro: '',
-            },
+            negocio: '',
             negocioModificar: '',
         };
     },
@@ -256,6 +273,20 @@ export default {
         this.obtenerInformacionNegocio();
     },
     methods: {
+        portadaSeleccionada(event) {
+            try {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = async (e) => {
+                        this.negocioModificar.portada = e.target.result;
+                    }
+                    reader.readAsDataURL(file);
+                }
+            } catch (error) {
+                console.log(error)
+            }
+        },
         mejorarPlan() {
             router.push('/u/planes');
         },
@@ -367,6 +398,7 @@ export default {
 </script>
 
 <style scoped>
+
 .modal-dialog .modal-dialog-center {
     z-index: 1 !important;
 }
@@ -430,7 +462,6 @@ img {
     margin-top: 10px;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
-    width: 400px;
     height: 200px;
 }
 

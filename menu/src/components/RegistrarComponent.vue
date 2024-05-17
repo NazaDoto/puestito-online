@@ -22,13 +22,14 @@
                         <h4 class="subtitulo">Cómo ingresarás a la plataforma.</h4>
                         <div class="col-md-6">
                             <input :class="{ 'usuario-disponible': !usuarioDisponible }" class="form-control"
-       type="text" id="username" v-model="negocio.usuario" @input="restrictInput"
-       @change="verificarDisponibilidad" placeholder="Nombre de Usuario" required />
+                                type="text" id="username" v-model="negocio.usuario" @input="restrictInput"
+                                @change="verificarDisponibilidad" placeholder="Nombre de Usuario" required />
                         </div>
                         <div class="col-md-6">
                             <input class="form-control" type="password" id="password" v-model="negocio.contraseña"
                                 placeholder="Contraseña" required />
                         </div>
+                        <div class="col-md-12 subtitulo">Tu link será puestito.online/{{ negocio.usuario }}</div>
                         <h4 class="titulo- mb-2">Información del negocio</h4>
                         <h4 class="subtitulo">
                             Más adelante podés modificar esta información.
@@ -39,7 +40,7 @@
                         </div>
                         <div class="col-md-6">
                             <input class="form-control" type="text" id="descripcion" v-model="negocio.descripcion"
-                                placeholder="Descripción (40 caracteres)" maxlength="40"/>
+                                placeholder="Descripción (40 caracteres)" maxlength="40" />
                         </div>
                         <div class="col-md-6">
                             <select class="form-select" name="rubro" id="rubro" v-model="negocio.rubro">
@@ -95,14 +96,20 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label text-center" for="imagen">Logo (JPG/PNG)</label>
-                            <input class="form-control" type="file" name="imagen" id="imagen" accept="image/jpeg, image/png"
-                                @change="imagenSeleccionada($event)" required />
+                            <input class="form-control" type="file" name="imagen" id="imagen"
+                                accept="image/jpeg, image/png" @change="imagenSeleccionada($event)" />
                         </div>
-                        <button :disabled="!usuarioDisponible" v-if="!plan" class="btn btn-menu botones m-auto"
-                            type="submit">
+                        <div class="col-md-6">
+                            <label class="form-label text-center" for="portada">Portada (JPG/PNG)</label>
+                            <input class="form-control" type="file" name="portada" id="portada"
+                                accept="image/jpeg, image/png" @change="portadaSeleccionada($event)" />
+                        </div>
+                        <div class="subtitulo">Puedes elegir las imágenes más tarde</div>
+                        <button :disabled="!usuarioDisponible" v-if="!plan"
+                            class="btn btn-menu botones m-auto mt-2 mb-2" type="submit">
                             Registrar
                         </button>
-                        <button :disabled="!usuarioDisponible" v-else class="btn btn-menu botones m-auto mb-2"
+                        <button :disabled="!usuarioDisponible" v-else class="btn btn-menu botones m-auto mt-2 mb-2"
                             type="submit">
                             Ir a Pagar
                         </button>
@@ -179,6 +186,7 @@ export default {
                 fechaVence: "",
                 email: "",
                 imagen: "",
+                portada:"",
                 direccion: "",
                 telefono: "",
                 descripcion: "",
@@ -194,18 +202,32 @@ export default {
     },
     methods: {
         restrictInput(event) {
-    const input = event.target.value;
-    // Expresión regular para buscar espacios y ciertos símbolos
-    const restrictedChars = /[\s!@#$%^&*()_+=[\]{};':"\\|,<>?`´¨~¡/°¬¿]/g;
-    if (restrictedChars.test(input)) {
-        this.negocio.usuario = this.negocio.usuario.substring(0, this.negocio.usuario.length - 1);
-    }
-}
-,
+            const input = event.target.value;
+            // Expresión regular para buscar espacios y ciertos símbolos
+            const restrictedChars = /[\s!@#$%^&*()_+=[\]{};':"\\|,<>?`´¨~¡/°¬¿]/g;
+            if (restrictedChars.test(input)) {
+                this.negocio.usuario = this.negocio.usuario.substring(0, this.negocio.usuario.length - 1);
+            }
+        }
+        ,
         checkAuthentication() {
             const isAuthenticated = !!localStorage.getItem("token");/* Agrega aquí tu lógica para verificar si el usuario está autenticado */
             if (isAuthenticated) {
                 this.$router.push("/u/home");
+            }
+        },
+        portadaSeleccionada(event) {
+            try {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = async (e) => {
+                        this.negocio.portada = e.target.result;
+                    }
+                    reader.readAsDataURL(file);
+                }
+            } catch (error) {
+                console.log(error)
             }
         },
         imagenSeleccionada(event) {
@@ -216,7 +238,7 @@ export default {
                     reader.onload = async (e) => {
                         this.imageToCrop = e.target.result;
                         this.modalCropImage = true;
-                        window.scrollTo({top: 0, behavior: 'smooth'})
+                        window.scrollTo({ top: 0, behavior: 'smooth' })
                         let cropperCanvas = this.$refs.cropperImg;
                         cropperCanvas.src = this.imageToCrop;
                         this.$nextTick(() => {
@@ -283,14 +305,14 @@ export default {
                 console.error(error);
             }
         },
-        verificarRubro(){
-            if (this.negocio.rubro == "Elegí tu rubro"){
+        verificarRubro() {
+            if (this.negocio.rubro == "Elegí tu rubro") {
                 Swal.fire({
-                        icon: "error",
-                        text: "Por favor selecciona un rubro.",
-                    });
-                    return false;
-            }else{
+                    icon: "error",
+                    text: "Por favor selecciona un rubro.",
+                });
+                return false;
+            } else {
                 return true;
             }
         },
@@ -305,8 +327,8 @@ export default {
                 if (this.usuario) {
                     this.mejorarPlan();
                 } else {
-                    if(this.verificarRubro()){
-                        
+                    if (this.verificarRubro()) {
+
                         this.verificarDisponibilidad();
                         if (this.usuarioDisponible) {
                             this.usuario = this.negocio.usuario;
@@ -315,8 +337,8 @@ export default {
                     }
                 }
             } else {
-                if(this.verificarRubro()){
-                    
+                if (this.verificarRubro()) {
+
                     this.verificarDisponibilidad();
                     if (this.usuarioDisponible) {
                         this.usuario = this.negocio.usuario;

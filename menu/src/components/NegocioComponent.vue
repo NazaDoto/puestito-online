@@ -9,7 +9,7 @@
             </div>
         </div>
         <div v-else>
-            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light" :class="{ 'navbar-hidden': isHidden }">
                 <div class="container-fluid">
                     <a class="navbar-brand" @click="scrollToInicio" href="#">~ {{ nombreNegocio.toUpperCase() }} ~</a>
                     <button class="navbar-brand navbar-toggler" type="button" data-bs-toggle="collapse"
@@ -17,8 +17,8 @@
                         aria-expanded="false" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
                     </button>
-                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <div class="collapse navbar-collapse text-end mr-2" id="navbarSupportedContent">
+                        <ul class="navbar-nav me-auto mb-2 mb-lg-0 ">
                             <div v-for="(categoria, index) in categoriasOrdenadas" :key="index">
                                 <li v-if="categoriasConProductosFiltrados.includes(categoria)" class="nav-item">
                                     <a class="nav-link" @click="scrollToCategoria(categoria); collapseNavbar()">{{
@@ -34,37 +34,42 @@
                     <div class="presentacion">
                         <!-- Imagen del negocio con texto superpuesto -->
                         <div class="imagen-container">
-                            <img :src="negocio.imagen" alt="" class="img-negocio">
+                            <img v-if="negocio.portada" :src="negocio.portada" alt="" class="img-negocio">
+                            <img v-else src="/recursos/missing.png" class="img-negocio" alt="">
                             <div class="texto-superpuesto">BIENVENIDOS
-                                <div class="texto-superpuesto2">"{{ negocio.descripcion }}"</div>
+                                <div class="texto-superpuesto2">{{ negocio.descripcion }}</div>
                                 <div class="text-center redes">
-                                    <a v-if="negocio.instagram" class="mauto" :href="'https://instagram.com/'+negocio.instagram"
-                                        target="blank"><img width='40' src="/recursos/instagram.png"></a>
-                                    <a v-if="negocio.facebook" class="mauto" :href="'https://facebook.com/'+negocio.facebook"
-                                        target="blank"><img width='36' src="/recursos/facebook.png"></a>
-                                    <a v-if="negocio.direccion"
+                                    <a class="link-dir" v-if="negocio.direccion"
                                         :href="'https://www.google.com/maps/search/' + encodeURIComponent(negocio.direccion)"
-                                        target="_blank"><img width='40' src="/recursos/pin.png"></a>
+                                        target="_blank">{{ negocio.direccion }}</a>
+                                    <a v-if="negocio.instagram" class="mauto"
+                                        :href="'https://instagram.com/' + negocio.instagram" target="blank"><img
+                                            width='40' src="/recursos/instagram.png"></a>
+                                    <a v-if="negocio.facebook" class="mauto"
+                                        :href="'https://facebook.com/' + negocio.facebook" target="blank"><img
+                                            width='36' src="/recursos/facebook.png"></a>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="tarjeta-container">
+                    <div class="body-container">
 
                         <div class="ancho">
-                            <div class="izquierda ancho-busqueda">
-                                <input class="form-control barra-busqueda" v-model="busqueda" type="text"
+                            <div class="izquierda ancho-busqueda input-group">
+                                <input class="form-control" v-model="busqueda" type="text"
                                     name="busqueda" id="" placeholder="Buscar producto"
                                     title="Ingrese una palabra clave...">
+                                    <button class="btn-close btn-limpiar-busqueda" @click="limpiarBusqueda"></button>
                             </div>
                             <div class="mt-2" v-for="(categoria, index) in categoriasOrdenadas" :key="index"
                                 :id="categoria">
                                 <div v-if="filteredProductos(categoria)">
 
-                                    <div class="titulo-categoria" @click="toggleCategoria(categoria)">{{ categoria }}
+                                    <div class="titulo-categoria" @click="toggleCategoria(categoria)" :class="{'fondo-oscuro': categoriaSeleccionada === categoria}">{{ categoria }}
+                                        <div class="inline" v-if="categoriaSeleccionada === categoria">↓</div>
+                                        <div class="inline" v-else>→</div>
                                     </div>
-                                    <div
-                                        :class="{ 'categoria-productos': true, 'categoria-activa': categoriaSeleccionada === categoria }">
+                                    <div :class="{ 'categoria-productos': true, 'categoria-activa': categoriaSeleccionada === categoria }">
                                         <div class="p-2">
                                             <div class="item-container mt-2"
                                                 v-for="(producto, index) in filteredProductos(categoria)" :key="index">
@@ -106,8 +111,8 @@
                                 </div>
                             </div>
                             <div class="ver-carrito" v-if="carrito.length > 0">
-                                <button class="btn-close mr-2" @click="limpiarCarrito"></button>
-                                <button class="ver-carrito-btn" data-bs-toggle="modal" data-bs-target="#modalCarrito">Ver Carrito ${{ total
+                                <button class="ver-carrito-btn" data-bs-toggle="modal"
+                                    data-bs-target="#modalCarrito">Ver Carrito ${{ total
                                     }}</button>
                             </div>
                             <div v-if="productosFiltrados.length === 0" class="text-center mt-3">
@@ -120,8 +125,8 @@
                     <div class="error-container">
                         <div class="error-content">
                             <h1 class="display-1 text-danger">404</h1>
-                            <h2 class="display-4">Página no encontrada</h2>
-                            <p class="lead">Lo sentimos, la página que buscas no se encuentra disponible o no tiene
+                            <h2 class="display-4">Puestito no encontrado</h2>
+                            <p class="lead">Lo sentimos, el puestito que buscas no se encuentra disponible o no tiene
                                 productos disponibles.</p>
                         </div>
                     </div>
@@ -173,7 +178,9 @@
                         <h4 class="text-end mt-4">Total: ${{ total }}</h4>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="ver-carrito-btn2" :disabled="!carrito.length > 0"
+                        <button type="button" class="btn btn-limpiar" data-bs-dismiss="modal" aria-label="Close"
+                            @click="limpiarCarrito">Limpiar carrito</button>
+                        <button type="button" class="btn btn-menu" :disabled="!carrito.length > 0"
                             data-bs-toggle="modal" data-bs-target="#modalPedido">Realizar pedido</button>
                     </div>
                 </div>
@@ -205,7 +212,7 @@
                                 v-model="pedido.detalle">
                         </div>
                         <div class="modal-footer">
-                            <button type="submit" class="ver-carrito-btn2" :disabled="!carrito.length > 0">Realizar
+                            <button type="submit" class="btn btn-menu" :disabled="!carrito.length > 0">Realizar
                                 pedido</button>
                         </div>
                     </form>
@@ -221,22 +228,14 @@ import Swal from 'sweetalert2';
 export default {
     data() {
         return {
+            isHidden: true,
             categoriaSeleccionada: null,
             mostrarModal: true,
             nombreUsuario: '', // Variable para almacenar el nombre de usuario del negocio
             nombreNegocio: '',
             productos: [],      // Array para almacenar los productos del negocio
             busqueda: '',
-            negocio: {
-                usuario: '',
-                nombre: '',
-                correo: '',
-                telefono: '',
-                direccion: '',
-                descripcion: '',
-                imagen: '',
-                fechaVence: '',
-            },
+            negocio: '',
             cargando: true,
             carrito: [],
             total: 0,
@@ -249,11 +248,16 @@ export default {
         };
     },
     mounted() {
+        window.addEventListener('scroll', this.handleScroll);
+
         // Obtener el nombre de usuario de la URL
         this.nombreUsuario = this.$route.params.nombreNegocio;
         // Lógica para obtener los productos del negocio con el nombre de usuario dado
         this.obtenerInformacionNegocio();
-        
+
+    },
+    beforeUnmount() {
+        window.removeEventListener('scroll', this.handleScroll);
     },
     computed: {
         categoriasOrdenadas() {
@@ -287,6 +291,14 @@ export default {
         }
     },
     methods: {
+        handleScroll() {
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            if (scrollTop === 0) {
+                this.isHidden = true;
+            } else {
+                this.isHidden = false;
+            }
+        },
         toggleCategoria(categoria) {
             if (this.categoriaSeleccionada === categoria) {
                 // Si la categoría seleccionada es la misma que se hizo clic, la contraemos
@@ -343,14 +355,14 @@ export default {
             // Construir el enlace completo
             const numeroWhatsapp = `${baseLink}?phone=${this.negocio.telefono}&text=${encodeURIComponent(mensajeCompleto)}`;
             // Finalmente, abrimos una nueva ventana del navegador con el enlace generado
-            try{
+            try {
                 window.open(numeroWhatsapp);
                 location.reload(1);
-            } catch(error){
+            } catch (error) {
                 Swal.fire({
-                            icon: 'error',
-                            text: 'Por favor habilita las ventanas emergentes para ir a WhatsApp.' + error.response.data.message,
-                        });
+                    icon: 'error',
+                    text: 'Por favor habilita las ventanas emergentes para ir a WhatsApp.' + error.response.data.message,
+                });
             }
         },
         agregarAlCarrito(producto) {
@@ -381,11 +393,11 @@ export default {
             sessionStorage.setItem('carrito', JSON.stringify(this.carrito));
             sessionStorage.setItem('total', JSON.stringify(this.total));
         },
-        limpiarCarrito(){
+        limpiarCarrito() {
             sessionStorage.clear();
             this.carrito = [];
             this.total = 0;
-            this.productos.forEach((producto)=>{
+            this.productos.forEach((producto) => {
                 producto.cantidadSeleccionada = 0;
             });
         },
@@ -462,22 +474,40 @@ export default {
         filteredProductos(categoria) {
             // Filtra los productos basándose en la categoría y en el valor de disponibilidad
             return this.productosFiltrados.filter(producto => producto.producto_categoria === categoria && producto.producto_disponibilidad === 1);
+        },
+        limpiarBusqueda(){
+            this.busqueda = '';
         }
     }
 };
 </script>
 
 <style scoped>
+.navbar {
+    position: sticky;
+    top: 0px;
+    z-index: 10;
+    transition: 0.3s ease;
+}
+
+.navbar-hidden {
+    position: relative;
+    width: calc(100svw - 5px);
+    top: -58.4px;
+    /* Ajusta este valor según la altura de tu navbar */
+}
+
 .categoria-productos {
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.7s ease-in-out;
+    transition: max-height 0.2s ease;
     /* Duración y función de la transición */
 }
 
 /* Clase para activar la categoría seleccionada */
 .categoria-activa {
     max-height: 1000px;
+    overflow: auto;
     /* Altura máxima suficientemente grande para mostrar todos los productos */
 }
 
@@ -488,48 +518,50 @@ export default {
 
 .btn-mas {
     height: 40px;
-    border-radius: 4px;
     width: 40px;
     font-weight: bold;
     border: none;
     box-shadow: 0.2px 0.2px 2px;
-    border-radius: 1px;
+    border-radius: 6px;
     background-color: white;
 }
 
 .btn-mas:hover {
     cursor: pointer;
-    background-color: rgb(238, 238, 238);
+    font-size: larger;
 }
 
 .btn-menos {
     height: 40px;
-    border-radius: 4px;
     width: 40px;
     font-weight: bold;
     border: none;
     box-shadow: 0.2px 0.2px 2px;
-    border-radius: 1px;
+    border-radius: 6px;
     background-color: white;
 }
 
 .btn-menos:hover {
+    font-size: larger;
     cursor: pointer;
 }
-.ver-carrito{
+
+.ver-carrito {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
+    bottom: 10px;
+    right: 0;
     z-index: 2;
+    text-align: end;
+    width: 100%;
 }
+
 .ver-carrito-btn {
+    margin-right: 10px;
     background: linear-gradient(rgb(148, 193, 252), rgb(0, 90, 207)) !important;
     color: white;
     padding: 10px 20px;
     border: none;
-    box-shadow: 0.2px 0.2px 2px black !important;
-    border-radius: 1px;
-    cursor: pointer;
+    border-radius: 2px;
 }
 
 .ver-carrito-btn:hover {
@@ -537,23 +569,22 @@ export default {
 
 }
 
-.ver-carrito-btn2 {
-    background: linear-gradient(rgb(148, 193, 252), rgb(0, 90, 207)) !important;
+.link-dir {
+    font-size: 1.2rem;
+    text-decoration: none;
     color: white;
-    padding: 10px 20px;
-    border: none;
-    box-shadow: 0.2px 0.2px 2px black !important;
-    border-radius: 1px;
-    cursor: pointer;
+    display: block;
+    font-weight: normal;
+    text-shadow: none;
 }
-
-.ver-carrito-btn2:hover {
-    background: linear-gradient(rgb(148, 193, 252), rgb(0, 87, 168)) !important;
-
+.fondo-oscuro{
+    background-color: rgb(122, 122, 122) !important;
+    color:white;
 }
-.mr-2{
+.mr-2 {
     margin-right: 10px;
 }
+
 .texto-carga {
     font-style: italic;
     margin: 20px;
@@ -578,7 +609,10 @@ export default {
     background-color: white;
     align-content: center;
 }
-
+.btn-close:focus{
+    box-shadow: none;
+    opacity: var(--bs-btn-close-opacity);
+}
 .pantalla-carga:hover {
     cursor: wait;
 }
@@ -600,15 +634,19 @@ export default {
 }
 
 .presentacion {
-    height: 90vh;
+    position: relative;
+    top: -56px;
+    margin-bottom: -56px;
+    height: 100svh;
 }
-
+.inline{
+    margin-left: auto;
+    font-weight: bold;
+}
 .img-negocio {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    filter: blur(6px);
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
 }
 
 .texto-superpuesto {
@@ -636,14 +674,24 @@ export default {
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-nav {
-    z-index: 1;
-    position: sticky;
-    top: 0px;
+.body-container {
+    margin: 0px 10px;
 }
 
 .nav-link {
     cursor: pointer;
+    font-size: 1.1rem;
+}
+
+.navbar-toggler {
+    outline: 0 !important;
+    border: none !important;
+    color: transparent;
+    margin: 0;
+}
+
+.navbar-toggler:focus {
+    color: black;
 }
 
 .error-container {
@@ -675,20 +723,42 @@ nav {
     background-color: black;
     color: white;
 }
+.input-group {
+  position: relative;
+}
 
+.form-control {
+    border-radius: 4px !important;
+  padding-right: 2.5rem; /* Espacio suficiente para el botón */
+}
+.form-control:focus{
+    box-shadow: none;
+}
+.btn-limpiar-busqueda {
+  position: absolute;
+  top: 50%;
+  right: 0.5rem; /* Ajusta según sea necesario */
+  transform: translateY(-50%);
+  z-index: 5; /* Asegura que el botón esté sobre el input */
+}
 .mauto {
     margin: 10px;
 }
 
 .titulo-categoria {
-    font-size: 30px;
-    background: linear-gradient(to right, rgb(254, 255, 174), #ffffff);
+    font-size: 1.3rem;
+    background: white;
+    /* background:  rgb(254, 255, 174); */
     width: 100%;
     margin: 0px;
-    padding: 5px 10px;
+    padding: 5px 15px;
     cursor: pointer;
+    border-radius: 4px;
+    display: flex;
 }
-
+.titulo-categoria:hover{
+    background:rgb(232, 231, 231);
+}
 .tarjetaProducto {
     border: 5px;
     background-color: white;
@@ -784,8 +854,9 @@ ul {
 }
 
 @media screen and (max-width: 992px) {
-    .navbar {
-        background: linear-gradient(to right, rgb(228, 190, 109), #ffffff);
+    .navbar-hidden {
+        width: 100svw;
+        top: -56px;
     }
 
     .navbar-brand {
@@ -798,13 +869,13 @@ ul {
     }
 
     .presentacion {
-        height: calc(100vh - 120px);
+        height: 100svh;
     }
 
 
     .container2 {
         min-height: calc(100vh - 200px);
-        margin: 0px 10px;
+        margin: 0px;
     }
 
 }

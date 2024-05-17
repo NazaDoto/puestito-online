@@ -19,10 +19,13 @@
         <div class="mt-2" v-for="(categoria, index) in categoriasOrdenadas" :key="index" :id="categoria">
           <div v-if="filteredProductos(categoria)">
             <div class="flex">
-              <div class="titulo-categoria" @click="toggleCategoria(categoria)">{{ categoria }}</div>
+              <div class="titulo-categoria" :class="{'fondo-oscuro': categoriaSeleccionada === categoria}" @click="toggleCategoria(categoria)">{{ categoria }}
+                <div class="inline" v-if="categoriaSeleccionada === categoria">↓</div>
+                                        <div class="inline" v-else>→</div>
+                                      </div>
               <div class="flex-end">
-                <button class="btn-edit p-2" title="Modificar" @click="abrirModificarCategoriaModal(categoria)"><img
-                    width="20" src="/recursos/edit.png" alt=""></button>
+                <img class="pointer" @click="abrirModificarCategoriaModal(categoria)"
+                    width="41.2" src="/recursos/edit.png" alt="">
               </div>
             </div>
             <div :class="{ 'categoria-productos': true, 'categoria-activa': categoriaSeleccionada === categoria }">
@@ -53,10 +56,9 @@
                           @change="actualizarEstadoProducto(producto)" class="form-check-input" name=""
                           id="productoDisponible" :checked="producto.producto_disponibilidad === 1"></div>
                     </div>
-                    <button class="btn-edit p-2" title="Modificar" @click="modificar(producto)"><img width="20"
-                        src="/recursos/edit.png" alt=""></button>
-                    <button class="btn-delete mt-2 p-2" title="Eliminar" @click="eliminar(producto.producto_id)"><img
-                        width="20" src="/recursos/delete.png" alt=""></button>
+                    <img class="pointer" @click="modificar(producto)" width="41.2" src="/recursos/edit.png" alt="">
+                    <img class="pointer" @click="eliminar(producto.producto_id)"
+                        width="41.2" src="/recursos/delete.png" alt="">
                   </div>
                 </div>
               </div>
@@ -579,43 +581,24 @@ export default {
 </script>
 
 <style scoped>
-.btn-edit {
-  display: inline-block;
-  text-align: center;
-  color: white;
-  border: none;
-  box-shadow: 0.2px 0.2px 2px black !important;
-  border-radius: 1px;
-  background: linear-gradient(rgb(148, 193, 252), rgb(0, 90, 207)) !important;
-
+.inline{
+  font-weight: bold;
+  margin-left: auto;
 }
-
-.btn-edit:hover {
-  background: linear-gradient(rgb(148, 193, 252), rgb(0, 87, 168)) !important;
-}
-
-.btn-delete {
-  display: inline-block;
-  text-align: center;
-  color: white;
-  border: none;
-  box-shadow: 0.2px 0.2px 2px black !important;
-  border-radius: 1px;
-  background: linear-gradient(rgb(255, 175, 175), rgb(207, 0, 0)) !important;
-
-}
-
-.btn-delete:hover {
-  background: linear-gradient(rgb(255, 175, 175), rgb(168, 0, 0)) !important;
+.fondo-oscuro{
+    background-color: rgb(122, 122, 122) !important;
+    color:white;
 }
 
 .categoria-productos {
   max-height: 0;
   overflow: hidden;
-  transition: max-height 0.7s ease-in-out;
+  transition: max-height 0.2s ease-in-out;
   /* Duración y función de la transición */
 }
-
+.titulo-categoria:hover{
+    background:rgb(232, 231, 231);
+}
 /* Clase para activar la categoría seleccionada */
 .categoria-activa {
   max-height: 1000px;
@@ -630,15 +613,22 @@ export default {
 }
 
 .titulo-categoria {
-  font-size: 30px;
-  background: linear-gradient(to right, rgb(254, 255, 174), #ffffff);
+  font-size: 1.3rem;
+  background: white;
+  border-radius: 4px;
   width: 100%;
-  margin: 0px;
-  padding: 5px 10px;
+  margin-right: 10px;
+  padding: 5px 15px;
   cursor: pointer;
-
+  display: flex;
 }
-
+.pointer{
+  cursor: pointer;
+  border-radius: 7px;
+}
+.pointer:hover{
+  background:rgb(232, 231, 231);
+}
 .tarjetaProducto {
   border: 5px;
   background-color: white;

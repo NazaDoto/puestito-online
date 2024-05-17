@@ -13,7 +13,7 @@
         <form class="row" @submit.prevent="login">
           <div class="width-size">
             <label for="usuario">Usuario</label>
-            <input class="form-control mb-3" type="text" v-model="usuario" required @input="restrictInput"/>
+            <input class="form-control mb-3" type="text" v-model="usuario" required @input="restrictInput" />
           </div>
           <div class="width-size">
             <label for="contraseña">Contraseña</label>
@@ -45,14 +45,14 @@ export default {
   },
   methods: {
     restrictInput(event) {
-    const input = event.target.value;
-    // Expresión regular para buscar espacios y ciertos símbolos
-    const restrictedChars = /[\s!@#$%^&*()_+=[\]{};':"\\|,<>?`´¨~¡/°¬¿]/g;
-    if (restrictedChars.test(input)) {
+      const input = event.target.value;
+      // Expresión regular para buscar espacios y ciertos símbolos
+      const restrictedChars = /[\s!@#$%^&*()_+=[\]{};':"\\|,<>?`´¨~¡/°¬¿]/g;
+      if (restrictedChars.test(input)) {
         this.usuario = this.usuario.substring(0, this.usuario.length - 1);
+      }
     }
-}
-,
+    ,
     checkAuthentication() {
       const isAuthenticated = !!localStorage.getItem("token");/* Agrega aquí tu lógica para verificar si el usuario está autenticado */
       if (isAuthenticated) {
@@ -126,8 +126,7 @@ a {
   background: linear-gradient(rgb(175, 210, 255), rgb(0, 90, 207)) !important;
   font-size: large;
   border: none;
-  box-shadow: 0.5px 1px 4px black;
-  border-radius: 1px;
+  border-radius: 2px;
 }
 
 .btn-entrar:hover {
@@ -142,14 +141,15 @@ h1.titulo {
 label {
   color: black;
 }
-
 .total {
-  height: calc(100svh - 41.1px);
-  background-color: #8cfbff;
-  background-image:url('../../public/recursos/patron.png');
-        background-size:contain;
-        background-repeat: repeat;
-        background-blend-mode:soft-light;
+  position: absolute;
+    height: 100svh;
+    width: 100svw;
+    background-image: url('../../public/recursos/patron.png');
+    background-color: #8cfbff !important;
+    background-size: 100%;
+    background-repeat: repeat;
+    background-blend-mode: soft-light;
 }
 
 .fondo {
@@ -180,15 +180,15 @@ form {
   .width-size {
     width: 80vw !important;
   }
-body{
-  background-color: white;
-}
+
   .total {
-    height: calc(100svh - 41.1px);
-        background-image:url('../../public/recursos/patron2.png');
-        background-size:100%;
-        background-repeat: repeat;
-        background-blend-mode:soft-light;
+    position: absolute;
+    height: 100svh;
+    background-image: url('../../public/recursos/patron2.png');
+    background-color: #8cfbff !important;
+    background-size: 100%;
+    background-repeat: repeat;
+    background-blend-mode: soft-light;
   }
 
   .fondo {
