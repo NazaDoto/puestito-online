@@ -8,7 +8,7 @@
       </div>
     </div>
     <div class="container mt-4 mb-2">
-      <h1 class="text-center">Listado de Productos</h1>
+      <h1 class="text-center">Listar Productos</h1>
       <div class="flex">
         <div class="izquierda ancho-busqueda">
           <input class="form-control barra-busqueda" v-model="busqueda" type="text" name="busqueda" id=""

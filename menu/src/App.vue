@@ -116,8 +116,18 @@ body{
 .btn-menu:focus{
     color:white !important;
 }
+.navbar-toggler {
+    outline: 0 !important;
+    border: none !important;
+    color: transparent;
+    margin-left: 10px;
+    padding: 3px;
+}
 
-
+.navbar-toggler:focus {
+    outline: 0 !important;
+    background:lightgray !important;
+}
 .btn-menu-danger {
     color: white;
     border: none;

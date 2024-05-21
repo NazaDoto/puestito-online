@@ -1,13 +1,13 @@
 <template>
     <nav class="navbar">
-        <!-- Logo -->
-        <router-link class="navbar-brand" to="/">
-            <img src="/favicon.ico" width="30" height="30" class="d-inline-block align-top" alt="">
-            Puestito Online
-        </router-link>
-        <!-- Botón de login -->
-        <router-link v-if="usuario" to="/u/home">Mi Negocio</router-link>
-        <router-link v-else to="/u/login">Login</router-link>
+      <!-- Logo -->
+      <router-link class="navbar-brand" to="/">
+        <img src="/favicon.ico" width="30" height="30" class="d-inline-block align-top" alt="">
+        Puestito Online
+      </router-link>
+      <!-- Botón de login -->
+      <router-link v-if="usuario" to="/u/home">Mi Negocio</router-link>
+      <router-link v-else to="/u/login">Login</router-link>
     </nav>
 </template>
 

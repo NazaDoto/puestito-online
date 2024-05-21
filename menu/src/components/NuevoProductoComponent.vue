@@ -2,7 +2,7 @@
     <div>
         <NavbarComponent></NavbarComponent>
         <div class="container mt-4 mb-2">
-            <h1 class="text-center">Nuevo Producto</h1>
+            <h1 class="text-center">Cargar Producto</h1>
 
             <form @submit.prevent="nuevoProducto(this.producto)" enctype="multipart/form-data">
                 <div class="row g-3 div-forms border mt-2">

@@ -12,7 +12,7 @@
             <div v-if="negocio">
                 <div class="tarjeta-container">
                     <div class="row">
-                        <h1 class="text-center">Mi Perfil</h1>
+                        <h1 class="text-center">Perfil</h1>
                         <div class="p-2 text-center">
                             <div class="tarjetaProducto">
                                 <div v-if="añoVence == '2100'" class="textoTarjeta">

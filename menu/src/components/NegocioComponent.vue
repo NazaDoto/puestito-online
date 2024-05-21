@@ -9,14 +9,22 @@
             </div>
         </div>
         <div v-else>
-            <nav class="navbar navbar-expand-lg navbar-light bg-light" :class="{ 'navbar-hidden': isHidden }">
-                <div class="container-fluid">
-                    <a class="navbar-brand" @click="scrollToInicio" href="#">~ {{ nombreNegocio.toUpperCase() }} ~</a>
-                    <button class="navbar-brand navbar-toggler" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
+            <nav class="navbar" :class="{ 'navbar-hidden': isHidden }">
+                <div class="container">
+                    <div class="flex">
+                        <a @click="scrollToInicio" href="#"><img class="nav-logo"
+                                :src="negocio.imagen"  alt=""></a>
+                        <div class="ancho-busqueda input-group mcenter">
+                            <input class="form-control" v-model="busqueda" type="text" name="busqueda" id=""
+                                placeholder="Buscar producto" title="Ingrese una palabra clave...">
+                            <button class="btn-close btn-limpiar-busqueda" @click="limpiarBusqueda"></button>
+                        </div>
+                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                            aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                    </div>
                     <div class="collapse navbar-collapse text-end mr-2" id="navbarSupportedContent">
                         <ul class="navbar-nav me-auto mb-2 mb-lg-0 ">
                             <div v-for="(categoria, index) in categoriasOrdenadas" :key="index">
@@ -55,21 +63,18 @@
                     <div class="body-container">
 
                         <div class="ancho">
-                            <div class="izquierda ancho-busqueda input-group">
-                                <input class="form-control" v-model="busqueda" type="text"
-                                    name="busqueda" id="" placeholder="Buscar producto"
-                                    title="Ingrese una palabra clave...">
-                                    <button class="btn-close btn-limpiar-busqueda" @click="limpiarBusqueda"></button>
-                            </div>
+
                             <div class="mt-2" v-for="(categoria, index) in categoriasOrdenadas" :key="index"
                                 :id="categoria">
                                 <div v-if="filteredProductos(categoria)">
 
-                                    <div class="titulo-categoria" @click="toggleCategoria(categoria)" :class="{'fondo-oscuro': categoriaSeleccionada === categoria}">{{ categoria }}
+                                    <div class="titulo-categoria" @click="toggleCategoria(categoria)"
+                                        :class="{ 'fondo-oscuro': categoriaSeleccionada === categoria }">{{ categoria }}
                                         <div class="inline" v-if="categoriaSeleccionada === categoria">↓</div>
                                         <div class="inline" v-else>→</div>
                                     </div>
-                                    <div :class="{ 'categoria-productos': true, 'categoria-activa': categoriaSeleccionada === categoria }">
+                                    <div
+                                        :class="{ 'categoria-productos': true, 'categoria-activa': categoriaSeleccionada === categoria }">
                                         <div class="p-2">
                                             <div class="item-container mt-2"
                                                 v-for="(producto, index) in filteredProductos(categoria)" :key="index">
@@ -121,15 +126,14 @@
                         </div>
                     </div>
                 </div>
-                <div v-else class="container text-center mt-4 no-negocio">
-                    <div class="error-container">
+                <div v-else>
                         <div class="error-content">
                             <h1 class="display-1 text-danger">404</h1>
                             <h2 class="display-4">Puestito no encontrado</h2>
                             <p class="lead">Lo sentimos, el puestito que buscas no se encuentra disponible o no tiene
                                 productos disponibles.</p>
+                                <router-link to="/">Volver a Puestito Online</router-link>
                         </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -475,7 +479,7 @@ export default {
             // Filtra los productos basándose en la categoría y en el valor de disponibilidad
             return this.productosFiltrados.filter(producto => producto.producto_categoria === categoria && producto.producto_disponibilidad === 1);
         },
-        limpiarBusqueda(){
+        limpiarBusqueda() {
             this.busqueda = '';
         }
     }
@@ -483,6 +487,16 @@ export default {
 </script>
 
 <style scoped>
+.error-content{
+    height: 100%;
+}
+.flex {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+}
+
 .navbar {
     position: sticky;
     top: 0px;
@@ -577,10 +591,12 @@ export default {
     font-weight: normal;
     text-shadow: none;
 }
-.fondo-oscuro{
+
+.fondo-oscuro {
     background-color: rgb(122, 122, 122) !important;
-    color:white;
+    color: white;
 }
+
 .mr-2 {
     margin-right: 10px;
 }
@@ -609,10 +625,12 @@ export default {
     background-color: white;
     align-content: center;
 }
-.btn-close:focus{
+
+.btn-close:focus {
     box-shadow: none;
     opacity: var(--bs-btn-close-opacity);
 }
+
 .pantalla-carga:hover {
     cursor: wait;
 }
@@ -623,9 +641,6 @@ export default {
     }
 }
 
-.navbar-brand {
-    font-weight: bold;
-}
 
 
 .imagen-container {
@@ -639,10 +654,12 @@ export default {
     margin-bottom: -56px;
     height: 100svh;
 }
-.inline{
+
+.inline {
     margin-left: auto;
     font-weight: bold;
 }
+
 .img-negocio {
     width: 100%;
     height: 100%;
@@ -683,33 +700,17 @@ export default {
     font-size: 1.1rem;
 }
 
-.navbar-toggler {
-    outline: 0 !important;
-    border: none !important;
-    color: transparent;
-    margin: 0;
-}
-
-.navbar-toggler:focus {
-    color: black;
-}
-
-.error-container {
-    height: 80vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.error-content {
-    text-align: center;
-}
 
 
 .textoTarjeta {
     padding: 5px 15px;
 }
-
+.nav-logo{
+    border-radius: 100%;
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
 .categoria-container {
     padding: 5px;
     border: 5px;
@@ -723,28 +724,39 @@ export default {
     background-color: black;
     color: white;
 }
+
 .input-group {
-  position: relative;
+    position: relative;
 }
 
 .form-control {
     border-radius: 4px !important;
-  padding-right: 2.5rem; /* Espacio suficiente para el botón */
+    padding-right: 2.5rem;
+    /* Espacio suficiente para el botón */
 }
-.form-control:focus{
+
+.form-control:focus {
     box-shadow: none;
 }
+
 .btn-limpiar-busqueda {
-  position: absolute;
-  top: 50%;
-  right: 0.5rem; /* Ajusta según sea necesario */
-  transform: translateY(-50%);
-  z-index: 5; /* Asegura que el botón esté sobre el input */
+    position: absolute;
+    top: 50%;
+    right: 0.5rem;
+    /* Ajusta según sea necesario */
+    transform: translateY(-50%);
+    z-index: 5;
+    /* Asegura que el botón esté sobre el input */
+}
+.navbar{
+    background-color: white;
 }
 .mauto {
     margin: 10px;
 }
-
+.mcenter{
+    margin:auto;
+}
 .titulo-categoria {
     font-size: 1.3rem;
     background: white;
@@ -756,9 +768,11 @@ export default {
     border-radius: 4px;
     display: flex;
 }
-.titulo-categoria:hover{
-    background:rgb(232, 231, 231);
+
+.titulo-categoria:hover {
+    background: rgb(232, 231, 231);
 }
+
 .tarjetaProducto {
     border: 5px;
     background-color: white;
@@ -783,7 +797,7 @@ img {
 
 
 .ancho {
-    min-height: 60vh;
+    margin-bottom: 10vh;
     overflow: auto;
 }
 
@@ -796,11 +810,9 @@ img {
 
 
 .ancho-busqueda {
-    width: 100%;
-    height: 50px;
+    width: 60%;
+    height: 40px;
     display: inline-flex;
-    margin-top: 20px;
-    padding: 1px;
 }
 
 ul {
@@ -848,19 +860,21 @@ ul {
     text-align: center;
     margin: auto;
 }
-
+.error-content{
+    text-align: center;
+}
 .container2 {
     margin: 0px 30vw;
+    min-height: calc(100svh - 97.4px);
 }
 
 @media screen and (max-width: 992px) {
+    .ancho-busqueda{
+        width: 100%;
+    }
     .navbar-hidden {
         width: 100svw;
         top: -56px;
-    }
-
-    .navbar-brand {
-        font-size: 20px;
     }
 
     .img-negocio {
@@ -874,7 +888,6 @@ ul {
 
 
     .container2 {
-        min-height: calc(100vh - 200px);
         margin: 0px;
     }
 

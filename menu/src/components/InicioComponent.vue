@@ -1,7 +1,45 @@
 <template>
   <div>
-    <NavbarPublicoComponent></NavbarPublicoComponent>
-    <div class="container2 mt-4">
+    <nav class="navbar">
+      <div class="container">
+        <div class="flex">
+          <router-link class="navbar-brand start" to="/"><img src="/favicon.ico" width="30" height="30" alt=""></router-link>
+          <div class="ancho-busqueda input-group mauto">
+            <input class="form-control" v-model="busqueda" type="text" name="busqueda" id=""
+              placeholder="Buscar puestitos o rubros..." title="Ingrese una palabra clave..." />
+              <button class="btn-close btn-limpiar-busqueda" @click="limpiarBusqueda"></button>
+          </div>
+          <button class="navbar-toggler end" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDarkDropdown"
+            aria-controls="navbarNavDarkDropdown" aria-expanded="false" aria-label="Toggle navigation"
+            @click="mostrarBusqueda">
+            <span data-v-e0d06366="" class="navbar-toggler-icon"></span>
+          </button>
+        </div>
+        <div class="collapse navbar-collapse mt-2" id="navbarNavDarkDropdown">
+          Filtrar rubros
+          <select class="inline ancho-busqueda form-select" name="rubro" id="rubro" v-model="rubro">
+            <option value="Todos" selected>Todos</option>
+            <option v-for="(rubro, index) in rubrosUnicos" :key="index" :value="rubro">
+              {{ rubro }}
+            </option>
+          </select>
+          <div class="block mt-2">
+              <button type="button" class="btn btn-limpiar mt-2" @click="limpiarBusqueda" aria-label="Close">
+                Limpiar búsqueda
+              </button>              
+            </div>
+            <hr>
+            <div class="flex mb-2">
+              <router-link class="inline-end" v-if="usuario" to="/u/home">Mi Negocio</router-link>
+              <router-link class="inline-end" v-else to="/u/login">Login</router-link>
+            </div>
+        </div>
+
+      </div>
+      <!-- Logo -->
+
+    </nav>
+    <div class="container2">
       <div v-if="cargando" class="pantalla-carga text-center">
         <div class="logo-carga">
           <img class="logo-img" src="/favicon.ico" width="50" alt="" />
@@ -11,85 +49,62 @@
       <div v-else>
         <div class="flex">
 
-          <button class="btn btn-menu inline" @click="mostrarBusqueda">
-            {{ buscarMenu ? 'Ocultar Búsqueda' : 'Buscar Puestitos' }}</button>
-          <button class="btn btn-menu inline2" @click="mostrarMapa">
-            {{
-              !mapaMostrado2
-                ? "Ver Mapa"
-                : `Ocultar
-            Mapa`
-            }}
-          </button>
+          <button class="btn btn-mapa mauto mt-2" @click="mostrarMapa">
+                  {{
+                    !mapaMostrado2
+                      ? "Abrir Mapa"
+                      : `Cerrar
+                  Mapa`
+                  }}
+                </button>
         </div>
-        <div v-if="buscarMenu" class="mt-2">
-          <label for="rubro">Buscar por rubro</label>
-          <select class="ancho-busqueda form-select" name="rubro" id="rubro" v-model="rubro">
-            <option value="Todos" selected>Todos</option>
-            <option v-for="(rubro, index) in rubrosUnicos" :key="index" :value="rubro">
-              {{ rubro }}
-            </option>
-          </select>
-          <div class="mt-2">
-            <input class="form-control" v-model="busqueda" type="text" name="busqueda" id=""
-              placeholder="Buscar por nombre" title="Ingrese una palabra clave..." />
-          </div>
-          <div class="flex">
-            <button type="button" class="btn btn-limpiar mt-2" @click="limpiarBusqueda" aria-label="Close">
-              Limpiar búsqueda
-            </button>
-          </div>
-        </div>
-
-        <div class="negocios-body mt-3">
-          <div class="modalMapa mt-2" v-show="mapaMostrado2" style="height: 400px">
-            <!-- Aquí iría todo lo relacionado con el mapa de Google Maps -->
-            <GMapMap style="height: 400px" :center="mapCenter" :zoom="zoom" :options="options">
-              <GMapMarker v-if="posicionActual" :position="posicionActual" :options="{ icon: '/recursos/pinself.png' }"
-                :title="'Estás aquí.'">
-              </GMapMarker>
-              <GMapMarker v-for="(negocio, index) in negociosFiltrados" :key="index" :position="negocio.location"
-                :title="negocio.nombre" @click="openInfoWindow(index)" :options="{ icon: '/recursos/pin30.png' }"
-                id="gmapm">
-                <GMapInfoWindow v-if="infoWindowOpened == index" :options="infoWindow[index].options" :closeclick="true"
-                  @closeclick="openInfoWindow(null)">
-                  <div style="max-width: 150px">
-                    <b style="font-size: 20px">{{ negocio.nombre }}</b><br />
-                    <div style="text-align: center">
-                      <a style="
+        <div class="mt-2">
+          <div class="modalMapa" v-show="mapaMostrado2" style="height: 400px">
+              <!-- Aquí iría todo lo relacionado con el mapa de Google Maps -->
+              <GMapMap style="height: 400px" :center="mapCenter" :zoom="zoom" :options="options">
+                <GMapMarker v-if="posicionActual" :position="posicionActual"
+                  :options="{ icon: '/recursos/pinself.png' }" :title="'Estás aquí.'">
+                </GMapMarker>
+                <GMapMarker v-for="(negocio, index) in negociosFiltrados" :key="index" :position="negocio.location"
+                  :title="negocio.nombre" @click="openInfoWindow(index)" :options="{ icon: '/recursos/pin30.png' }"
+                  id="gmapm">
+                  <GMapInfoWindow v-if="infoWindowOpened == index" :options="infoWindow[index].options"
+                    :closeclick="true" @closeclick="openInfoWindow(null)">
+                    <div style="max-width: 150px">
+                      <b style="font-size: 20px">{{ negocio.nombre }}</b><br />
+                      <div style="text-align: center">
+                        <a style="
                           text-decoration: none;
                           color: white;
                           font-size: 12px;
                           padding: 4px 6px;
                         " :href="'https://puestito.online/' + negocio.usuario" target="_blank"><img src="/favicon.ico"
-                          width="20" alt="" /></a>
-                      <a v-if="negocio.instagram" :href="'https://instagram.com/' + negocio.instagram"
-                        target="blank"><img style="margin: 0px 10px" width="20" src="/recursos/instagram.png" /></a>
-                      <a v-if="negocio.facebook" :href="'https://facebook.com/' + negocio.facebook" target="blank"><img
-                          style="margin: 0px 10px" width="20" src="/recursos/facebook.png" /></a>
+                            width="20" alt="" /></a>
+                        <a v-if="negocio.instagram" :href="'https://instagram.com/' + negocio.instagram"
+                          target="blank"><img style="margin: 0px 10px" width="20" src="/recursos/instagram.png" /></a>
+                        <a v-if="negocio.facebook" :href="'https://facebook.com/' + negocio.facebook"
+                          target="blank"><img style="margin: 0px 10px" width="20" src="/recursos/facebook.png" /></a>
+                      </div>
+                      <p style="margin: 5px 0px">
+                        <b>Dirección:</b> {{ negocio.direccion }}
+                      </p>
+                      <p style="margin: 5px 0px">
+                        <b>Correo:</b> {{ negocio.correo }}
+                      </p>
+                      <p style="margin: 5px 0px">
+                        <b>Teléfono:</b> {{ negocio.telefono }}
+                      </p>
+                      <p style="text-align: center; margin: 7px 0px">
+                        "{{ negocio.descripcion }}"
+                      </p>
                     </div>
-                    <p style="margin: 5px 0px">
-                      <b>Dirección:</b> {{ negocio.direccion }}
-                    </p>
-                    <p style="margin: 5px 0px">
-                      <b>Correo:</b> {{ negocio.correo }}
-                    </p>
-                    <p style="margin: 5px 0px">
-                      <b>Teléfono:</b> {{ negocio.telefono }}
-                    </p>
-                    <p style="text-align: center; margin: 7px 0px">
-                      "{{ negocio.descripcion }}"
-                    </p>
-                  </div>
-                </GMapInfoWindow>
-              </GMapMarker>
-            </GMapMap>
-          </div>
-          <hr>
+                  </GMapInfoWindow>
+                </GMapMarker>
+              </GMapMap>
+            </div>
           <div v-for="(grupo, rubro) in negociosAgrupados" :key="rubro">
             <div class="titulo-rubro">{{ rubro }}</div>
             <div class="categoria-container">
-
               <div class="carrusel">
                 <div v-for="(negocio, negocioIndex) in grupo" :key="negocioIndex"
                   :class="{ 'carrusel-item': true, 'active': negocioIndex === 0 }">
@@ -105,7 +120,7 @@
                         {{ negocio.nombre }}
                       </div>
                     </router-link>
-                      <div class="item-btn">
+                    <div class="item-btn">
                       <a v-if="negocio.location !== null" class="cursor-pointer mt-1" @click="localizar(negocio)"><img
                           src="/recursos/pin.png" width="30" alt="" /></a>
                     </div>
@@ -128,15 +143,14 @@
 
 <script>
 import axios from "axios";
-import NavbarPublicoComponent from "./NavbarPublicoComponent.vue";
 import router from "@/router";
 export default {
   components: {
-    NavbarPublicoComponent,
   },
   name: "MapaComponent",
   data() {
     return {
+      usuario: '',
       buscarMenu: false,
       posicionActual: "",
       options: {
@@ -172,6 +186,7 @@ export default {
     if (this.$route.params) {
       router.push("/", this.$route.params);
     }
+    this.obtenerUsuario()
   },
   computed: {
     negociosFiltrados() {
@@ -231,6 +246,9 @@ export default {
     },
   },
   methods: {
+    obtenerUsuario() {
+      this.usuario = localStorage.getItem('usuario');
+    },
     limpiarBusqueda() {
       this.busqueda = "";
       this.rubro = "Todos";
@@ -245,10 +263,11 @@ export default {
           console.error('Error al inicializar el mapa:', error);
         }
       }
+      this.buscarMenu = true;
       this.mapaMostrado2 = true;
       this.mapCenter = negocio.location;
       this.openInfoWindow(negocio.index);
-      window.scrollTo({top:0, behavior:'smooth'});
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     },
     openInfoWindow(index) {
       if (this.infoWindowOpened == index) {
@@ -345,23 +364,48 @@ export default {
 </script>
 
 <style scoped>
-
-
+.btn-limpiar-busqueda {
+    position: absolute;
+    top: 50%;
+    right: 0.5rem;
+    /* Ajusta según sea necesario */
+    transform: translateY(-50%);
+    z-index: 5;
+    /* Asegura que el botón esté sobre el input */
+}
+.btn-mapa{
+  background: rgba(255, 255, 255, 1);
+}
+.barra {
+  background: rgb(167, 211, 255);
+  position: sticky;
+  top: 0;
+  padding: 10px 20px;
+  z-index: 50;
+}
+.btn-close:focus {
+    box-shadow: none;
+    opacity: var(--bs-btn-close-opacity);
+}
 .flex {
   display: flex;
-  justify-content: flex-start;
+  width: 100%;
+      justify-content: space-between;
+      align-items: center;
 }
 
 .inline {
   display: inline-flex;
 }
 
-
+.inline-start{
+  justify-self: flex-start;
+}
 .mauto {
   margin: auto;
 }
 
-.inline2 {
+.inline-end {
   margin-left: auto;
 }
 
@@ -371,7 +415,9 @@ export default {
   background-color: rgba(255, 255, 255, 0.7);
   border-radius: 50px;
 }
-
+.input-group {
+    position: relative;
+}
 .modalMapa {
   height: 100px;
 }
@@ -384,6 +430,7 @@ export default {
 
 .cursor-pointer {
   cursor: pointer;
+  margin: 10px;
 }
 
 .ancho-busqueda {
@@ -395,7 +442,22 @@ export default {
 }
 
 .container2 {
-  margin: 0px 30vw;
+  margin: 0px 20vw;
+  align-items: center;
+  background-image: url('../../public/recursos/patron.png');
+  background-size: contain;
+  background-repeat: repeat;
+  background-attachment: fixed;
+}
+
+a {
+  text-decoration: none;
+}
+
+.navbar {
+  position: sticky;
+  top: 0;
+  background: white;
 }
 
 .navbar-brand {
@@ -433,6 +495,10 @@ ul {
   display: inline-flex;
 }
 
+.block {
+  display: block;
+}
+
 .carrusel-item {
   margin: 0px 5px;
   text-align: center;
@@ -442,12 +508,13 @@ ul {
 }
 
 .item-container {
-  padding: 0px;
+  height: 215px;
   width: 150px;
   overflow: hidden;
   /* Asegura que la imagen no desborde el contenedor */
   justify-content: center;
   align-items: center;
+  border-radius: 5px;
 }
 
 .imagen-negocio {
@@ -469,8 +536,10 @@ ul {
 }
 
 .item-nombre {
+  margin-top: 5px;
   font-size: 1rem;
   overflow: hidden;
+  color: black;
 }
 
 .item-descripcion {
@@ -506,7 +575,7 @@ ul {
   }
 
   .ancho-busqueda {
-    width: 40vw;
+    width: 100%;
   }
 
   .ancho-busqueda2 {
@@ -515,6 +584,7 @@ ul {
 
   .container2 {
     margin: 0px 10px;
+    background-image:none;
   }
 }
 </style>

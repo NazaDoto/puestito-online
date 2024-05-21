@@ -15,15 +15,11 @@
             <li class="test nav-item">
               <router-link class="nav-link" to='/u/modificar'>Pefil</router-link>
             </li>
-            <li class="test nav-item dropdown">
-              <button :class="{ active: isActiveProductos() }" class="dropdown-toggle nav-link" data-bs-toggle="dropdown"
-                aria-expanded="false">
-                Productos
-              </button>
-              <ul class="dropdown-menu dropdown-menu-dark">
-                <li><router-link class="dropdown-item" to="/u/nuevoProducto">Nuevo Producto</router-link></li>
-                <li><router-link class="dropdown-item" to='/u/productos'>Listar Productos</router-link></li>
-              </ul>
+            <li class="test nav-item">
+              <router-link class="nav-link" to="/u/nuevoProducto">Cargar Producto</router-link>
+            </li>
+            <li class="test nav-item">
+              <router-link class="nav-link" to='/u/productos'>Listar Productos</router-link>
             </li>
             <li class="test nav-item">
               <button class="nav-link" data-bs-toggle="modal" data-bs-target="#exampleModal">
@@ -101,7 +97,6 @@ export default {
 .nav-link:hover {
   background-color: gray;
 }
-
 @media screen and (max-width: 992px) {
   .nav-item {
     margin-top: 8px;
@@ -122,8 +117,7 @@ export default {
 
   .test {
     display: inline-block;
-    margin-left: 5px;
-    margin-right: 5px;
+    margin-left: auto;
   }
 
   .navbar-text {}
