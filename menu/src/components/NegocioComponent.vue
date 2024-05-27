@@ -44,7 +44,9 @@
                             <img v-if="negocio.portada" :src="negocio.portada" alt="" class="img-negocio">
                             <img v-else src="/recursos/missing.png" class="img-negocio" alt="">
                             <div class="texto-superpuesto">BIENVENIDOS
-                                <div class="texto-superpuesto2">{{ negocio.descripcion }}</div>
+                                <div class="texto-superpuesto2">{{ negocio.descripcion }}
+                                
+                                </div>
                                 <div class="text-center redes">
                                     <a class="link-dir" v-if="negocio.direccion"
                                         :href="'https://www.google.com/maps/search/' + encodeURIComponent(negocio.direccion)"
@@ -55,8 +57,11 @@
                                     <a v-if="negocio.facebook" class="mauto"
                                         :href="'https://facebook.com/' + negocio.facebook" target="blank"><img
                                             width='36' src="/recursos/facebook.png"></a> <br>
-                                    <img v-show="isHidden" src="/recursos/scroll-down.png" class="scroll-down"
-                                        :class="{ 'fade-in-out': isHidden }" alt="">
+                                            <div class="text-center">
+                                                <img v-show="isHidden" src="/recursos/scroll-down.png" class="scroll-down"
+                                                    :class="{ 'fade-in-out': isHidden }" alt="">
+
+                                            </div>
                                 </div>
                             </div>
                         </div>
@@ -738,6 +743,7 @@ export default {
     position: absolute;
     top: 55vh;
     text-align: center;
+    width: 100%;
 }
 
 .texto-superpuesto2 {
