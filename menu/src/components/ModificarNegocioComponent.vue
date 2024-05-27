@@ -238,6 +238,34 @@
                         </div>
                     </div>
                 </div>
+                <div v-show="modalCropPortada" class="modalCategoriaContainer  text-center ">
+                    <div class="modalCategoria">
+                        <div class="modal-dialog modal-dialog-centered ">
+                            <div class="modal-content ">
+                                <div class="modal-header pl-2">
+                                    <h1 class="modal-title fs-5" id="agregarCategoriaLabel">Recortar Imagen</h1>
+                                    <button type="button" class="btn-close" @click="cerrarCropPortada"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body mt-2 ">
+                                    <div v-show="cargandoCropperPortada" class="pantalla-cargas text-center">
+                                        <div class="logo-carga">
+                                            <img class="logo-img" src="/favicon.ico" width="50" alt="">
+                                            <div class="texto-carga">
+                                                Cargando imagen
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <img ref="cropperPortada" alt="Croppear">
+                                </div>
+                                <div class="modal-footer mt-2">
+                                    <button type="button" class="btn" @click="cerrarCropPortada">Cerrar</button>
+                                    <button class="btn btn-menu" @click="guardarPortadaRecortada">Recortar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -257,8 +285,11 @@ export default {
         return {
             obteniendoInfo: false,
             cargandoCropper: true,
+            cargandoCropperPortada: true,
             modalCropImage: false,
+            modalCropPortada: false,
             cropper: null,
+            cropperPortada: null,
             imageToCrop: '',
             fechaVence: '',
             añoVence: '',
@@ -273,20 +304,7 @@ export default {
         this.obtenerInformacionNegocio();
     },
     methods: {
-        portadaSeleccionada(event) {
-            try {
-                const file = event.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = async (e) => {
-                        this.negocioModificar.portada = e.target.result;
-                    }
-                    reader.readAsDataURL(file);
-                }
-            } catch (error) {
-                console.log(error)
-            }
-        },
+        
         mejorarPlan() {
             router.push('/u/planes');
         },
@@ -335,9 +353,61 @@ export default {
             }
 
         },
+        portadaSeleccionada(event) {
+            try {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = async (e) => {
+                        this.imageToCrop = e.target.result;
+                        this.modalCropPortada = true;
+                        window.scrollTo({top:0,behavior:'smooth'})
+                        let cropperCanvas = this.$refs.cropperPortada;
+                        cropperCanvas.src = this.imageToCrop;
+                        this.$nextTick(() => {
+                            const canvasExiste = document.querySelector('cropper-canvas');
+                            if (canvasExiste) {
+                                canvasExiste.parentNode.removeChild(canvasExiste);
+                            }
+                            this.cropperPortada = new Cropper(cropperCanvas, {
+                                template: `<cropper-canvas background style='height:50vh;'>
+                                    <cropper-image alt='Lol' rotatable=false></cropper-image>
+                                        <cropper-shade hidden></cropper-shade>
+                                        <cropper-handle  action='move' plain></cropper-handle>
+                                        <cropper-selection initial-coverage='0.5' aspect-ratio='0.75' movable resizable zoomable>
+                                            <cropper-grid role='grid' covered></cropper-grid>
+                                            <cropper-crosshair centered></cropper-crosshair>
+                                            <cropper-handle action='move'
+                                                theme-color='rgba(255, 255, 255, 0.35)'></cropper-handle>
+                                            <cropper-handle action='ne-resize'></cropper-handle>
+                                            <cropper-handle action='nw-resize'></cropper-handle>
+                                            <cropper-handle action='se-resize'></cropper-handle>
+                                            <cropper-handle action='sw-resize'></cropper-handle>
+                                        </cropper-selection>
+                                    </cropper-canvas >` ,
+                            });
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                }
+            } catch (error) {
+                console.log(error)
+            } finally {
+                this.cargandoCropperPortada = false;
+            }
+        },       
+        async guardarPortadaRecortada() {
+            try {
+                const canvas = await this.cropperPortada.getCropperSelection().$toCanvas();
+                this.negocioModificar.portada = canvas.toDataURL();
+            } catch (error) {
+                console.error('Error al guardar la imagen recortada:', error);
+            } finally {
+                this.modalCropPortada = false;
+            }
+        }, 
         imagenSeleccionada(event) {
             try {
-
                 const file = event.target.files[0];
                 if (file) {
                     const reader = new FileReader();
@@ -355,7 +425,7 @@ export default {
                             }
                             this.cropper = new Cropper(cropperCanvas, {
                                 template: `<cropper-canvas background style='height:50vh;'>
-                                    <cropper-image alt='Lol' rotatable=false>asd</cropper-image>
+                                    <cropper-image  alt='Lol' rotatable=false></cropper-image>
                                         <cropper-shade hidden></cropper-shade>
                                         <cropper-handle  action='move' plain></cropper-handle>
                                         <cropper-selection initial-coverage='0.5' aspect-ratio='1' movable resizable zoomable>
@@ -379,10 +449,7 @@ export default {
             } finally {
                 this.cargandoCropper = false;
             }
-        },
-        cerrarCrop() {
-            this.modalCropImage = false;
-        },
+        },        
         async guardarImagenRecortada() {
             try {
                 const canvas = await this.cropper.getCropperSelection().$toCanvas();
@@ -392,6 +459,13 @@ export default {
             } finally {
                 this.modalCropImage = false;
             }
+        },
+       
+        cerrarCrop() {
+            this.modalCropImage = false;
+        },
+        cerrarCropPortada() {
+            this.modalCropPortada = false;
         },
     }
 };

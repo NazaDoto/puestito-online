@@ -1,21 +1,21 @@
 <template>
   <div>
-    <nav class="navbar">
+    <nav class="navbar navbar-dark bg-dark">
       <div class="container">
-        <div class="flex">
-          <router-link class="navbar-brand start" to="/"><img src="/favicon.ico" width="30" height="30" alt=""></router-link>
+        <div class="flex ">
+          <router-link to="/"><img src="/favicon.ico" alt="" class="nav-logo"></router-link>
           <div class="ancho-busqueda input-group mauto">
             <input class="form-control" v-model="busqueda" type="text" name="busqueda" id=""
               placeholder="Buscar puestitos o rubros..." title="Ingrese una palabra clave..." />
-              <button class="btn-close btn-limpiar-busqueda" @click="limpiarBusqueda"></button>
+            <button class="btn-close btn-limpiar-busqueda" @click="limpiarBusqueda"></button>
           </div>
-          <button class="navbar-toggler end" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDarkDropdown"
-            aria-controls="navbarNavDarkDropdown" aria-expanded="false" aria-label="Toggle navigation"
-            @click="mostrarBusqueda">
+          <button class="navbar-toggler end" type="button" data-bs-toggle="collapse"
+            data-bs-target="#navbarNavDarkDropdown" aria-controls="navbarNavDarkDropdown" aria-expanded="false"
+            aria-label="Toggle navigation" @click="mostrarBusqueda">
             <span data-v-e0d06366="" class="navbar-toggler-icon"></span>
           </button>
         </div>
-        <div class="collapse navbar-collapse mt-2" id="navbarNavDarkDropdown">
+        <div class="collapse navbar-collapse mt-2 c-white" id="navbarNavDarkDropdown">
           Filtrar rubros
           <select class="inline ancho-busqueda form-select" name="rubro" id="rubro" v-model="rubro">
             <option value="Todos" selected>Todos</option>
@@ -24,15 +24,15 @@
             </option>
           </select>
           <div class="block mt-2">
-              <button type="button" class="btn btn-limpiar mt-2" @click="limpiarBusqueda" aria-label="Close">
-                Limpiar búsqueda
-              </button>              
-            </div>
-            <hr>
-            <div class="flex mb-2">
-              <router-link class="inline-end" v-if="usuario" to="/u/home">Mi Negocio</router-link>
-              <router-link class="inline-end" v-else to="/u/login">Login</router-link>
-            </div>
+            <button type="button" class="btn btn-limpiar mt-2" @click="limpiarBusqueda" aria-label="Close">
+              Limpiar búsqueda
+            </button>
+          </div>
+          <hr>
+          <div class="flex mb-2">
+            <router-link class="inline-end" v-if="usuario" to="/u/home">Mi Negocio</router-link>
+            <router-link class="inline-end" v-else to="/u/login">Login</router-link>
+          </div>
         </div>
 
       </div>
@@ -50,58 +50,58 @@
         <div class="flex">
 
           <button class="btn btn-mapa mauto mt-2" @click="mostrarMapa">
-                  {{
-                    !mapaMostrado2
-                      ? "Abrir Mapa"
-                      : `Cerrar
-                  Mapa`
-                  }}
-                </button>
+            {{
+              !mapaMostrado2
+                ? "Abrir Mapa"
+                : `Cerrar
+            Mapa`
+            }}
+          </button>
         </div>
         <div class="mt-2">
           <div class="modalMapa" v-show="mapaMostrado2" style="height: 400px">
-              <!-- Aquí iría todo lo relacionado con el mapa de Google Maps -->
-              <GMapMap style="height: 400px" :center="mapCenter" :zoom="zoom" :options="options">
-                <GMapMarker v-if="posicionActual" :position="posicionActual"
-                  :options="{ icon: '/recursos/pinself.png' }" :title="'Estás aquí.'">
-                </GMapMarker>
-                <GMapMarker v-for="(negocio, index) in negociosFiltrados" :key="index" :position="negocio.location"
-                  :title="negocio.nombre" @click="openInfoWindow(index)" :options="{ icon: '/recursos/pin30.png' }"
-                  id="gmapm">
-                  <GMapInfoWindow v-if="infoWindowOpened == index" :options="infoWindow[index].options"
-                    :closeclick="true" @closeclick="openInfoWindow(null)">
-                    <div style="max-width: 150px">
-                      <b style="font-size: 20px">{{ negocio.nombre }}</b><br />
-                      <div style="text-align: center">
-                        <a style="
+            <!-- Aquí iría todo lo relacionado con el mapa de Google Maps -->
+            <GMapMap style="height: 400px" :center="mapCenter" :zoom="zoom" :options="options">
+              <GMapMarker v-if="posicionActual" :position="posicionActual" :options="{ icon: '/recursos/pinself.png' }"
+                :title="'Estás aquí.'">
+              </GMapMarker>
+              <GMapMarker v-for="(negocio, index) in negociosFiltrados" :key="index" :position="negocio.location"
+                :title="negocio.nombre" @click="openInfoWindow(index)" :options="{ icon: '/recursos/pin30.png' }"
+                id="gmapm">
+                <GMapInfoWindow v-if="infoWindowOpened == index" :options="infoWindow[index].options" :closeclick="true"
+                  @closeclick="openInfoWindow(null)">
+                  <div style="max-width: 150px">
+                    <b style="font-size: 20px">{{ negocio.nombre }}</b><br />
+                    <div style="text-align: center">
+                      <a style="
                           text-decoration: none;
                           color: white;
                           font-size: 12px;
                           padding: 4px 6px;
                         " :href="'https://puestito.online/' + negocio.usuario" target="_blank"><img src="/favicon.ico"
-                            width="20" alt="" /></a>
-                        <a v-if="negocio.instagram" :href="'https://instagram.com/' + negocio.instagram"
-                          target="blank"><img style="margin: 0px 10px" width="20" src="/recursos/instagram.png" /></a>
-                        <a v-if="negocio.facebook" :href="'https://facebook.com/' + negocio.facebook"
-                          target="blank"><img style="margin: 0px 10px" width="20" src="/recursos/facebook.png" /></a>
-                      </div>
-                      <p style="margin: 5px 0px">
-                        <b>Dirección:</b> {{ negocio.direccion }}
-                      </p>
-                      <p style="margin: 5px 0px">
-                        <b>Correo:</b> {{ negocio.correo }}
-                      </p>
-                      <p style="margin: 5px 0px">
-                        <b>Teléfono:</b> {{ negocio.telefono }}
-                      </p>
-                      <p style="text-align: center; margin: 7px 0px">
-                        "{{ negocio.descripcion }}"
-                      </p>
+                          width="20" alt="" /></a>
+                      <a v-if="negocio.instagram" :href="'https://instagram.com/' + negocio.instagram"
+                        target="blank"><img style="margin: 0px 10px" width="20" src="/recursos/instagram.png" /></a>
+                      <a v-if="negocio.facebook" :href="'https://facebook.com/' + negocio.facebook" target="blank"><img
+                          style="margin: 0px 10px" width="20" src="/recursos/facebook.png" /></a>
                     </div>
-                  </GMapInfoWindow>
-                </GMapMarker>
-              </GMapMap>
-            </div>
+                    <p style="margin: 5px 0px">
+                      <b>Dirección:</b> {{ negocio.direccion }}
+                    </p>
+                    <p style="margin: 5px 0px">
+                      <b>Correo:</b> {{ negocio.correo }}
+                    </p>
+                    <p style="margin: 5px 0px">
+                      <b>Teléfono:</b> {{ negocio.telefono }}
+                    </p>
+                    <p style="text-align: center; margin: 7px 0px">
+                      "{{ negocio.descripcion }}"
+                    </p>
+                  </div>
+                </GMapInfoWindow>
+              </GMapMarker>
+            </GMapMap>
+          </div>
           <div v-for="(grupo, rubro) in negociosAgrupados" :key="rubro">
             <div class="titulo-rubro">{{ rubro }}</div>
             <div class="categoria-container">
@@ -365,17 +365,19 @@ export default {
 
 <style scoped>
 .btn-limpiar-busqueda {
-    position: absolute;
-    top: 50%;
-    right: 0.5rem;
-    /* Ajusta según sea necesario */
-    transform: translateY(-50%);
-    z-index: 5;
-    /* Asegura que el botón esté sobre el input */
+  position: absolute;
+  top: 50%;
+  right: 0.5rem;
+  /* Ajusta según sea necesario */
+  transform: translateY(-50%);
+  z-index: 5;
+  /* Asegura que el botón esté sobre el input */
 }
-.btn-mapa{
+
+.btn-mapa {
   background: rgba(255, 255, 255, 1);
 }
+
 .barra {
   background: rgb(167, 211, 255);
   position: sticky;
@@ -383,24 +385,27 @@ export default {
   padding: 10px 20px;
   z-index: 50;
 }
+
 .btn-close:focus {
-    box-shadow: none;
-    opacity: var(--bs-btn-close-opacity);
+  box-shadow: none;
+  opacity: var(--bs-btn-close-opacity);
 }
+
 .flex {
   display: flex;
   width: 100%;
-      justify-content: space-between;
-      align-items: center;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .inline {
   display: inline-flex;
 }
 
-.inline-start{
+.inline-start {
   justify-self: flex-start;
 }
+
 .mauto {
   margin: auto;
 }
@@ -415,9 +420,11 @@ export default {
   background-color: rgba(255, 255, 255, 0.7);
   border-radius: 50px;
 }
+
 .input-group {
-    position: relative;
+  position: relative;
 }
+
 .modalMapa {
   height: 100px;
 }
@@ -428,6 +435,10 @@ export default {
   color: grey;
 }
 
+.c-white {
+  color: white;
+}
+
 .cursor-pointer {
   cursor: pointer;
   margin: 10px;
@@ -435,6 +446,7 @@ export default {
 
 .ancho-busqueda {
   width: 60%;
+  height: 40px;
 }
 
 .ancho-busqueda2 {
@@ -457,7 +469,8 @@ a {
 .navbar {
   position: sticky;
   top: 0;
-  background: white;
+  z-index: 10;
+  padding: 8px 0px;
 }
 
 .navbar-brand {
@@ -584,7 +597,7 @@ ul {
 
   .container2 {
     margin: 0px 10px;
-    background-image:none;
+    background-image: none;
   }
 }
 </style>

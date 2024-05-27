@@ -1,5 +1,5 @@
 <template>
-    <nav class="navbar">
+    <nav class="navbar navbar-dark bg-dark">
       <!-- Logo -->
       <router-link class="navbar-brand" to="/">
         <img src="/favicon.ico" width="30" height="30" class="d-inline-block align-top" alt="">

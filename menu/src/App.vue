@@ -169,7 +169,20 @@ body{
 .logo-img {
     animation: l2 2s infinite;
 }
-
+.form-control {
+    border-radius: 4px !important;
+    padding-right: 2.5rem;
+    /* Espacio suficiente para el botón */
+}
+.nav-logo{
+    border-radius: 100%;
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+.form-control:focus {
+    box-shadow: none;
+}
 .pantalla-carga {
     z-index: 2;
     position: absolute;

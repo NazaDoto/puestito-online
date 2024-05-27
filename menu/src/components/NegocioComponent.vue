@@ -9,11 +9,10 @@
             </div>
         </div>
         <div v-else>
-            <nav class="navbar" :class="{ 'navbar-hidden': isHidden }">
+            <nav class="navbar navbar-dark bg-dark" :class="{ 'navbar-hidden': isHidden }">
                 <div class="container">
                     <div class="flex">
-                        <a @click="scrollToInicio" href="#"><img class="nav-logo"
-                                :src="negocio.imagen"  alt=""></a>
+                        <a @click="scrollToInicio" href="#"><img class="nav-logo" :src="negocio.imagen" alt=""></a>
                         <div class="ancho-busqueda input-group mcenter">
                             <input class="form-control" v-model="busqueda" type="text" name="busqueda" id=""
                                 placeholder="Buscar producto" title="Ingrese una palabra clave...">
@@ -55,19 +54,24 @@
                                             width='40' src="/recursos/instagram.png"></a>
                                     <a v-if="negocio.facebook" class="mauto"
                                         :href="'https://facebook.com/' + negocio.facebook" target="blank"><img
-                                            width='36' src="/recursos/facebook.png"></a>
+                                            width='36' src="/recursos/facebook.png"></a> <br>
+                                    <img v-show="isHidden" src="/recursos/scroll-down.png" class="scroll-down"
+                                        :class="{ 'fade-in-out': isHidden }" alt="">
                                 </div>
                             </div>
                         </div>
                     </div>
+                    <hr>
+                    <div class="text-center mt-2 mensajeWpp p-2" @click="enviarMensaje">
+                        Enviá tu consulta
+                        <img class="ml" src="/recursos/whatsapp.png" width="30" alt="">
+                    </div>
+                    <hr>
                     <div class="body-container">
-
                         <div class="ancho">
-
                             <div class="mt-2" v-for="(categoria, index) in categoriasOrdenadas" :key="index"
                                 :id="categoria">
                                 <div v-if="filteredProductos(categoria)">
-
                                     <div class="titulo-categoria" @click="toggleCategoria(categoria)"
                                         :class="{ 'fondo-oscuro': categoriaSeleccionada === categoria }">{{ categoria }}
                                         <div class="inline" v-if="categoriaSeleccionada === categoria">↓</div>
@@ -127,13 +131,13 @@
                     </div>
                 </div>
                 <div v-else>
-                        <div class="error-content">
-                            <h1 class="display-1 text-danger">404</h1>
-                            <h2 class="display-4">Puestito no encontrado</h2>
-                            <p class="lead">Lo sentimos, el puestito que buscas no se encuentra disponible o no tiene
-                                productos disponibles.</p>
-                                <router-link to="/">Volver a Puestito Online</router-link>
-                        </div>
+                    <div class="error-content">
+                        <h1 class="display-1 text-danger">404</h1>
+                        <h2 class="display-4">Puestito no encontrado</h2>
+                        <p class="lead">Lo sentimos, el puestito que buscas no se encuentra disponible o no tiene
+                            productos disponibles.</p>
+                        <router-link to="/">Volver a Puestito Online</router-link>
+                    </div>
                 </div>
             </div>
         </div>
@@ -328,6 +332,29 @@ export default {
                 this.pedido = JSON.parse(localStorage.getItem('pedido'));
             }
         },
+        enviarMensaje(){
+            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+            // Verificar si el usuario está en un dispositivo móvil
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+
+            // Definir el enlace base según si es móvil o no
+            let baseLink = isMobile ? 'whatsapp://send' : 'https://web.whatsapp.com/send';
+
+            // Construir el enlace completo
+            const mensajeCompleto = `Hola ${this.negocio.nombre}!`;
+            const numeroWhatsapp = `${baseLink}?phone=${this.negocio.telefono}&text=${encodeURIComponent(mensajeCompleto)}`;
+            // Finalmente, abrimos una nueva ventana del navegador con el enlace generado
+            try {
+                window.open(numeroWhatsapp);
+                location.reload(1);
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    text: 'Por favor habilita las ventanas emergentes para ir a WhatsApp.' + error.response.data.message,
+                });
+            }
+        },
         // Método para realizar el pedido
         realizarPedido() {
             // Agrega aquí la lógica para enviar el mensaje por WhatsApp
@@ -336,15 +363,44 @@ export default {
 
             localStorage.setItem('pedido', JSON.stringify(this.pedido));
 
-            const mensaje = `¡Hola *${this.negocio.nombre}*! \nQuiero realizar un pedido:\n`;
-            const productos = this.carrito.map(producto => `- *${producto.producto_nombre}:* $${producto.producto_precio} (${producto.cantidadSeleccionada})\n\n`);
+            const mensaje = `¡Hola *${this.negocio.nombre}*! \nQuiero realizar un pedido:\n\n`;
+
+            // Agrupar productos por categoría
+            const productosPorCategoria = this.carrito.reduce((acc, producto) => {
+                const categoria = producto.producto_categoria;
+                if (!acc[categoria]) {
+                    acc[categoria] = [];
+                }
+                acc[categoria].push(producto);
+                return acc;
+            }, {});
+
+            // Crear el mensaje de productos agrupados por categoría
+            let productosMensaje = '';
+            for (const categoria in productosPorCategoria) {
+                productosMensaje += `*${categoria}:*\n`;
+                productosPorCategoria[categoria].forEach(producto => {
+                    productosMensaje += `- *${producto.producto_nombre}:* $${producto.producto_precio} (${producto.cantidadSeleccionada})\n`;
+                });
+                productosMensaje += '\n'; // Añadir un salto de línea entre categorías
+            }
+
             const total = `*Total: $${this.total}*\n\n`;
             let datos = `*Nombre:* ${this.pedido.nombre}\n*Medio de pago:* ${this.pedido.medio}\n`;
-            this.pedido.direccion ? datos += `*Dirección:* ${this.pedido.direccion}\n` : this.pedido.detalle ? datos += `*Detalle:* ${this.pedido.detalle}\n\n¡Muchas gracias!` : datos += `\n¡Muchas gracias!`;
 
+            if (this.pedido.direccion) {
+                datos += `*Dirección:* ${this.pedido.direccion}\n`;
+            } else if (this.pedido.detalle) {
+                datos += `*Detalle:* ${this.pedido.detalle}\n\n¡Muchas gracias!`;
+            } else {
+                datos += `\n¡Muchas gracias!`;
+            }
 
             // Concatenamos el mensaje con la lista de productos y el total
-            const mensajeCompleto = mensaje + productos.join('') + total + datos;
+            const mensajeCompleto = mensaje + productosMensaje + total + datos;
+
+            console.log(mensajeCompleto);
+
 
             // Aquí debes reemplazar 'tu_numero_de_whatsapp' por el número de teléfono de tu negocio
             // Obtener el agente del usuario para verificar si está en un dispositivo móvil
@@ -487,9 +543,19 @@ export default {
 </script>
 
 <style scoped>
-.error-content{
+.mensajeWpp{
+    cursor:pointer;
+    font-size: 1.2rem;
+    background: linear-gradient(to right, rgba(0, 255, 0, 0) 0%, rgba(90, 255, 90, 1) 10%,rgba(90, 255, 90, 1) 90%, rgba(0, 255, 0, 0) 100%);
+}
+.mensajeWpp:hover{
+    background: linear-gradient(to right, rgba(0, 255, 0, 0) 0%, rgba(90, 230, 90, 1) 10%,rgba(90, 230, 90, 1) 90%, rgba(0, 255, 0, 0) 100%);
+
+}
+.error-content {
     height: 100%;
 }
+
 .flex {
     display: flex;
     width: 100%;
@@ -615,16 +681,6 @@ export default {
     animation: l2 2s infinite;
 }
 
-.pantalla-carga {
-    z-index: 2;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: calc(100vh - 100px);
-    background-color: white;
-    align-content: center;
-}
 
 .btn-close:focus {
     box-shadow: none;
@@ -668,7 +724,7 @@ export default {
 
 .texto-superpuesto {
     position: absolute;
-    top: 40%;
+    top: 20%;
     left: 50%;
     transform: translate(-50%, -50%);
     font-size: 3rem;
@@ -680,8 +736,7 @@ export default {
 
 .redes {
     position: absolute;
-    top: 45vh;
-    width: 100%;
+    top: 55vh;
     text-align: center;
 }
 
@@ -689,6 +744,33 @@ export default {
     font-size: 20px;
     color: white;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+.ml{
+    margin-left: 10%;
+}
+.scroll-down {
+    width: 100%;
+    height: 40px;
+    object-fit: fill;
+    border-radius: 15px;
+}
+
+.fade-in-out {
+    animation: fade-in-out 2s infinite;
+}
+
+@keyframes fade-in-out {
+    0% {
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
 }
 
 .body-container {
@@ -705,12 +787,7 @@ export default {
 .textoTarjeta {
     padding: 5px 15px;
 }
-.nav-logo{
-    border-radius: 100%;
-    width: 40px;
-    height: 40px;
-    margin-right: 10px;
-}
+
 .categoria-container {
     padding: 5px;
     border: 5px;
@@ -729,15 +806,7 @@ export default {
     position: relative;
 }
 
-.form-control {
-    border-radius: 4px !important;
-    padding-right: 2.5rem;
-    /* Espacio suficiente para el botón */
-}
 
-.form-control:focus {
-    box-shadow: none;
-}
 
 .btn-limpiar-busqueda {
     position: absolute;
@@ -748,15 +817,15 @@ export default {
     z-index: 5;
     /* Asegura que el botón esté sobre el input */
 }
-.navbar{
-    background-color: white;
-}
+
 .mauto {
     margin: 10px;
 }
-.mcenter{
-    margin:auto;
+
+.mcenter {
+    margin: auto;
 }
+
 .titulo-categoria {
     font-size: 1.3rem;
     background: white;
@@ -782,10 +851,6 @@ export default {
 
 .descripcion {
     font-style: italic;
-}
-
-img {
-    object-fit: contain;
 }
 
 .imagen {
@@ -860,18 +925,21 @@ ul {
     text-align: center;
     margin: auto;
 }
-.error-content{
+
+.error-content {
     text-align: center;
 }
+
 .container2 {
     margin: 0px 30vw;
     min-height: calc(100svh - 97.4px);
 }
 
 @media screen and (max-width: 992px) {
-    .ancho-busqueda{
+    .ancho-busqueda {
         width: 100%;
     }
+
     .navbar-hidden {
         width: 100svw;
         top: -56px;
