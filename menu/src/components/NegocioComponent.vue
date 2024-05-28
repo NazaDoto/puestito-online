@@ -45,7 +45,7 @@
                             <img v-else src="/recursos/missing.png" class="img-negocio" alt="">
                             <div class="texto-superpuesto">BIENVENIDOS
                                 <div class="texto-superpuesto2">{{ negocio.descripcion }}
-                                
+
                                 </div>
                                 <div class="text-center redes">
                                     <a class="link-dir" v-if="negocio.direccion"
@@ -57,11 +57,11 @@
                                     <a v-if="negocio.facebook" class="mauto"
                                         :href="'https://facebook.com/' + negocio.facebook" target="blank"><img
                                             width='36' src="/recursos/facebook.png"></a> <br>
-                                            <div class="text-center">
-                                                <img v-show="isHidden" src="/recursos/scroll-down.png" class="scroll-down"
-                                                    :class="{ 'fade-in-out': isHidden }" alt="">
+                                    <div class="text-center">
+                                        <img v-show="isHidden" src="/recursos/scroll-down.png" class="scroll-down"
+                                            :class="{ 'fade-in-out': isHidden }" alt="">
 
-                                            </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -337,7 +337,7 @@ export default {
                 this.pedido = JSON.parse(localStorage.getItem('pedido'));
             }
         },
-        enviarMensaje(){
+        enviarMensaje() {
             const userAgent = navigator.userAgent || navigator.vendor || window.opera;
 
             // Verificar si el usuario está en un dispositivo móvil
@@ -395,11 +395,12 @@ export default {
 
             if (this.pedido.direccion) {
                 datos += `*Dirección:* ${this.pedido.direccion}\n`;
-            } else if (this.pedido.detalle) {
-                datos += `*Detalle:* ${this.pedido.detalle}\n\n¡Muchas gracias!`;
-            } else {
-                datos += `\n¡Muchas gracias!`;
             }
+            if (this.pedido.detalle) {
+                datos += `*Detalle:* ${this.pedido.detalle}\n`;
+            }
+            datos += `\n¡Muchas gracias!`;
+
 
             // Concatenamos el mensaje con la lista de productos y el total
             const mensajeCompleto = mensaje + productosMensaje + total + datos;
@@ -548,15 +549,17 @@ export default {
 </script>
 
 <style scoped>
-.mensajeWpp{
-    cursor:pointer;
+.mensajeWpp {
+    cursor: pointer;
     font-size: 1.2rem;
-    background: linear-gradient(to right, rgba(0, 255, 0, 0) 0%, rgba(90, 255, 90, 1) 10%,rgba(90, 255, 90, 1) 90%, rgba(0, 255, 0, 0) 100%);
+    background: linear-gradient(to right, rgba(0, 255, 0, 0) 0%, rgba(90, 255, 90, 1) 10%, rgba(90, 255, 90, 1) 90%, rgba(0, 255, 0, 0) 100%);
 }
-.mensajeWpp:hover{
-    background: linear-gradient(to right, rgba(0, 255, 0, 0) 0%, rgba(90, 230, 90, 1) 10%,rgba(90, 230, 90, 1) 90%, rgba(0, 255, 0, 0) 100%);
+
+.mensajeWpp:hover {
+    background: linear-gradient(to right, rgba(0, 255, 0, 0) 0%, rgba(90, 230, 90, 1) 10%, rgba(90, 230, 90, 1) 90%, rgba(0, 255, 0, 0) 100%);
 
 }
+
 .error-content {
     height: 100%;
 }
@@ -751,9 +754,11 @@ export default {
     color: white;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
-.ml{
+
+.ml {
     margin-left: 10%;
 }
+
 .scroll-down {
     width: 100%;
     height: 40px;
