@@ -24,9 +24,9 @@
                             <span class="navbar-toggler-icon"></span>
                         </button>
                     </div>
-                    <div class="collapse navbar-collapse text-end mr-2" id="navbarSupportedContent">
-                        <ul class="navbar-nav me-auto mb-2 mb-lg-0 ">
-                            <div v-for="(categoria, index) in categoriasOrdenadas" :key="index">
+                    <div class="collapse navbar-collapse text-end bg-dark" id="navbarSupportedContent">
+                        <ul class="navbar-nav m-2">
+                            <div  v-for="(categoria, index) in categoriasOrdenadas" :key="index">
                                 <li v-if="categoriasConProductosFiltrados.includes(categoria)" class="nav-item">
                                     <a class="nav-link" @click="scrollToCategoria(categoria); collapseNavbar()">{{
                                         categoria }}</a>
@@ -573,30 +573,29 @@ export default {
 
 .navbar {
     position: sticky;
-    top: 0px;
+    top: 0;
     z-index: 10;
-    transition: 0.3s ease;
+    max-height: 56.4px;
+transition: max-height 0.2s ease;
 }
 
 .navbar-hidden {
-    position: relative;
+    max-height: 0;
+    padding: 0;
+    overflow: hidden;
     width: calc(100svw - 5px);
-    top: -58.4px;
-    /* Ajusta este valor según la altura de tu navbar */
+    transition: max-height 0.2s ease;
 }
 
 .categoria-productos {
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.2s ease;
-    /* Duración y función de la transición */
 }
 
-/* Clase para activar la categoría seleccionada */
 .categoria-activa {
     max-height: 1000px;
     overflow: auto;
-    /* Altura máxima suficientemente grande para mostrar todos los productos */
 }
 
 .cantidad {
@@ -714,8 +713,6 @@ export default {
 
 .presentacion {
     position: relative;
-    top: -56px;
-    margin-bottom: -56px;
     height: 100svh;
 }
 
@@ -953,7 +950,6 @@ ul {
 
     .navbar-hidden {
         width: 100svw;
-        top: -56px;
     }
 
     .img-negocio {

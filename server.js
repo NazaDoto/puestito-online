@@ -240,13 +240,13 @@ app.get('/negocios', async(req, res) => {
                             rubro: negocio.usuario_rubro,
                             location: location
                         };
-                    } catch (error) {
-                        console.error("Error al obtener las coordenadas para la dirección:", direccion, error);
+                    } catch (e) {
+                        console.error("Error al obtener las coordenadas para la dirección:", direccion);
                         return {
                             usuario: negocio.usuario_nombre,
                             nombre: negocio.usuario_nombre_negocio,
                             fechaVence: negocio.usuario_fecha_vencimiento,
-                            direccion: negocio.usuario_direccion,
+                            direccion: negocio.usuario_direccion ? negocio.usuario_direccion : null,
                             correo: negocio.usuario_correo,
                             telefono: negocio.usuario_telefono,
                             descripcion: negocio.usuario_descripcion,

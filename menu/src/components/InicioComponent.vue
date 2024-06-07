@@ -1,6 +1,6 @@
 <template>
   <div>
-    <nav class="navbar navbar-dark bg-dark">
+    <nav class="navbar navbar-dark bg-black">
       <div class="container">
         <div class="flex ">
           <router-link to="/"><img src="/favicon.ico" alt="" class="nav-logo"></router-link>
@@ -9,35 +9,44 @@
               placeholder="Buscar puestitos o rubros..." title="Ingrese una palabra clave..." />
             <button class="btn-close btn-limpiar-busqueda" @click="limpiarBusqueda"></button>
           </div>
-          <button class="navbar-toggler end" type="button" data-bs-toggle="collapse"
-            data-bs-target="#navbarNavDarkDropdown" aria-controls="navbarNavDarkDropdown" aria-expanded="false"
-            aria-label="Toggle navigation" @click="mostrarBusqueda">
-            <span data-v-e0d06366="" class="navbar-toggler-icon"></span>
-          </button>
-        </div>
-        <div class="collapse navbar-collapse mt-2 c-white" id="navbarNavDarkDropdown">
-          Filtrar rubros
-          <select class="inline ancho-busqueda form-select" name="rubro" id="rubro" v-model="rubro">
-            <option value="Todos" selected>Todos</option>
-            <option v-for="(rubro, index) in rubrosUnicos" :key="index" :value="rubro">
-              {{ rubro }}
-            </option>
-          </select>
-          <div class="block mt-2">
-            <button type="button" class="btn btn-limpiar mt-2" @click="limpiarBusqueda" aria-label="Close">
-              Limpiar búsqueda
-            </button>
-          </div>
-          <hr>
-          <div class="flex mb-2">
-            <router-link class="inline-end" v-if="usuario" to="/u/home">Mi Negocio</router-link>
-            <router-link class="inline-end" v-else to="/u/login">Login</router-link>
+          <div class="end btn-login">
+            <router-link class="inline-end c-white" v-if="usuario" to="/u/home"><svg xmlns="http://www.w3.org/2000/svg"
+                width="28" fill="currentColor" class="bi bi-box-arrow-in-right" viewBox="0 0 16 16">
+                <path fill-rule="evenodd"
+                  d="M6 3.5a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-2a.5.5 0 0 0-1 0v2A1.5 1.5 0 0 0 6.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-8A1.5 1.5 0 0 0 5 3.5v2a.5.5 0 0 0 1 0z" />
+                <path fill-rule="evenodd"
+                  d="M11.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H1.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708z" />
+              </svg></router-link>
+            <router-link class="inline-end c-white" v-else to="/u/login"><svg xmlns="http://www.w3.org/2000/svg"
+                width="28" fill="currentColor" class="bi bi-box-arrow-in-right" viewBox="0 0 16 16">
+                <path fill-rule="evenodd"
+                  d="M6 3.5a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-2a.5.5 0 0 0-1 0v2A1.5 1.5 0 0 0 6.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-8A1.5 1.5 0 0 0 5 3.5v2a.5.5 0 0 0 1 0z" />
+                <path fill-rule="evenodd"
+                  d="M11.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H1.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708z" />
+              </svg></router-link>
           </div>
         </div>
-
       </div>
       <!-- Logo -->
 
+    </nav>
+    <nav class="navbar bg-dark c-white mtb-0">
+      <div class="container">
+        <select class="navbar-filter" name="rubro" id="rubro" v-model="rubro">
+          <option value="Todos" selected>Todos</option>
+          <option v-for="(rubro, index) in rubrosUnicos" :key="index" :value="rubro">
+            {{ rubro }}
+          </option>
+        </select>
+        <button class="navbar-filter" @click="mostrarMapa">
+          {{
+            !mapaMostrado2
+              ? "Abrir Mapa"
+              : `Cerrar
+          Mapa`
+          }}
+        </button>
+      </div>
     </nav>
     <div class="container2">
       <div v-if="cargando" class="pantalla-carga text-center">
@@ -47,17 +56,6 @@
         </div>
       </div>
       <div v-else>
-        <div class="flex">
-
-          <button class="btn btn-mapa mauto mt-2" @click="mostrarMapa">
-            {{
-              !mapaMostrado2
-                ? "Abrir Mapa"
-                : `Cerrar
-            Mapa`
-            }}
-          </button>
-        </div>
         <div class="mt-2">
           <div class="modalMapa" v-show="mapaMostrado2" style="height: 400px">
             <!-- Aquí iría todo lo relacionado con el mapa de Google Maps -->
@@ -373,6 +371,23 @@ export default {
   z-index: 5;
   /* Asegura que el botón esté sobre el input */
 }
+.form-control{
+  border-radius: 20px !important;
+}
+.btn-filtrar {
+  background: none;
+  border: none;
+}
+
+.btn-filtrar-busqueda {
+  position: absolute;
+  top: 50%;
+  right: 1.5rem;
+  /* Ajusta según sea necesario */
+  transform: translateY(-50%);
+  z-index: 5;
+  /* Asegura que el botón esté sobre el input */
+}
 
 .btn-mapa {
   background: rgba(255, 255, 255, 1);
@@ -389,6 +404,23 @@ export default {
 .btn-close:focus {
   box-shadow: none;
   opacity: var(--bs-btn-close-opacity);
+}
+
+.navbar-filter {
+  background: none;
+  border: none;
+  color: white;
+  border-radius: 5px;
+}
+
+.navbar-filter:hover {
+  background: rgb(95, 95, 95);
+  cursor: pointer;
+}
+
+.navbar-filter:focus {
+  background: rgb(95, 95, 95);
+  outline: none;
 }
 
 .flex {
@@ -453,9 +485,19 @@ export default {
   width: 35%;
 }
 
+.btn-login {
+padding: 7px;
+border-radius: 100%;
+}
+.btn-login:hover{
+  background: rgb(95, 95, 95);
+  cursor:pointer;
+}
+
 .container2 {
   margin: 0px 20vw;
   align-items: center;
+  min-height: calc(100svh - 150px);
   background-image: url('../../public/recursos/patron.png');
   background-size: contain;
   background-repeat: repeat;
@@ -466,9 +508,12 @@ a {
   text-decoration: none;
 }
 
+.w-60 {
+  width: 60%;
+  justify-content: center !important;
+}
+
 .navbar {
-  position: sticky;
-  top: 0;
   z-index: 10;
   padding: 8px 0px;
 }
@@ -509,7 +554,7 @@ ul {
 }
 
 .block {
-  display: block;
+  display: block !important;
 }
 
 .carrusel-item {
@@ -534,8 +579,7 @@ ul {
   width: 150px;
   height: 150px;
   transition: transform 0.2s ease;
-  border-top-right-radius: 5px;
-  border-top-left-radius: 5px;
+  border-radius: 100%;
 }
 
 
@@ -572,6 +616,13 @@ ul {
 .item-texto-block-end {
   text-decoration: none;
   padding: 5px 0px;
+}
+
+.mtb-0 {
+  margin-top: 0px;
+  margin-bottom: 0px;
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 .item-texto-block-end:hover {

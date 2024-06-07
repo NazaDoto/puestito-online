@@ -40,16 +40,16 @@ html{
 /* width */
 ::-webkit-scrollbar {
   width: 5px;
-}
-
-/* Track */
-::-webkit-scrollbar-track {
-    
-    background: #f1f1f1;
-}
-
-/* Handle */
-::-webkit-scrollbar-thumb {
+  }
+  
+  /* Track */
+  ::-webkit-scrollbar-track {
+      
+      background: #f1f1f1;
+      }
+      
+      /* Handle */
+      ::-webkit-scrollbar-thumb {
   background: #888;
 }
 
@@ -61,13 +61,12 @@ body{
     background-color:#f0f0f0;
 }
 .body{
-    width:calc(100svw - 5px);
+    width:calc(100svw -5 px);
     min-height: calc(100svh  - 41.4px)!important;
 }
 .pl-2 {
     padding-left: 10px;
 }
-
 .modalCategoriaContainer {
     position: absolute;
     z-index: 1233;
