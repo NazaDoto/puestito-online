@@ -2,103 +2,97 @@
     <div>
         <NavbarComponent></NavbarComponent>
         <div v-if="obteniendoInfo" class="pantalla-carga text-center">
-      <div class="logo-carga">
-        <img class="logo-img" src="/favicon.ico" width="50" alt="" />
-        <div class="texto-carga">Cargando información</div>
-      </div>
-    </div>
-        <div class="container mt-2 mb-2 text-center">
+            <div class="logo-carga">
+                <img class="logo-img" src="/favicon.ico" width="50" alt="" />
+                <div class="texto-carga">Cargando información</div>
+            </div>
+        </div>
+        <div class="container mt-4 mb-2 text-center">
             <!-- Mostrar información del negocio -->
             <div v-if="negocio">
-                <div class="tarjeta-container">
-                    <div class="row">
-                        <h1 class="text-center">Perfil</h1>
-                        <div class="p-2 text-center">
-                            <div class="tarjetaProducto">
-                                <div v-if="añoVence == '2100'" class="textoTarjeta">
-                                    <h4 class="titulo-div-forms mb-2 mt-2">Esta es una cuenta gratis.</h4>
-                                    <button @click="mejorarPlan" class="btn btn-agregar">Mejorar
-                                        Plan</button>
-                                </div>
-                                <div v-else class="textoTarjeta">
-                                    <h4 class="titulo-div-forms mb-2 mt-2">Esta es una cuenta Premium.</h4>
-                                    <h4 class="titulo-div-forms">Vence: {{ fechaVence }}</h4>
-                                </div>
-                                <hr class="m-2">
-                                <div v-if="negocio.imagen">
-                                    <strong>Logo:</strong> <br>
-                                    <img class="imagen" :src="negocio.imagen" alt=" ">
-                                </div>
-                                <div v-if="negocio.portada">
-                                    <strong>Portada:</strong>  <br>
-                                    <img class="imagen" :src="negocio.portada" alt=" ">
-                                </div>
-                                <div class="textoTarjeta">
-                                    <table class="table table-light table-striped">
-                                        <thead>
-                                            <th></th>
-                                            <th></th>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>
-                                                    <strong>Nombre:</strong>
-                                                </td>
-                                                <td>{{negocio.nombre}}</td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <strong>Correo:</strong>
-                                                </td>
-                                                <td>{{ negocio.correo }}</td>
-                                            </tr>
-                                            <tr>
-                                                <td><strong>Teléfono:</strong></td>
-                                                <td>{{ negocio.telefono }}</td>
-                                            </tr>
-                                            <tr>
-                                                <td><strong>Dirección:</strong></td>
-                                                <td>{{ negocio.direccion }}</td>
-                                            </tr>
-                                            <tr>
-                                                <td><strong>Descripción:</strong></td>
-                                                <td>{{ negocio.descripcion }}</td>
-                                            </tr>
-                                            <tr>
-                                                <td><strong>Rubro:</strong></td>
-                                                <td>{{ negocio.rubro }}</td>
-                                            </tr>
-                                            <tr v-if="negocio.instagram">
-                                            <td><strong>Instagram:</strong></td>
-                                            <td>{{ negocio.instagram }}</td>
-                                            </tr>
-                                            <tr v-if="negocio.facebook">
-                                            <td><strong>Facebook:</strong></td>
-                                            <td>{{ negocio.facebook }}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                    <div class="descripcion text-start">
-                                        <div class="text-center">
-                                            <a v-if="negocio.instagram" class="mauto" :href="'https://instagram.com/'+negocio.instagram"
-                                                target="blank"><img width='40' src="/recursos/instagram.png"></a>
-                                            <div v-else>Sin Instagram</div>
-                                            <a v-if="negocio.facebook" class="mauto" :href="'https://facebook.com/'+negocio.facebook"
-                                                target="blank"><img width='36' src="/recursos/facebook.png"></a>
-                                            <div v-else>Sin Facebook</div>
-                                        </div>
-                                    </div>
-                                    <button class="btn btn-menu col-md-12 mt-2 mb-2" title="Modificar"
-                                        data-bs-toggle="modal" data-bs-target="#modificarProducto">Modificar
-                                        Datos</button>
-
-                                </div>
-                            </div>
-                            <br>
-
-                        </div>
-
+                <h1 class="text-center">Perfil</h1>
+                <div class="p-2 text-center">
+                    <div v-if="añoVence == '2100'" class="textoTarjeta">
+                        <h4 class="titulo-div-forms mb-2 mt-2">Esta es una cuenta gratis.</h4>
+                        <button @click="mejorarPlan" class="btn btn-agregar">Mejorar
+                            Plan</button>
                     </div>
+                    <div v-else class="textoTarjeta">
+                        <h4 class="titulo-div-forms mb-2 mt-2">Esta es una cuenta Premium.</h4>
+                        <h4 class="titulo-div-forms">Vence: {{ fechaVence }}</h4>
+                    </div>
+                    <hr class="m-2">
+                    <div class="textoTarjeta">
+                        <table class="table table-light table-striped">
+                            <thead>
+                                <th></th>
+                                <th></th>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <strong>Logo:</strong>
+                                    </td>
+                                    <td v-if="negocio.imagen">
+                                        <img class="imagen round" :src="negocio.imagen" alt=" ">
+                                    </td>
+                                    <td v-else>Sin logo.</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Portada:</strong>
+                                    </td>
+                                    <td v-if="negocio.portada">
+                                        <img class="imagen" :src="negocio.portada" alt=" ">
+                                    </td>
+                                    <td v-else>Sin portada.</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Nombre:</strong>
+                                    </td>
+                                    <td>{{ negocio.nombre }}</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Correo:</strong>
+                                    </td>
+                                    <td>{{ negocio.correo }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Teléfono:</strong></td>
+                                    <td>{{ negocio.telefono }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Dirección:</strong></td>
+                                    <td>{{ negocio.direccion }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Descripción:</strong></td>
+                                    <td>{{ negocio.descripcion }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Rubro:</strong></td>
+                                    <td>{{ negocio.rubro }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Instagram:</strong></td>
+                                    <td v-if="negocio.instagram">{{ negocio.instagram }}</td>
+                                    <td v-else>Sin instagram.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Facebook:</strong></td>
+                                    <td v-if="negocio.facebook">{{ negocio.facebook }}</td>
+                                    <td v-else>Sin facebook.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <button class="btn btn-menu mt-2 mb-2" title="Modificar" data-bs-toggle="modal"
+                            data-bs-target="#modificarProducto">Modificar
+                            Datos</button>
+                    </div>
+                    <br>
+
                 </div>
 
 
@@ -114,37 +108,39 @@
                             </div>
                             <div class="modal-body">
                                 <form @submit.prevent="modificarPerfil">
-                                    <div class="row g-3 div-forms border text-start">
+                                    <div class="row g-3 div-forms text-start">
                                         <h4 class="titulo-div-forms mb-2">Información del Negocio</h4>
                                         <div>
                                             <label class="form-label" for="nombre">Nombre</label>
                                             <input class="form-control" type="text" id="nombre" name="nombre"
-                                            v-model="negocioModificar.nombre" placeholder="Nombre del Negocio"
-                                            required>
+                                                v-model="negocioModificar.nombre" placeholder="Nombre del Negocio"
+                                                required>
                                         </div>
                                         <div>
                                             <label class="form-label" for="correo">Correo</label>
                                             <input class="form-control" type="email" id="correo"
-                                            v-model="negocioModificar.correo" placeholder="Correo">
+                                                v-model="negocioModificar.correo" placeholder="Correo">
                                         </div>
                                         <div>
                                             <label class="form-label" for="telefono">Teléfono</label>
                                             <input class="form-control" type="number" id="telefono"
-                                            v-model="negocioModificar.telefono" placeholder="Teléfono">
+                                                v-model="negocioModificar.telefono" placeholder="Teléfono">
                                         </div>
                                         <div>
                                             <label class="form-label" for="direccion">Dirección</label>
                                             <input class="form-control" type="text" id="direccion"
-                                            v-model="negocioModificar.direccion" placeholder="Dirección">
+                                                v-model="negocioModificar.direccion" placeholder="Dirección">
                                         </div>
                                         <div>
                                             <label class="form-label" for="descripcion">Descripción</label>
                                             <input class="form-control" type="text" id="descripcion"
-                                            v-model="negocioModificar.descripcion" placeholder="Descripción" maxlength="40">
+                                                v-model="negocioModificar.descripcion" placeholder="Descripción"
+                                                maxlength="40">
                                         </div>
                                         <div>
                                             <label class="form-label" for="rubro">Rubro</label>
-                                            <select class="form-select" name="rubro" id="rubro" v-model="negocioModificar.rubro">
+                                            <select class="form-select" name="rubro" id="rubro"
+                                                v-model="negocioModificar.rubro">
                                                 <option value="Elegí tu rubro" selected disabled>Elegí tu rubro</option>
                                                 <option value="Artesanías">Artesanías</option>
                                                 <option value="Bar/Restaurante">Bar/Restaurante</option>
@@ -179,12 +175,12 @@
                                         <div>
                                             <label class="form-label" for="instagram">Instagram</label>
                                             <input class="form-control" type="text" id="instagram"
-                                            v-model="negocioModificar.instagram" placeholder="Instagram">
+                                                v-model="negocioModificar.instagram" placeholder="Instagram">
                                         </div>
                                         <div>
                                             <label class="form-label" for="facebook">Facebook</label>
                                             <input class="form-control" type="text" id="facebook"
-                                            v-model="negocioModificar.facebook" placeholder="Facebook">
+                                                v-model="negocioModificar.facebook" placeholder="Facebook">
                                         </div>
                                         <div>
                                             <label class="form-label mr-2" for="imagen">Logo (JPG/PNG)</label>
@@ -304,11 +300,12 @@ export default {
         this.obtenerInformacionNegocio();
     },
     methods: {
-        
+
         mejorarPlan() {
             router.push('/u/planes');
         },
         modificarPerfil() {
+            this.obteniendoInfo = true;
             axios.put('/modificarPerfil', { negocio: this.negocioModificar }).then(() => {
                 localStorage.setItem('nombre', this.negocioModificar.nombre);
                 const Toast = Swal.mixin({
@@ -322,17 +319,16 @@ export default {
                         toast.addEventListener('mouseleave', Swal.resumeTimer)
                     }
                 })
-
                 Toast.fire({
                     icon: 'success',
                     title: 'Datos modificados.'
                 });
-                setTimeout(function () {
-                    location.reload();
-                }, 2000);
             })
                 .catch((error) => {
                     console.error('Error al actualizar la información en la base de datos:', error);
+                this.obteniendoInfo = false;
+                }).finally(() => {
+                    this.obteniendoInfo = false;
                 });
         },
         async obtenerInformacionNegocio() {
@@ -348,7 +344,7 @@ export default {
                 this.fechaVence = fechaVence.getDate() + '/' + (Number(fechaVence.getMonth()) + 1) + '/' + fechaVence.getFullYear();
             } catch (error) {
                 console.error("Error al cargar los productos:", error);
-            } finally{
+            } finally {
                 this.obteniendoInfo = false;
             }
 
@@ -361,7 +357,7 @@ export default {
                     reader.onload = async (e) => {
                         this.imageToCrop = e.target.result;
                         this.modalCropPortada = true;
-                        window.scrollTo({top:0,behavior:'smooth'})
+                        window.scrollTo({ top: 0, behavior: 'smooth' })
                         let cropperCanvas = this.$refs.cropperPortada;
                         cropperCanvas.src = this.imageToCrop;
                         this.$nextTick(() => {
@@ -395,7 +391,7 @@ export default {
             } finally {
                 this.cargandoCropperPortada = false;
             }
-        },       
+        },
         async guardarPortadaRecortada() {
             try {
                 const canvas = await this.cropperPortada.getCropperSelection().$toCanvas();
@@ -405,7 +401,7 @@ export default {
             } finally {
                 this.modalCropPortada = false;
             }
-        }, 
+        },
         imagenSeleccionada(event) {
             try {
                 const file = event.target.files[0];
@@ -414,7 +410,7 @@ export default {
                     reader.onload = async (e) => {
                         this.imageToCrop = e.target.result;
                         this.modalCropImage = true;
-                        window.scrollTo({top:0,behavior:'smooth'})
+                        window.scrollTo({ top: 0, behavior: 'smooth' })
                         let cropperCanvas = this.$refs.cropperImg;
                         cropperCanvas.src = this.imageToCrop;
                         this.$nextTick(() => {
@@ -449,7 +445,7 @@ export default {
             } finally {
                 this.cargandoCropper = false;
             }
-        },        
+        },
         async guardarImagenRecortada() {
             try {
                 const canvas = await this.cropper.getCropperSelection().$toCanvas();
@@ -460,7 +456,7 @@ export default {
                 this.modalCropImage = false;
             }
         },
-       
+
         cerrarCrop() {
             this.modalCropImage = false;
         },
@@ -472,7 +468,6 @@ export default {
 </script>
 
 <style scoped>
-
 .modal-dialog .modal-dialog-center {
     z-index: 1 !important;
 }
@@ -480,6 +475,10 @@ export default {
 .block {
     display: block !important;
     width: 400px;
+}
+
+.round {
+    border-radius: 100%;
 }
 
 .mauto {
@@ -534,9 +533,7 @@ img {
 
 .imagen {
     margin-top: 10px;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
-    height: 200px;
+    max-height: 100px;
 }
 
 .izquierda {

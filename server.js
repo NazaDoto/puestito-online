@@ -4,12 +4,7 @@ const bcrypt = require('bcrypt');
 const mysql = require('mysql2');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
-const axios = require('axios');
 const morgan = require('morgan');
-const path = require('path'); // Importa el módulo 'path'
-
-
-const { connect } = require('http2');
 const app = express();
 const port = 3500;
 
@@ -17,9 +12,12 @@ const https = require("https"),
     fs = require("fs");
 
 
-
 const env = "prod";
 
+require('dotenv').config();
+const apiKey = process.env.API_KEY;
+const mapsKey = process.env.MAPS_KEY;
+const passwordDB = process.env.PWDB;
 
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
@@ -42,7 +40,7 @@ if (env == 'dev') {
     connection = mysql.createPool({
         host: 'localhost',
         user: 'root',
-        password: 'Nazacapo341746$',
+        password: passwordDB,
         database: 'menu'
     });
 }
@@ -205,7 +203,7 @@ app.get('/listarNegocios', async(req, res) => {
 })
 
 const googleMapsClient = require('@google/maps').createClient({
-    key: 'AIzaSyC8vrGiWbmnS138WURJk2odQ9HU_BIEz9s',
+    key: mapsKey,
     Promise: Promise
 });
 
@@ -679,7 +677,7 @@ const mercado = require('mercadopago');
 // Configurar Mercado Pago
 
 
-const client = new mercado.MercadoPagoConfig({ accessToken: 'APP_USR-3974731186843034-040421-a31df430f192320ee94b04ac13d48f80-232808230' }); //prod
+const client = new mercado.MercadoPagoConfig({ accessToken: apiKey }); //prod
 //const client = new mercado.MercadoPagoConfig({ accessToken: 'TEST-6756231137958668-041108-d71f41fe529ec1b71e76caf0a57c4334-1755754609' }); //prod
 
 // Crear una instancia de Preference

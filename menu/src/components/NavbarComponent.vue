@@ -2,7 +2,7 @@
   <div class="">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <div class="container-fluid">
-        <router-link class="navbar-brand" to="/u/home">{{ leerUsuario() }} | </router-link>
+        <router-link class="navbar-brand" to="/u/home"><img class="m-2" src="/recursos/home.png" width="25" alt=""> {{ leerUsuario() }} </router-link>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDarkDropdown"
           aria-controls="navbarNavDarkDropdown" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
@@ -80,6 +80,12 @@ export default {
 </script>
     
 <style scoped>
+.navbar-brand{
+  padding:0;
+}
+.navbar{
+  padding:5px;
+}
 .navbar-text {
   font-style: italic;
 }

@@ -29,13 +29,23 @@
             <h2 class="titulo-div-forms mb-2">
               Tu link
             </h2>
-            <a :href="'https://puestito.online/' + nombreUsuario" target="_blank">https://puestito.online/{{ nombreUsuario }}</a><br>
+            <a :href="'https://puestito.online/' + nombreUsuario" target="_blank">https://puestito.online/{{
+              nombreUsuario }}</a><br>
           </div>
         </div>
-        <div v-if="fechaVence !== '2100'" class="row g-3 div-forms border mt-2">
+        <div v-if="fechaVence !== '2100'" class="div-forms mt-2">
+          <h2 class="titulo-div-forms mb-2">Tu código QR</h2>
+          <div ref="contenido" class="position-relative">
+            <img class="portada" :src="negocio.portada" alt="">
+            <div class="p-4 frente">
+              <img class="logo" :src="negocio.imagen" width="100" alt="">
+              <h3>Consultá el menú</h3>
+              <a style="color:black;text-decoration: none;" ref="qrcode"
+                :href="'https://puestito.online/' + nombreUsuario" target="_blank"></a><br>
+            </div>
+          </div>
           <div class="col-md-6">
-            <h2 class="titulo-div-forms mb-2">Tu código QR</h2>
-            <a ref="qrcode" :href="'https://puestito.online/' + nombreUsuario" target="_blank"></a><br>            
+
             <button @click="descargarQR" class="btn btn-menu margenbtn">Descargar QR</button>
           </div>
         </div>
@@ -50,13 +60,15 @@ import NavbarComponent from "./NavbarComponent.vue";
 import NavbarAdminComponent from "./NavbarAdminComponent.vue";
 import { RouterLink } from "vue-router";
 import { saveAs } from 'file-saver'; // Importa la función saveAs de la biblioteca file-saver
-
+import html2canvas from 'html2canvas';
+import axios from 'axios';
 export default {
   data() {
     return {
       nombreUsuario: '',
       nombreNegocio: '',
       fechaVence: '',
+      negocio: '',
     }
   },
   components: {
@@ -70,7 +82,25 @@ export default {
       this.generarQR();
     }
   },
+  created() {
+    // Realiza una solicitud HTTP para obtener los informes desde el servidor
+    this.obtenerInformacionNegocio();
+  },
   methods: {
+    async obtenerInformacionNegocio() {
+      try {
+        this.obteniendoInfo = true;
+        // Realiza una solicitud HTTP GET para obtener los informes desde el servidor
+        const response = await axios.get(`/miNegocio?usuario=${localStorage.getItem('usuario')}`);
+        // Actualiza la lista de informes con los datos recibidos
+        this.negocio = response.data;
+      } catch (error) {
+        console.error("Error al cargar los productos:", error);
+      } finally {
+        this.obteniendoInfo = false;
+      }
+
+    },
     generarQR() {
       // Obtén el nombre de usuario desde el almacenamiento local
       const nombreUsuario = localStorage.getItem("nombre");
@@ -100,6 +130,7 @@ export default {
 
       // Agregar la clase al elemento
       qrcodeElement.innerHTML = qrCodeImageTag;
+      qrcodeElement.innerHTML += '<br>puestito.online/' + this.nombreUsuario;
 
     },
     leerUsuario() {
@@ -111,26 +142,46 @@ export default {
       return (localStorage.getItem("usuario") == "admin");
     },
     descargarQR() {
-      // Obtiene la referencia al elemento del código QR
-      const qrElement = this.$refs.qrcode.firstChild;
-
-      // Crea un elemento de lienzo para convertir el código QR en una imagen
-      const canvas = document.createElement('canvas');
-      const context = canvas.getContext('2d');
-      canvas.width = qrElement.width;
-      canvas.height = qrElement.height;
-      context.drawImage(qrElement, 0, 0);
-
-      // Convierte el lienzo en una imagen JPEG y la descarga
-      canvas.toBlob(blob => {
-        saveAs(blob, 'codigoQR-' + this.nombreUsuario + '.jpg');
-      }, 'image/jpeg');
+      const contenidoDiv = this.$refs.contenido;
+      html2canvas(contenidoDiv).then(canvas => {
+        canvas.toBlob(blob => {
+          saveAs(blob, 'contenido-' + this.nombreUsuario + '.png');
+        });
+      });
     },
   }
 };
 </script>
 
 <style scoped>
+.position-relative {
+  margin: 0 10% 0 10%;
+  background: none;
+}
+
+.frente {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.portada {
+  width: 60%;
+  opacity: 0.3;
+  filter: blur(3px);
+  position: relative;
+}
+
+.logo {
+  border-radius: 100%;
+}
 
 .margenbtn {
   margin: 20px auto;
@@ -170,8 +221,15 @@ export default {
   }
 
   .div-forms {
-    margin: 20px;
+    margin: 0px;
   }
 
+  .position-relative {
+    margin: 0;
+  }
+
+  .portada {
+    width: 100%;
+  }
 }
 </style>

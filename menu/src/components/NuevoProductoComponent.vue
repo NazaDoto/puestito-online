@@ -5,7 +5,7 @@
             <h1 class="text-center">Cargar Producto</h1>
 
             <form @submit.prevent="nuevoProducto(this.producto)" enctype="multipart/form-data">
-                <div class="row g-3 div-forms border mt-2">
+                <div class="row g-3 div-forms mt-2">
                     <h4 class="titulo-div-forms mb-2">Información del Producto</h4>
                     <div class="col-md-6">
                         <input class="form-control" type="text" id="nombre" v-model="producto.nombre"
