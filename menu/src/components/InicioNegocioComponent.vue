@@ -11,20 +11,22 @@
 
       </div>
       <div v-else class="text-center">
-        <div class="row g-3 div-forms border">
+        <div class="row g-3 div-forms">
           <div class="col-md-6">
             <h2 class="titulo-div-forms mb-2">Perfil</h2>
             <router-link class="btn btn-menu" to='/u/modificar'>Ver Información</router-link>
           </div>
         </div>
-        <div class="row g-3 div-forms border mt-2">
+        <hr>
+        <div class="row g-3 div-forms mt-2">
           <div class="col-md-6">
             <h2 class="titulo-div-forms mb-2">Productos</h2>
             <router-link class="btn btn-menu" to="/u/nuevoProducto">Nuevo Producto</router-link><br>
             <router-link class="btn btn-menu" to='/u/productos'>Listar Productos</router-link>
           </div>
         </div>
-        <div class="row g-3 div-forms border mt-2">
+        <hr>
+        <div class="row g-3 div-forms mt-2">
           <div class="col-md-6">
             <h2 class="titulo-div-forms mb-2">
               Tu link
@@ -33,13 +35,28 @@
               nombreUsuario }}</a><br>
           </div>
         </div>
+        <hr>
         <div v-if="fechaVence !== '2100'" class="div-forms mt-2">
           <h2 class="titulo-div-forms mb-2">Tu código QR</h2>
-          <div ref="contenido" class="position-relative">
+          <div class="col-md-6">
+            <label class="form-label" for="qrText">Texto1</label>
+            <div class="flex">
+              <input class="form-control" name="qrText" type="text" v-model="qrText">
+              <input class="form-control-color" type="color" name="qrTextColor" v-model="qrTextColor">
+            </div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label mt-2" for="qrTitle">Texto2</label>
+              <div class="flex">
+                <input class="form-control" name="qrTitle" type="text" v-model="qrTitle">
+                <input class="form-control-color" type="color" name="qrTitleColor" v-model="qrTitleColor">
+              </div>
+          </div>
+          <div ref="contenido" class="mt-4 position-relative">
             <img class="portada" :src="negocio.portada" alt="">
             <div class="p-4 frente">
-              <img class="logo" :src="negocio.imagen" width="100" alt="">
-              <h3>Consultá el menú</h3>
+              <h5 class="mt-2 qr-text-consulta" :style="{color: qrTextColor}">{{ qrText }}<p class="qr-text" :style="{color: qrTitleColor }">{{ qrTitle }}</p>
+              </h5>
               <a style="color:black;text-decoration: none;" ref="qrcode"
                 :href="'https://puestito.online/' + nombreUsuario" target="_blank"></a><br>
             </div>
@@ -69,6 +86,10 @@ export default {
       nombreNegocio: '',
       fechaVence: '',
       negocio: '',
+      qrText: '',
+      qrTitle: '',
+      qrTextColor:'',
+      qrTitleColor:'',
     }
   },
   components: {
@@ -78,6 +99,7 @@ export default {
   },
   mounted() {
     this.leerUsuario();
+    this.leerTextoQR();
     if (this.nombreUsuario != 'admin') {
       this.generarQR();
     }
@@ -87,6 +109,12 @@ export default {
     this.obtenerInformacionNegocio();
   },
   methods: {
+    leerTextoQR() {
+      this.qrText = localStorage.getItem('qrText') || 'CONSULTÁ EL';
+      this.qrTitle = localStorage.getItem('qrTitle') || 'MENÚ';
+      this.qrTextColor = localStorage.getItem('qrTextColor') || '#000000';
+      this.qrTitleColor = localStorage.getItem('qrTitleColor') || '#000000';
+    },
     async obtenerInformacionNegocio() {
       try {
         this.obteniendoInfo = true;
@@ -130,7 +158,7 @@ export default {
 
       // Agregar la clase al elemento
       qrcodeElement.innerHTML = qrCodeImageTag;
-      qrcodeElement.innerHTML += '<br>puestito.online/' + this.nombreUsuario;
+      qrcodeElement.innerHTML += `<div class="mt-2" style="color:white;background: black;border-radius: 10px;">puestito.online/` + this.nombreUsuario + '</div>';
 
     },
     leerUsuario() {
@@ -143,7 +171,11 @@ export default {
     },
     descargarQR() {
       const contenidoDiv = this.$refs.contenido;
-      html2canvas(contenidoDiv).then(canvas => {
+      localStorage.setItem('qrText', this.qrText);
+      localStorage.setItem('qrTitle', this.qrTitle);
+      localStorage.setItem('qrTitleColor', this.qrTitleColor);
+      localStorage.setItem('qrTextColor', this.qrTextColor);
+      html2canvas(contenidoDiv, { backgroundColor: null }).then(canvas => {
         canvas.toBlob(blob => {
           saveAs(blob, 'contenido-' + this.nombreUsuario + '.png');
         });
@@ -154,9 +186,21 @@ export default {
 </script>
 
 <style scoped>
+.form-control-color{
+  border: none;
+  padding: 1px;
+}
+.flex{
+  display: flex;
+}
+.qr-text {
+  font-size: 3rem;
+  font-weight: 750;
+  margin-bottom: 0;
+}
+
 .position-relative {
   margin: 0 10% 0 10%;
-  background: none;
 }
 
 .frente {
@@ -174,13 +218,16 @@ export default {
 
 .portada {
   width: 60%;
-  opacity: 0.3;
-  filter: blur(3px);
   position: relative;
 }
 
 .logo {
   border-radius: 100%;
+}
+
+.qr-text-consulta {
+  width: 100%;
+  color: white;
 }
 
 .margenbtn {
