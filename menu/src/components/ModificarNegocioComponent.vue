@@ -97,12 +97,12 @@
 
 
                 <!-- MODAL MODIFICAR-->
-                <div class="modal fade" id="modificarProducto" tabindex="-1" aria-labelledby="modificarProductoLabel"
+                <div class="modal fade" id="modificarProducto" tabindex="-1" aria-labelledby="modificarDatosLabel"
                     aria-hidden="true" ref="modalModificar">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content ">
                             <div class="modal-header">
-                                <h1 class="modal-title fs-5" id="modificarProductoLabel">Modificar Datos</h1>
+                                <h1 class="modal-title fs-5" id="modificarDatosLabel">Modificar Datos</h1>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"
                                     aria-label="Close"></button>
                             </div>

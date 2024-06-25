@@ -16,7 +16,7 @@
                                     Gratis
                                 </div>
                                 <ul class="text-start">
-                                    <li>✅ Página + Menú online autoadministrable.</li>
+                                    <li>✅ Página + Menú online.</li>
                                     <li>⚠️ Visualización en nuestra plataforma.</li>
                                     <li>⚠️ Carrito y pedidos por WhatsApp.</li>
                                     <li>⚠️ Código QR para el menú.</li>
@@ -37,7 +37,7 @@
                         </div>
                         <div class="mt-2 p-2 text-center">
                             <ul class="text-start">
-                                <li>✅ Página + Menú online autoadministrable.</li>
+                                <li>✅ Página + Menú online.</li>
                                 <li>✅ Visualización en nuestra plataforma.</li>
                                 <li>✅ Carrito y pedidos por WhatsApp.</li>
                                 <li>✅ Código QR para el menú.</li>

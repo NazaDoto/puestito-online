@@ -34,6 +34,10 @@
                             placeholder="Precio (sin $)" />
                     </div>
                     <div class="col-md-6">
+                        <input class="form-control" type="number" id="stock" v-model="producto.stock"
+                            placeholder="Stock (opcional)" />
+                    </div>
+                    <div class="col-md-6">
                         <label class="form-label mr-2" for="imagen">Imagen (JPG/PNG)</label>
                         <input class="form-control mb-3" type="file" name="imagen" id="imagen" accept="image/jpeg, image/png"
                             @change="imagenSeleccionada($event)" />
@@ -165,6 +169,7 @@ export default {
                 categoria: 'Categoría',
                 precio: '',
                 imagen: '',
+                stock: '',
                 usuario: '',
             },
             categoria_nombre: '',

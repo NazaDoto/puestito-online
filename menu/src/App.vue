@@ -80,7 +80,7 @@ body{
 }
 
 .modalCategoria {
-    padding: 20px;
+    padding: 15px;
     margin: auto;
     width: 30vw;
     background-color: white;

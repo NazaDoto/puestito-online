@@ -449,11 +449,11 @@ app.post('/nuevoProducto', (req, res) => {
 
         // Realizar la inserción en la base de datos
         const sql = `
-            INSERT INTO productos (producto_nombre, producto_descripcion, producto_categoria, producto_precio, producto_imagen, usuario_nombre)
+            INSERT INTO productos (producto_nombre, producto_descripcion, producto_categoria, producto_precio, producto_imagen, producto_stock, usuario_nombre)
             VALUES (?, ?, ?, ?, ?, ?)
         `;
         const sqlSinImg = `
-            INSERT INTO productos (producto_nombre, producto_descripcion, producto_categoria, producto_precio,  usuario_nombre)
+            INSERT INTO productos (producto_nombre, producto_descripcion, producto_categoria, producto_precio,  producto_stock, usuario_nombre)
             VALUES (?, ?, ?, ?, ?)
         `;
 
@@ -464,6 +464,7 @@ app.post('/nuevoProducto', (req, res) => {
                 producto.descripcion,
                 producto.categoria,
                 producto.precio,
+                producto.stock,
                 producto.usuario
             ], (err, result) => {
                 if (err) {
@@ -482,6 +483,7 @@ app.post('/nuevoProducto', (req, res) => {
                 producto.categoria,
                 producto.precio,
                 producto.imagen,
+                producto.stock,
                 producto.usuario
             ], (err, result) => {
                 if (err) {
@@ -597,8 +599,8 @@ app.put('/actualizarDisponibilidad', (req, res) => {
 
 app.put('/modificarProducto', (req, res) => {
     const { producto } = req.body;
-    const sqlSinImg = `UPDATE productos SET producto_nombre = ?, producto_descripcion = ?, producto_categoria = ?, producto_precio = ? WHERE producto_id = ?`;
-    const sql = `UPDATE productos SET producto_nombre = ?, producto_descripcion = ?, producto_categoria = ?, producto_precio = ?, producto_imagen = ? WHERE producto_id = ?`;
+    const sqlSinImg = `UPDATE productos SET producto_nombre = ?, producto_descripcion = ?, producto_categoria = ?, producto_precio = ?, producto_stock = ? WHERE producto_id = ?`;
+    const sql = `UPDATE productos SET producto_nombre = ?, producto_descripcion = ?, producto_categoria = ?, producto_precio = ?, producto_stock = ?, producto_imagen = ? WHERE producto_id = ?`;
 
     if (producto.producto_imagen == null) {
         const { producto } = req.body;
@@ -607,6 +609,7 @@ app.put('/modificarProducto', (req, res) => {
             producto.producto_descripcion,
             producto.producto_categoria,
             producto.producto_precio,
+            producto.producto_stock,
             producto.producto_id
         ], (err, result) => {
             if (err) {
@@ -624,6 +627,7 @@ app.put('/modificarProducto', (req, res) => {
             producto.producto_descripcion,
             producto.producto_categoria,
             producto.producto_precio,
+            producto.producto_stock,
             producto.producto_imagen,
             producto.producto_id
         ], (err, result) => {

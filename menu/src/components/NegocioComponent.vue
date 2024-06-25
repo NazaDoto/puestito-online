@@ -644,15 +644,15 @@ transition: max-height 0.2s ease;
 
 .ver-carrito-btn {
     margin-right: 10px;
-    background: linear-gradient(rgb(148, 193, 252), rgb(0, 90, 207)) !important;
+    background: black;
     color: white;
     padding: 10px 20px;
     border: none;
-    border-radius: 2px;
+    border-radius: 20px;
 }
 
 .ver-carrito-btn:hover {
-    background: linear-gradient(rgb(148, 193, 252), rgb(0, 87, 168)) !important;
+    cursor:pointer;
 
 }
 

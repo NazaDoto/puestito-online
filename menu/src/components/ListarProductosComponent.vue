@@ -19,13 +19,14 @@
         <div class="mt-2" v-for="(categoria, index) in categoriasOrdenadas" :key="index" :id="categoria">
           <div v-if="filteredProductos(categoria)">
             <div class="flex">
-              <div class="titulo-categoria" :class="{'fondo-oscuro': categoriaSeleccionada === categoria}" @click="toggleCategoria(categoria)">{{ categoria }}
+              <div class="titulo-categoria" :class="{ 'fondo-oscuro': categoriaSeleccionada === categoria }"
+                @click="toggleCategoria(categoria)">{{ categoria }}
                 <div class="inline" v-if="categoriaSeleccionada === categoria">↓</div>
-                                        <div class="inline" v-else>→</div>
-                                      </div>
+                <div class="inline" v-else>→</div>
+              </div>
               <div class="flex-end">
-                <img class="pointer" @click="abrirModificarCategoriaModal(categoria)"
-                    width="41.2" src="/recursos/edit.png" alt="">
+                <img class="pointer" @click="abrirModificarCategoriaModal(categoria)" width="41.2"
+                  src="/recursos/edit.png" alt="">
               </div>
             </div>
             <div :class="{ 'categoria-productos': true, 'categoria-activa': categoriaSeleccionada === categoria }">
@@ -48,6 +49,9 @@
                       <div class="item-descripcion" v-if="producto.producto_descripcion">
                         "{{ producto.producto_descripcion }}"
                       </div>
+                      <div class="item-stock" v-if="producto.producto_stock !== -1">
+                        Stock: {{ producto.producto_stock }}
+                      </div>
                     </div>
                   </div>
                   <div class="item-texto-block-end">
@@ -57,8 +61,8 @@
                           id="productoDisponible" :checked="producto.producto_disponibilidad === 1"></div>
                     </div>
                     <img class="pointer" @click="modificar(producto)" width="41.2" src="/recursos/edit.png" alt="">
-                    <img class="pointer" @click="eliminar(producto.producto_id)"
-                        width="41.2" src="/recursos/delete.png" alt="">
+                    <img class="pointer" @click="eliminar(producto.producto_id)" width="41.2" src="/recursos/delete.png"
+                      alt="">
                   </div>
                 </div>
               </div>
@@ -76,41 +80,49 @@
         <div class="modalCategoria">
           <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-              <div class="modal-header pl-2">
+              <div class="modal-header">
                 <h1 class="modal-title fs-5" id="modificarProductoLabel">
                   Modificar Producto
                 </h1>
                 <button type="button" class="btn-close" @click="cerrarModificarModal" aria-label="Close"></button>
               </div>
-              <form @submit.prevent="modificarProducto(this.productoModificar)">
-                <div class="modal-body">
+              <hr>
+              <div class="modal-body">
+                <form @submit.prevent="modificarProducto(this.productoModificar)">
                   <div class="row g-3 div-forms">
-                    <div>
+                    <div class="col-md-6">
+                      <label class="form-label" for="nombre">Nombre</label>
                       <input class="form-control" type="text" id="nombre" v-model="productoModificar.producto_nombre"
                         required />
                     </div>
-                    <div>
+                    <div class="col-md-6">
+                      <label class="form-label" for="descripcion">Descripción</label>
                       <textarea class="form-control" type="text" id="descripcion"
                         v-model="productoModificar.producto_descripcion" placeholder="Descripción"></textarea>
                     </div>
-                    <div>
+                    <div class="col-md-6">
+                      <label class="form-label" for="categoria">Categoría</label>
                       <select class="form-select" v-model="productoModificar.producto_categoria" id="" required>
                         <option selected disabled>Categoría</option>
                         <option v-for="categoria in categorias" :key="categoria.id" :value="categoria.categoria_nombre">
                           {{ categoria.categoria_nombre }}
                         </option>
                       </select>
-                    </div>
-                    <div>
-                      <button type="button" class="btn btn-agregar" @click="agregarCategoriaModal">
+                      <button type="button" class="btn btn-agregar mt-2" @click="agregarCategoriaModal">
                         Agregar Categoría
                       </button>
                     </div>
-                    <div>
+                    <div class="col-md-6">
+                      <label class="form-label" for="precio">Precio</label>
                       <input class="form-control" type="number" id="precio" v-model="productoModificar.producto_precio"
                         placeholder="Precio (sin $)" />
                     </div>
-                    <div>
+                    <div class="col-md-6">
+                      <label class="form-label" for="stock">Stock (si no manejás stock de este producto poné -1)</label>
+                      <input class="form-control" type="number" id="stock" v-model="productoModificar.producto_stock"
+                        placeholder="Stock" />
+                    </div>
+                    <div class="col-md-6">
                       <label class="form-label mr-2" for="imagen">Imagen (JPG/PNG)</label>
                       <input class="form-control" type="file" name="imagen" id="imagen" accept="image/jpeg, image/png"
                         @change="imagenSeleccionada" />
@@ -120,8 +132,8 @@
                     <button type="button" class="btn" @click="cerrarModificarModal">Cerrar</button>
                     <button class="btn btn-menu" type="submit">Modificar</button>
                   </div>
-                </div>
-              </form>
+                </form>
+              </div>
             </div>
           </div>
         </div>
@@ -234,6 +246,7 @@ export default {
         categoria: "Categoría",
         precio: "",
         imagen: "",
+        stock: "",
         usuario: "",
       },
       categoria_nombre: "",
@@ -300,15 +313,15 @@ export default {
           title: "Categoría modificada.",
         });
         setTimeout(function () {
-              location.reload()
-            }, 1000);
+          location.reload()
+        }, 1000);
       }).catch((error) => {
         Swal.fire({
           icon: 'error',
           text: 'No se pudo modificar la categoría. ' + error.response.data.message,
         });
-      }).finally(()=>{
-        this.modificarCategoriaModalAbierto = false;        
+      }).finally(() => {
+        this.modificarCategoriaModalAbierto = false;
       });
 
 
@@ -581,13 +594,14 @@ export default {
 </script>
 
 <style scoped>
-.inline{
+.inline {
   font-weight: bold;
   margin-left: auto;
 }
-.fondo-oscuro{
-    background-color: rgb(122, 122, 122) !important;
-    color:white;
+
+.fondo-oscuro {
+  background-color: rgb(122, 122, 122) !important;
+  color: white;
 }
 
 .categoria-productos {
@@ -596,9 +610,11 @@ export default {
   transition: max-height 0.2s ease-in-out;
   /* Duración y función de la transición */
 }
-.titulo-categoria:hover{
-    background:rgb(232, 231, 231);
+
+.titulo-categoria:hover {
+  background: rgb(232, 231, 231);
 }
+
 /* Clase para activar la categoría seleccionada */
 .categoria-activa {
   max-height: 1000px;
@@ -622,13 +638,16 @@ export default {
   cursor: pointer;
   display: flex;
 }
-.pointer{
+
+.pointer {
   cursor: pointer;
   border-radius: 7px;
 }
-.pointer:hover{
-  background:rgb(232, 231, 231);
+
+.pointer:hover {
+  background: rgb(232, 231, 231);
 }
+
 .tarjetaProducto {
   border: 5px;
   background-color: white;
