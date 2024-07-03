@@ -11,11 +11,17 @@ import NegocioComponent from './components/NegocioComponent.vue';
 import ModificarNegocioComponent from './components/ModificarNegocioComponent.vue';
 import PlanesComponent from './components/PlanesComponent.vue';
 import SuccessComponent from './components/SuccessComponent.vue';
+import CalcularComponent from './components/CalcularComponent.vue';
 
 
 const routes = [{
         path: '/',
         component: InicioComponent,
+        meta: { requiresAuth: false },
+    },
+    {
+        path: '/u/calcular',
+        component: CalcularComponent,
         meta: { requiresAuth: false },
     },
     {
