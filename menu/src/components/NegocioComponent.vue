@@ -9,33 +9,35 @@
             </div>
         </div>
         <div v-else>
-            <nav class="navbar navbar-dark bg-dark" :class="{ 'navbar-hidden': isHidden }">
-                <div class="container">
-                    <div class="flex">
-                        <a @click="scrollToInicio" href="#"><img class="nav-logo" :src="negocio.imagen" alt=""></a>
-                        <div class="ancho-busqueda input-group mcenter">
-                            <input class="form-control" v-model="busqueda" type="text" name="busqueda" id=""
-                                placeholder="Buscar producto" title="Ingrese una palabra clave...">
-                            <button class="btn-close btn-limpiar-busqueda" @click="limpiarBusqueda"></button>
-                        </div>
-                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                            data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                            aria-expanded="false" aria-label="Toggle navigation">
-                            <span class="navbar-toggler-icon"></span>
-                        </button>
-                    </div>
-                    <div class="collapse navbar-collapse text-end bg-dark" id="navbarSupportedContent">
-                        <ul class="navbar-nav m-2">
-                            <div  v-for="(categoria, index) in categoriasOrdenadas" :key="index">
-                                <li v-if="categoriasConProductosFiltrados.includes(categoria)" class="nav-item">
-                                    <a class="nav-link" @click="scrollToCategoria(categoria); collapseNavbar()">{{
-                                        categoria }}</a>
-                                </li>
+            <div class="absolute">
+                <nav class="navbar navbar-dark bg-dark" :class="{ 'navbar-hidden': isHidden }">
+                    <div class="container">
+                        <div class="flex">
+                            <a @click="scrollToInicio" href="#"><img class="nav-logo" :src="negocio.imagen" alt=""></a>
+                            <div class="ancho-busqueda input-group mcenter">
+                                <input class="form-control" v-model="busqueda" type="text" name="busqueda" id=""
+                                    placeholder="Buscar producto" title="Ingrese una palabra clave...">
+                                <button class="btn-close btn-limpiar-busqueda" @click="limpiarBusqueda"></button>
                             </div>
-                        </ul>
+                            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                                aria-expanded="false" aria-label="Toggle navigation">
+                                <span class="navbar-toggler-icon"></span>
+                            </button>
+                        </div>
+                        <div class="collapse navbar-collapse text-end bg-dark" id="navbarSupportedContent">
+                            <ul class="navbar-nav m-2">
+                                <div v-for="(categoria, index) in categoriasOrdenadas" :key="index">
+                                    <li v-if="categoriasConProductosFiltrados.includes(categoria)" class="nav-item">
+                                        <a class="nav-link" @click="scrollToCategoria(categoria); collapseNavbar()">{{
+                                            categoria }}</a>
+                                    </li>
+                                </div>
+                            </ul>
+                        </div>
                     </div>
-                </div>
-            </nav>
+                </nav>
+            </div>
             <div class="container2">
                 <div v-if="productos.length">
                     <div class="presentacion">
@@ -571,20 +573,27 @@ export default {
     align-items: center;
 }
 
+.absolute {
+    position: absolute;
+}
+
 .navbar {
-    position: sticky;
+    position: fixed;
+    opacity: 0;
+    width: calc(100svw - 5px);
     top: 0;
     z-index: 10;
-    max-height: 56.4px;
-transition: max-height 0.2s ease;
+    animation: fadeIn 0.5s forwards;
 }
 
 .navbar-hidden {
-    max-height: 0;
-    padding: 0;
-    overflow: hidden;
-    width: calc(100svw - 5px);
-    transition: max-height 0.2s ease;
+    display: none;
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
 }
 
 .categoria-productos {
@@ -652,7 +661,7 @@ transition: max-height 0.2s ease;
 }
 
 .ver-carrito-btn:hover {
-    cursor:pointer;
+    cursor: pointer;
 
 }
 
