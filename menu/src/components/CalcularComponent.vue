@@ -16,15 +16,15 @@
           </h4>
         </div>
       </div>
-      <div class="border p-2">
-        <h3>Subir archivo:</h3>
+      <div class="border p-2 mt-2">
+        <h3>Convertir archivo en audio:</h3>
         <hr>
         <input class="form-control" type="file" @change="handleFileUpload" accept="image/*,.pdf">
         <div v-if="ocrResult">
-            <p class="text-center">Listo</p>
+            <div class="text-center">Listo</div>
         </div>
         <div v-if="loading">
-          <p class="text-center">Procesando...</p>
+          <div class="text-center">Procesando...</div>
         </div>
         <div>
           <button class="btn btn-primary mt-2" :disabled="!ocrResult" @click="convertirATextoAVoz">Descargar Audio</button>
