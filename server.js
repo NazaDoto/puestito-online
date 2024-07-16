@@ -450,11 +450,11 @@ app.post('/nuevoProducto', (req, res) => {
         // Realizar la inserción en la base de datos
         const sql = `
             INSERT INTO productos (producto_nombre, producto_descripcion, producto_categoria, producto_precio, producto_imagen, producto_stock, usuario_nombre)
-            VALUES (?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
         `;
         const sqlSinImg = `
             INSERT INTO productos (producto_nombre, producto_descripcion, producto_categoria, producto_precio,  producto_stock, usuario_nombre)
-            VALUES (?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?)
         `;
 
         if (producto.imagen == null) {
