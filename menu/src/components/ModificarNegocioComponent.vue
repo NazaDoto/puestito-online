@@ -20,6 +20,14 @@
                     <div v-else class="textoTarjeta">
                         <h4 class="titulo-div-forms mb-2 mt-2">Esta es una cuenta Premium.</h4>
                         <h4 class="titulo-div-forms">Vence: {{ fechaVence }}</h4>
+                        <div class="flex">
+
+                            Tipo de Puestito:
+                                <select class="form-select selectTipo" name="tipo" id="" v-model="tipoPuestito" @change="cambiarTipoPuestito">
+                                    <option value="0">Menú sin pedidos</option>
+                                    <option value="1">Carrito con pedidos</option>
+                                </select>
+                        </div>
                     </div>
                     <hr class="m-2">
                     <div class="textoTarjeta">
@@ -291,6 +299,7 @@ export default {
             añoVence: '',
             negocio: '',
             negocioModificar: '',
+            tipoPuestito: '',
         };
     },
     mounted() {
@@ -338,6 +347,7 @@ export default {
                 const response = await axios.get(`/miNegocio?usuario=${localStorage.getItem('usuario')}`);
                 // Actualiza la lista de informes con los datos recibidos
                 this.negocio = response.data;
+                this.tipoPuestito = this.negocio.tipo;
                 this.negocioModificar = response.data;
                 const fechaVence = new Date(response.data.fechaVence);
                 this.añoVence = fechaVence.getFullYear();
@@ -348,6 +358,13 @@ export default {
                 this.obteniendoInfo = false;
             }
 
+        },
+        async cambiarTipoPuestito(){
+            try {
+                await axios.put('/cambiarTipoPuestito', {tipo: this.tipoPuestito, usuario: this.negocio.usuario});
+            } catch (error) {
+                console.error("Error al cambiar el tipo: ", error);
+            }
         },
         portadaSeleccionada(event) {
             try {
@@ -468,6 +485,10 @@ export default {
 </script>
 
 <style scoped>
+.selectTipo{
+    width: auto;
+    margin: auto;
+}
 .modal-dialog .modal-dialog-center {
     z-index: 1 !important;
 }

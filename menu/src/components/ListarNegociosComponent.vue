@@ -257,6 +257,7 @@ export default {
         console.error("Error al obtener los datos de los negocios:", error);
       } finally {
         this.cargando = false; // Indicar que la carga ha terminado, independientemente del resultado
+        console.log(this.negocios)
       }
     },
   },

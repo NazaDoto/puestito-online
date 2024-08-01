@@ -18,19 +18,21 @@
             <div v-if="!usuario" class="row g-3 mt-4 border">
                 <form @submit.prevent="registrarNegocio" id="form-checkout">
                     <div class="row g-3 border">
-                        <h4 class="titulo- mb-2">Información de acceso</h4>
+                        <h4 class="mb-2">Información de acceso</h4>
                         <h4 class="subtitulo">Cómo ingresarás a la plataforma.</h4>
                         <div class="col-md-6">
                             <input :class="{ 'usuario-disponible': !usuarioDisponible }" class="form-control"
-                                type="text" id="username" v-model="negocio.usuario" @input="restrictInput"
-                                @change="verificarDisponibilidad" placeholder="Nombre de Usuario" required />
+                                type="text" id="username" v-model="negocio.usuario" maxlength="20"
+                                @input="restrictInput" @change="verificarDisponibilidad" placeholder="Nombre de Usuario"
+                                required />
+                            <div class="subtitulo">Tu link será puestito.online/{{ negocio.usuario }}</div>
                         </div>
                         <div class="col-md-6">
-                            <input class="form-control" type="password" id="password" v-model="negocio.contraseña"
-                                placeholder="Contraseña" required />
+                            <input class="form-control" type="password" id="password" maxlength="20"
+                                v-model="negocio.contraseña" placeholder="Contraseña" required />
+                            <div class="subtitulo" style="color:gray;">{{ negocio.contraseña }}</div>
                         </div>
-                        <div class="col-md-12 subtitulo">Tu link será puestito.online/{{ negocio.usuario }}</div>
-                        <h4 class="titulo- mb-2">Información del negocio</h4>
+                        <h4 class="mb-2">Información del negocio</h4>
                         <h4 class="subtitulo">
                             Más adelante podés modificar esta información.
                         </h4>
@@ -78,6 +80,7 @@
                             <input class="form-control" type="email" id="email" v-model="negocio.email"
                                 placeholder="Email" required />
                         </div>
+
                         <div class="col-md-6">
                             <input class="form-control" type="text" id="direccion" v-model="negocio.direccion"
                                 placeholder="Dirección (por ej. Libertad 20, Santiago del Estero, Argentina)" />
@@ -151,33 +154,33 @@
             </div>
         </div>
         <div v-show="modalCropPortada" class="modalCategoriaContainer  text-center ">
-                    <div class="modalCategoria">
-                        <div class="modal-dialog modal-dialog-centered ">
-                            <div class="modal-content ">
-                                <div class="modal-header pl-2">
-                                    <h1 class="modal-title fs-5" id="agregarCategoriaLabel">Recortar Imagen</h1>
-                                    <button type="button" class="btn-close" @click="cerrarCropPortada"
-                                        aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body mt-2 ">
-                                    <div v-show="cargandoCropperPortada" class="pantalla-cargas text-center">
-                                        <div class="logo-carga">
-                                            <img class="logo-img" src="/favicon.ico" width="50" alt="">
-                                            <div class="texto-carga">
-                                                Cargando imagen
-                                            </div>
-                                        </div>
+            <div class="modalCategoria">
+                <div class="modal-dialog modal-dialog-centered ">
+                    <div class="modal-content ">
+                        <div class="modal-header pl-2">
+                            <h1 class="modal-title fs-5" id="agregarCategoriaLabel">Recortar Imagen</h1>
+                            <button type="button" class="btn-close" @click="cerrarCropPortada"
+                                aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body mt-2 ">
+                            <div v-show="cargandoCropperPortada" class="pantalla-cargas text-center">
+                                <div class="logo-carga">
+                                    <img class="logo-img" src="/favicon.ico" width="50" alt="">
+                                    <div class="texto-carga">
+                                        Cargando imagen
                                     </div>
-                                    <img ref="cropperPortada" alt="Croppear">
-                                </div>
-                                <div class="modal-footer mt-2">
-                                    <button type="button" class="btn" @click="cerrarCropPortada">Cerrar</button>
-                                    <button class="btn btn-menu" @click="guardarPortadaRecortada">Recortar</button>
                                 </div>
                             </div>
+                            <img ref="cropperPortada" alt="Croppear">
+                        </div>
+                        <div class="modal-footer mt-2">
+                            <button type="button" class="btn" @click="cerrarCropPortada">Cerrar</button>
+                            <button class="btn btn-menu" @click="guardarPortadaRecortada">Recortar</button>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -217,7 +220,7 @@ export default {
                 fechaVence: "",
                 email: "",
                 imagen: "",
-                portada:"",
+                portada: "",
                 direccion: "",
                 telefono: "",
                 descripcion: "",
@@ -229,7 +232,6 @@ export default {
     },
     mounted() {
         this.obtenerPlan();
-        this.checkAuthentication();
     },
     methods: {
         restrictInput(event) {
@@ -241,10 +243,17 @@ export default {
             }
         }
         ,
-        checkAuthentication() {
+        obtenerPlan() {
             const isAuthenticated = !!localStorage.getItem("token");/* Agrega aquí tu lógica para verificar si el usuario está autenticado */
+            this.plan = localStorage.getItem("plan");
+            console.log(this.plan)
             if (isAuthenticated) {
-                this.$router.push("/u/home");
+                if (this.plan) {
+                    this.usuario = localStorage.getItem("usuario");
+                    this.registrarNegocio();
+                } else {
+                    this.$router.push("/u/home");
+                }
             }
         },
         portadaSeleccionada(event) {
@@ -255,7 +264,7 @@ export default {
                     reader.onload = async (e) => {
                         this.imageToCrop = e.target.result;
                         this.modalCropPortada = true;
-                        window.scrollTo({top:0,behavior:'smooth'})
+                        window.scrollTo({ top: 0, behavior: 'smooth' })
                         let cropperCanvas = this.$refs.cropperPortada;
                         cropperCanvas.src = this.imageToCrop;
                         this.$nextTick(() => {
@@ -289,7 +298,7 @@ export default {
             } finally {
                 this.cargandoCropperPortada = false;
             }
-        },       
+        },
         async guardarPortadaRecortada() {
             try {
                 const canvas = await this.cropperPortada.getCropperSelection().$toCanvas();
@@ -299,7 +308,7 @@ export default {
             } finally {
                 this.modalCropPortada = false;
             }
-        }, 
+        },
         imagenSeleccionada(event) {
             try {
                 const file = event.target.files[0];
@@ -388,10 +397,6 @@ export default {
             } else {
                 return true;
             }
-        },
-        async obtenerPlan() {
-            this.plan = localStorage.getItem("plan");
-            this.usuario = localStorage.getItem("usuario");
         },
         async registrarNegocio() {
             this.cargandoRegistro = true;
@@ -588,12 +593,15 @@ export default {
 .form-control-fact {
     height: 40px;
 }
-
+.flex{
+    display: flex;
+}
 .subtitulo {
     font-weight: normal;
     font-size: 14px;
     font-style: italic;
     margin: 0px;
+    justify-content: start !important;
 }
 
 input.date {
@@ -603,8 +611,7 @@ input.date {
 .col-md-6 {
     margin-top: 5px;
     margin-bottom: 5px;
-    display: inline-flex !important;
-    justify-content: center !important;
+    justify-content: center;
     align-items: center !important;
 }
 

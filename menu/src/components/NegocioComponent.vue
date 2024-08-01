@@ -109,7 +109,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div v-if="negocio.fechaVence !== 2100" class="item-texto-block-end">
+                                                <div v-if="negocio.tipo == 1" class="item-texto-block-end">
                                                     <button class="btn-mas" @click="agregarAlCarrito(producto)">
                                                         +
                                                     </button>

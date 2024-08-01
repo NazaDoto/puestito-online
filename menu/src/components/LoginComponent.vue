@@ -70,15 +70,12 @@ export default {
 
         // Maneja la respuesta del backend
         if (response.status === 200) {
-
-          const fecha = await axios.post('/comprobar-vencimiento', { usuario: response.data.nomUsuario });
-          const fechaVence = fecha.data;
+          console.log(response.data.nomUsuario)
+          await axios.post('/comprobar-vencimiento', { usuario: response.data.nomUsuario });
           // Almacena el token en el almacenamiento local
           localStorage.setItem("token", response.data.token);
           localStorage.setItem("nombre", response.data.nombre);
           localStorage.setItem("usuario", response.data.nomUsuario);
-
-          localStorage.setItem("año", fechaVence);
           // Redirige al usuario a la página de inicio (por ejemplo, /u/home)
           this.$router.push("/u/home");
           const Toast = Swal.mixin({

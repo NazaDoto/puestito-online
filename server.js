@@ -113,7 +113,6 @@ app.post('/login', (req, res) => {
                 const usuarioId = result[0].usuario_id; // Cambia esto a la columna adecuada en tu tabla de usuarios
                 const nombre = result[0].usuario_nombre_negocio; // Campo de nombre personal
                 const nomUsuario = result[0].usuario_nombre;
-                const fechaVence = result[0].usuario_fecha_vencimiento;
 
                 // Compara la contraseña ingresada con el hash almacenado
                 bcrypt.compare(contraseña, storedHash, (err, result) => {
@@ -123,7 +122,7 @@ app.post('/login', (req, res) => {
                     } else {
                         if (result) {
                             const token = generarToken(usuarioId); // Modifica la función generarToken para aceptar el nombre personal
-                            res.status(200).json({ message: 'Inicio de sesión exitoso', token, nombre, nomUsuario, fechaVence });
+                            res.status(200).json({ message: 'Inicio de sesión exitoso', token, nombre, nomUsuario });
                         } else {
                             res.status(401).json({ message: 'Credenciales inválidas' });
                         }
@@ -139,9 +138,7 @@ app.post('/login', (req, res) => {
 
 app.post('/comprobar-vencimiento', (req, res) => {
     const datos = req.body;
-    let año; // Definir la variable año antes del callback de la consulta
-
-    query = 'SELECT usuario_fecha_vencimiento, usuario_fecha_alta FROM usuarios WHERE usuario_nombre = ?';
+    query = 'SELECT usuario_fecha_vencimiento FROM usuarios WHERE usuario_nombre = ?';
     connection.query(query, datos.usuario, (err, results) => {
         if (err) {
             console.log(err);
@@ -150,21 +147,15 @@ app.post('/comprobar-vencimiento', (req, res) => {
             const fechaUsuario = results[0].usuario_fecha_vencimiento;
             let fechaHoy = new Date();
             if (fechaHoy > fechaUsuario) {
-                fechaHoy.setFullYear(2100);
-                const fechaActualizada = fechaHoy.toISOString().slice(0, 19).replace('T', ' ');
-                query = 'UPDATE usuarios SET usuario_fecha_vencimiento = ? WHERE usuario_nombre = ?';
-                connection.query(query, [fechaActualizada, datos.usuario], (err, results) => {
+                query = 'UPDATE usuarios SET usuario_tipo = 0 WHERE usuario_nombre = ?';
+                connection.query(query, datos.usuario, (err, results) => {
                     if (err) {
                         console.log(err);
-                        res.status(500).send('Error al actualizar la fecha de vencimiento'); // Enviar respuesta de error si hay un error en la actualización
-                    } else {
-                        año = '2100';
-                        res.send(año); // Enviar la respuesta dentro del callback de la actualización
+                        res.status(500).send('Error al actualizar el tipo de usuario'); // Enviar respuesta de error si hay un error en la actualización
                     }
                 });
             } else {
-                año = new Date(fechaUsuario).getFullYear();
-                res.send(año.toString()); // Enviar la respuesta dentro del else
+                res.status(200).send();
             }
         }
     });
@@ -193,6 +184,7 @@ app.get('/listarNegocios', async(req, res) => {
                         instagram: negocio.usuario_instagram,
                         facebook: negocio.usuario_facebook,
                     }
+
                 });
                 res.json(negocios);
             }
@@ -211,7 +203,7 @@ const googleMapsClient = require('@google/maps').createClient({
 app.get('/negocios', async(req, res) => {
     try {
         // Consultar la base de datos para obtener la información de los negocios
-        const query = "SELECT usuario_nombre, usuario_nombre_negocio, usuario_fecha_vencimiento, usuario_direccion, usuario_correo, usuario_telefono, usuario_descripcion, usuario_imagen, usuario_instagram, usuario_facebook, usuario_rubro FROM usuarios WHERE usuario_nombre != 'admin'";
+        const query = "SELECT usuario_nombre, usuario_nombre_negocio, usuario_fecha_vencimiento, usuario_direccion, usuario_correo, usuario_telefono, usuario_descripcion, usuario_imagen, usuario_instagram, usuario_facebook, usuario_rubro, usuario_tipo FROM usuarios WHERE usuario_nombre != 'admin'";
         connection.query(query, async(error, results) => {
             if (error) {
                 console.error('Error al obtener los negocios de la base de datos:', error);
@@ -236,6 +228,7 @@ app.get('/negocios', async(req, res) => {
                             instagram: negocio.usuario_instagram,
                             facebook: negocio.usuario_facebook,
                             rubro: negocio.usuario_rubro,
+                            tipo: negocio.usuario_tipo,
                             location: location
                         };
                     } catch (e) {
@@ -252,16 +245,18 @@ app.get('/negocios', async(req, res) => {
                             instagram: negocio.usuario_instagram,
                             facebook: negocio.usuario_facebook,
                             rubro: negocio.usuario_rubro,
+                            tipo: negocio.usuario_tipo,
                             location: null
                         };
                     }
+
                 });
 
                 // Esperar a que todas las conversiones de direcciones a coordenadas geográficas se completen
                 const negocios = await Promise.all(negociosPromises);
 
                 // Filtrar resultados nulos (sin coordenadas geográficas)
-                const negociosValidos = negocios.filter(negocio => negocio !== null);
+                const negociosValidos = negocios.filter(negocio => negocio !== null && negocio.tipo == 1);
 
                 res.json(negociosValidos);
             }
@@ -274,7 +269,7 @@ app.get('/negocios', async(req, res) => {
 
 app.get('/miNegocio', (req, res) => {
     const usuario = req.query.usuario;
-    const query = "SELECT usuario_nombre_negocio,  usuario_fecha_vencimiento, usuario_correo, usuario_telefono, usuario_descripcion, usuario_imagen, usuario_portada, usuario_direccion, usuario_instagram, usuario_facebook, usuario_rubro FROM usuarios WHERE usuario_nombre = ?";
+    const query = "SELECT usuario_nombre_negocio,  usuario_fecha_vencimiento, usuario_correo, usuario_telefono, usuario_descripcion, usuario_imagen, usuario_portada, usuario_direccion, usuario_instagram, usuario_facebook, usuario_rubro, usuario_tipo FROM usuarios WHERE usuario_nombre = ?";
     // Ejecutar la consulta
     connection.query(query, usuario, (error, results) => {
         if (error) {
@@ -300,68 +295,55 @@ app.get('/miNegocio', (req, res) => {
             instagram: results[0].usuario_instagram,
             facebook: results[0].usuario_facebook,
             rubro: results[0].usuario_rubro,
+            tipo: results[0].usuario_tipo,
         });
     });
 });
 app.get('/negocio', (req, res) => {
     // Consulta SQL para obtener la información del negocio
     const usuario = req.query.usuario;
-    const queryCheck = "SELECT usuario_fecha_vencimiento FROM usuarios WHERE usuario_nombre = ?";
-    connection.query(queryCheck, usuario, (error, results) => {
+
+    const query = "SELECT usuario_nombre_negocio,  usuario_correo, usuario_telefono, usuario_descripcion, usuario_imagen, usuario_portada, usuario_direccion, usuario_instagram, usuario_facebook, usuario_tipo FROM usuarios WHERE usuario_nombre = ?";
+    // Ejecutar la consulta
+    connection.query(query, usuario, (error, results) => {
         if (error) {
-            console.error('Error al obtener fecha de vencimiento del negocio.', error);
+            console.error('Error al obtener la información del negocio:', error);
             res.status(500).json({ error: 'Error al obtener la información del negocio' });
             return;
         }
+
         if (results.length === 0) {
             res.status(404).json({ error: 'No se encontró información del negocio' });
             return;
         }
-        const fechaHoy = new Date();
-        // Establecer la hora, los minutos, los segundos y los milisegundos a cero
-        fechaHoy.setHours(0, 0, 0, 0);
-
-        const fechaVence = new Date(results[0].usuario_fecha_vencimiento);
-        // Establecer la hora, los minutos, los segundos y los milisegundos a cero
-        fechaVence.setHours(0, 0, 0, 0);
-
-
-        // Comparar las fechas sin tener en cuenta la hora
-        if (fechaVence >= fechaHoy) {
-            const query = "SELECT usuario_nombre_negocio,  usuario_correo, usuario_telefono, usuario_descripcion, usuario_imagen, usuario_portada, usuario_direccion, usuario_instagram, usuario_facebook FROM usuarios WHERE usuario_nombre = ?";
-            // Ejecutar la consulta
-            connection.query(query, usuario, (error, results) => {
-                if (error) {
-                    console.error('Error al obtener la información del negocio:', error);
-                    res.status(500).json({ error: 'Error al obtener la información del negocio' });
-                    return;
-                }
-
-                if (results.length === 0) {
-                    res.status(404).json({ error: 'No se encontró información del negocio' });
-                    return;
-                }
-                res.json({
-                    usuario: usuario,
-                    nombre: results[0].usuario_nombre_negocio,
-                    correo: results[0].usuario_correo,
-                    telefono: results[0].usuario_telefono,
-                    direccion: results[0].usuario_direccion,
-                    descripcion: results[0].usuario_descripcion,
-                    imagen: results[0].usuario_imagen,
-                    portada: results[0].usuario_portada,
-                    instagram: results[0].usuario_instagram,
-                    facebook: results[0].usuario_facebook,
-                    fechaVence: fechaVence.getFullYear(),
-                });
-            });
+        res.json({
+            usuario: usuario,
+            nombre: results[0].usuario_nombre_negocio,
+            correo: results[0].usuario_correo,
+            telefono: results[0].usuario_telefono,
+            direccion: results[0].usuario_direccion,
+            descripcion: results[0].usuario_descripcion,
+            imagen: results[0].usuario_imagen,
+            portada: results[0].usuario_portada,
+            instagram: results[0].usuario_instagram,
+            facebook: results[0].usuario_facebook,
+            tipo: results[0].usuario_tipo,
+        });
+    });
+});
+app.put('/cambiarTipoPuestito', (req, res) => {
+    const cambio = req.body;
+    console.log(cambio)
+    query = 'UPDATE usuarios SET usuario_tipo = ? WHERE usuario_nombre = ?';
+    connection.query(query, [cambio.tipo, cambio.usuario], (err, result) => {
+        if (err) {
+            console.error('Error al cambiar el tipo');
+            res.status(500).json({ message: 'Error al cambiar el tipo' });
         } else {
-            res.status(400).json({ error: 'No se encontró el negocio' });
+            res.status(200).json({ message: 'Se cambió el tipo' });
         }
     })
-
-});
-
+})
 app.put('/modificarPerfil', (req, res) => {
     const { negocio } = req.body;
     query = 'UPDATE usuarios SET usuario_nombre_negocio = ?, usuario_correo = ?, usuario_telefono = ?, usuario_descripcion = ?, usuario_imagen = ?, usuario_portada = ?, usuario_direccion = ?, usuario_instagram = ?, usuario_facebook = ?, usuario_rubro = ? WHERE usuario_nombre = ?';
@@ -751,7 +733,7 @@ app.post('/facturar/verificarPago', async(req, res) => {
 
 app.put('/facturar/acreditar', (req, res) => {
     const datos = req.body;
-    const query = `UPDATE usuarios SET usuario_fecha_vencimiento = ? WHERE usuario_nombre = ?`;
+    const query = `UPDATE usuarios SET usuario_fecha_vencimiento = ?, usuario_tipo = 1 WHERE usuario_nombre = ?`;
     connection.query(query, [datos.fecha, datos.usuario], (err, result) => {
         if (err) {
             console.log(err);

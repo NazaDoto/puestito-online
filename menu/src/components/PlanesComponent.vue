@@ -100,7 +100,6 @@ export default {
         elegirPlan(plan) {
             if (plan) {
                 localStorage.setItem("plan", plan);
-                console.log("PlanesComponent: ", localStorage.getItem("plan"))
                 router.push('/u/registrar');
             } else {
                 console.log('plan nulo')

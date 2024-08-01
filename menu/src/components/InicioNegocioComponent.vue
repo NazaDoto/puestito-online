@@ -44,18 +44,31 @@
               <input class="form-control" name="qrText" type="text" v-model="qrText">
               <input class="form-control-color" type="color" name="qrTextColor" v-model="qrTextColor">
             </div>
-            </div>
-            <div class="col-md-6">
-              <label class="form-label mt-2" for="qrTitle">Texto2</label>
-              <div class="flex">
-                <input class="form-control" name="qrTitle" type="text" v-model="qrTitle">
-                <input class="form-control-color" type="color" name="qrTitleColor" v-model="qrTitleColor">
-              </div>
           </div>
-          <div ref="contenido" class="mt-4 position-relative">
-            <img class="portada" :src="negocio.portada" alt="">
+          <div class="col-md-6">
+            <label class="form-label mt-2" for="qrTitle">Texto2</label>
+            <div class="flex">
+              <input class="form-control" name="qrTitle" type="text" v-model="qrTitle">
+              <input class="form-control-color" type="color" name="qrTitleColor" v-model="qrTitleColor">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="justify-content-center">
+              <label class="form-label mt-2" for="qrPortada">Utilizar portada como fondo</label>
+              <input class="form-control-check" type="checkbox" name="qrPortada" id="" v-model="mostrarPortada"> <br>
+              <router-link v-if="mostrarPortada" to="/u/modificar">Cambiar portada</router-link>
+            </div>
+          </div>
+          <div v-if="!mostrarPortada" class="col-md-">
+            <label for="qrFondoColor" class="form-label mt-2">Color de fondo</label> <br>
+            <input class="form-control-color" type="color" name="qrFondoColor" v-model="qrFondoColor">
+          </div>
+          <div ref="contenido" class="mt-4 position-relative" >
+            <img v-if="mostrarPortada" class="portada" :src="negocio.portada" alt="">
+            <div v-else class="fondoColor" :style="{ backgroundColor: qrFondoColor }"></div>
             <div class="p-4 frente">
-              <h5 class="mt-2 qr-text-consulta" :style="{color: qrTextColor}">{{ qrText }}<p class="qr-text" :style="{color: qrTitleColor }">{{ qrTitle }}</p>
+              <h5 class="mt-2 qr-text-consulta" :style="{ color: qrTextColor }">{{ qrText }}<p class="qr-text"
+                  :style="{ color: qrTitleColor }">{{ qrTitle }}</p>
               </h5>
               <a style="color:black;text-decoration: none;" ref="qrcode"
                 :href="'https://puestito.online/' + nombreUsuario" target="_blank"></a><br>
@@ -88,8 +101,10 @@ export default {
       negocio: '',
       qrText: '',
       qrTitle: '',
-      qrTextColor:'',
-      qrTitleColor:'',
+      qrTextColor: '',
+      qrTitleColor: '',
+      qrFondoColor: '#FFFFFF',
+      mostrarPortada: true,
     }
   },
   components: {
@@ -186,13 +201,15 @@ export default {
 </script>
 
 <style scoped>
-.form-control-color{
+.form-control-color {
   border: none;
   padding: 1px;
 }
-.flex{
+
+.flex {
   display: flex;
 }
+
 .qr-text {
   font-size: 3rem;
   font-weight: 750;
@@ -216,7 +233,19 @@ export default {
   text-align: center;
 }
 
+.form-control-check {
+  margin-left: 10px;
+}
+
+.fondoColor {
+  margin: auto;
+  height: 65svh;
+  width: 60%;
+  position: relative;
+}
+
 .portada {
+  height: 65svh;
   width: 60%;
   position: relative;
 }
@@ -276,6 +305,9 @@ export default {
   }
 
   .portada {
+    width: 100%;
+  }
+  .fondoColor{
     width: 100%;
   }
 }

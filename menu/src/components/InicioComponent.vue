@@ -7,7 +7,7 @@
           <div class="ancho-busqueda input-group mauto">
             <input class="form-control" v-model="busqueda" type="text" name="busqueda" id=""
               placeholder="Buscar puestitos o rubros..." title="Ingrese una palabra clave..." />
-            <button class="btn-close btn-limpiar-busqueda" @click="limpiarBusqueda"></button>
+            <button v-if="busqueda" class="btn-close btn-limpiar-busqueda" @click="limpiarBusqueda"></button>
           </div>
           <div class="end btn-login">
             <router-link class="inline-end c-white" v-if="usuario" to="/u/home"><svg xmlns="http://www.w3.org/2000/svg"
@@ -38,6 +38,10 @@
             {{ rubro }}
           </option>
         </select>
+
+        <router-link class="navbar-filter" to="/u/planes">
+          Quiero mi Puestito!
+        </router-link>
         <button class="navbar-filter" @click="mostrarMapa">
           {{
             !mapaMostrado2
@@ -213,7 +217,6 @@ export default {
           );
         });
       }
-
       return negociosFiltrados;
     },
     negociosAgrupados() {
@@ -339,8 +342,7 @@ export default {
         this.negocios = response.data.filter((negocio, index) => {
           // Agregar el atributo "index" a cada objeto negocio
           negocio.index = index;
-          const fechaVencimiento = new Date(negocio.fechaVence);
-          return fechaVencimiento.getFullYear() !== 2100;
+          return negocio;
         });
         this.infoWindow = Array(this.negocios.length).fill({
           open: false,
@@ -362,6 +364,14 @@ export default {
 </script>
 
 <style scoped>
+.flotante {
+  border-radius: 20px;
+  font-size: 1rem;
+  background-color: black;
+  color: white;
+  padding: 4px;
+}
+
 .btn-limpiar-busqueda {
   position: absolute;
   top: 50%;
@@ -371,9 +381,11 @@ export default {
   z-index: 5;
   /* Asegura que el botón esté sobre el input */
 }
-.form-control{
+
+.form-control {
   border-radius: 20px !important;
 }
+
 .btn-filtrar {
   background: none;
   border: none;
@@ -486,12 +498,13 @@ export default {
 }
 
 .btn-login {
-padding: 7px;
-border-radius: 100%;
+  padding: 7px;
+  border-radius: 100%;
 }
-.btn-login:hover{
+
+.btn-login:hover {
   background: rgb(95, 95, 95);
-  cursor:pointer;
+  cursor: pointer;
 }
 
 .container2 {
