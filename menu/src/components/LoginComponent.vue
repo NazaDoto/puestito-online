@@ -70,7 +70,6 @@ export default {
 
         // Maneja la respuesta del backend
         if (response.status === 200) {
-          console.log(response.data.nomUsuario)
           await axios.post('/comprobar-vencimiento', { usuario: response.data.nomUsuario });
           // Almacena el token en el almacenamiento local
           localStorage.setItem("token", response.data.token);

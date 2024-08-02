@@ -12,7 +12,7 @@
             <div v-if="negocio">
                 <h1 class="text-center">Perfil</h1>
                 <div class="p-2 text-center">
-                    <div v-if="añoVence == '2100'" class="textoTarjeta">
+                    <div v-if="esPremium" class="textoTarjeta">
                         <h4 class="titulo-div-forms mb-2 mt-2">Esta es una cuenta gratis.</h4>
                         <button @click="mejorarPlan" class="btn btn-agregar">Mejorar
                             Plan</button>
@@ -24,8 +24,8 @@
 
                             Tipo de Puestito:
                                 <select class="form-select selectTipo" name="tipo" id="" v-model="tipoPuestito" @change="cambiarTipoPuestito">
-                                    <option value="0">Menú sin pedidos</option>
-                                    <option value="1">Carrito con pedidos</option>
+                                    <option value="0">Menú (solo se muestran tus productos)</option>
+                                    <option value="1">Carrito (puedes recibir pedidos por WhatsApp)</option>
                                 </select>
                         </div>
                     </div>
@@ -300,6 +300,7 @@ export default {
             negocio: '',
             negocioModificar: '',
             tipoPuestito: '',
+            esPremium: '',
         };
     },
     mounted() {
@@ -351,6 +352,8 @@ export default {
                 this.negocioModificar = response.data;
                 const fechaVence = new Date(response.data.fechaVence);
                 this.añoVence = fechaVence.getFullYear();
+                const fechaHoy = new Date();
+                this.esPremium = fechaHoy >= fechaVence ? true : false;
                 this.fechaVence = fechaVence.getDate() + '/' + (Number(fechaVence.getMonth()) + 1) + '/' + fechaVence.getFullYear();
             } catch (error) {
                 console.error("Error al cargar los productos:", error);

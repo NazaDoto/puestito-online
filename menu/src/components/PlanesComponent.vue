@@ -9,7 +9,7 @@
                     <div class="row justify-content-center text-center mb-4">
                         <div class="col-md-6">
                             <div class="titulo-plan">
-                                <h3>Plan Básico</h3>
+                                <h3>Menú Online</h3>
                             </div>
                             <div class="border mt-2 p-2 text-center">
                                 <div class="titulo-plan">
@@ -17,9 +17,9 @@
                                 </div>
                                 <ul class="text-start">
                                     <li>✅ Página + Menú online.</li>
-                                    <li>⚠️ Visualización en nuestra plataforma.</li>
+                                    <li>✅ Visualización en nuestra plataforma.</li>
+                                    <li>✅ Código QR para el menú.</li>
                                     <li>⚠️ Carrito y pedidos por WhatsApp.</li>
-                                    <li>⚠️ Código QR para el menú.</li>
                                 </ul>
 
                                 <div class="gris mt-2">⚠️ = 1 mes gratis <br>
@@ -33,14 +33,14 @@
                 <div class="row justify-content-center text-center">
                     <div class="col-md-6">
                         <div class="titulo-plan">
-                            <h3>Plan Completo</h3>
+                            <h3>Carrito Online</h3>
                         </div>
                         <div class="mt-2 p-2 text-center">
                             <ul class="text-start">
                                 <li>✅ Página + Menú online.</li>
                                 <li>✅ Visualización en nuestra plataforma.</li>
-                                <li>✅ Carrito y pedidos por WhatsApp.</li>
                                 <li>✅ Código QR para el menú.</li>
+                                <li>✅ Carrito y pedidos por WhatsApp.</li>
                             </ul>
                         </div>
                     </div>

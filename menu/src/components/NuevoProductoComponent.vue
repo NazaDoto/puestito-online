@@ -351,6 +351,9 @@ export default {
                         });
             } else{
                 this.botonAgregarProductoEnabled = false;
+                if (!producto.stock){
+                    producto.stock = -1;
+                }
                 axios.post('/nuevoProducto', { producto: producto })
                     .then(() => {
                         const Toast = Swal.mixin({

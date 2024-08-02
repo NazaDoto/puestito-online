@@ -147,11 +147,16 @@ app.post('/comprobar-vencimiento', (req, res) => {
             const fechaUsuario = results[0].usuario_fecha_vencimiento;
             let fechaHoy = new Date();
             if (fechaHoy > fechaUsuario) {
-                query = 'UPDATE usuarios SET usuario_tipo = 0 WHERE usuario_nombre = ?';
+
+                const query = 'UPDATE usuarios SET usuario_tipo = 0 WHERE usuario_nombre = ?';
                 connection.query(query, datos.usuario, (err, results) => {
+                    console.log('asd')
                     if (err) {
                         console.log(err);
                         res.status(500).send('Error al actualizar el tipo de usuario'); // Enviar respuesta de error si hay un error en la actualización
+                    } else {
+                        console.log('lmao')
+                        res.status(200).send();
                     }
                 });
             } else {
@@ -255,8 +260,9 @@ app.get('/negocios', async(req, res) => {
                 // Esperar a que todas las conversiones de direcciones a coordenadas geográficas se completen
                 const negocios = await Promise.all(negociosPromises);
 
-                // Filtrar resultados nulos (sin coordenadas geográficas)
-                const negociosValidos = negocios.filter(negocio => negocio !== null && negocio.tipo == 1);
+                // Filtrar resultados nulos (sin coordenadas geográficas y premium)
+                const fechaHoy = new Date();
+                const negociosValidos = negocios.filter(negocio => negocio !== null && negocio.fechaVence >= fechaHoy);
 
                 res.json(negociosValidos);
             }

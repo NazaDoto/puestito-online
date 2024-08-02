@@ -957,7 +957,7 @@ ul {
         width: 100%;
     }
 
-    .navbar-hidden {
+    .navbar {
         width: 100svw;
     }
 
