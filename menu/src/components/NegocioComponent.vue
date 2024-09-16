@@ -275,7 +275,7 @@ export default {
         document.title = this.nombreNegocio;
         document
             .querySelector('meta[property="og:title"]')
-            .setAttribute('content', this.title);
+            .setAttribute('content', this.nombreNegocio);
         document
             .querySelector('meta[property="og:description"]')
             .setAttribute('content', this.negocio.descripcion);
