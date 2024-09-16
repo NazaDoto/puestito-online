@@ -5,6 +5,11 @@ const mysql = require('mysql2');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const morgan = require('morgan');
+const fileUpload = require('express-fileupload');
+const { spawn } = require('child_process');
+const path = require('path');
+
+
 const app = express();
 const port = 3500;
 
@@ -26,7 +31,7 @@ app.use(express.json());
 
 
 app.use(morgan('dev'));
-
+app.use(fileUpload());
 
 
 if (env == 'dev') {
@@ -56,7 +61,41 @@ function generarToken(usuarioId) {
 }
 
 
+app.post('/transcribe', (req, res) => {
+    console.log('se llama');
+    if (!req.files || !req.files.audio) {
+        return res.status(400).send('No file uploaded.');
+    }
 
+    const audioFile = req.files.audio;
+    const audioPath = path.join(__dirname, 'uploads', audioFile.name);
+
+    // Save the audio file to the server
+    audioFile.mv(audioPath, (err) => {
+        if (err) {
+            return res.status(500).send(err);
+        }
+
+        // Call Whisper to transcribe the audio file
+        const whisperProcess = spawn('whisper', [audioPath, '--task', 'transcribe', '--model', 'medium', '--output_dir', './transcriptions']);
+
+        whisperProcess.on('close', (code) => {
+            if (code !== 0) {
+                return res.status(500).send('Error during transcription.');
+            }
+
+            const transcriptionPath = path.join(__dirname, 'transcriptions', path.basename(audioPath, path.extname(audioPath)) + '.txt');
+
+            fs.readFile(transcriptionPath, 'utf8', (err, data) => {
+                if (err) {
+                    return res.status(500).send('Error reading transcription file.');
+                }
+
+                res.send({ transcription: data });
+            });
+        });
+    });
+});
 
 
 app.put('/modificarVencimiento', (req, res) => {

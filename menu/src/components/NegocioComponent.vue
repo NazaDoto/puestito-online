@@ -262,13 +262,29 @@ export default {
             }
         };
     },
-    mounted() {
+
+    async mounted() {
         window.addEventListener('scroll', this.handleScroll);
 
         // Obtener el nombre de usuario de la URL
         this.nombreUsuario = this.$route.params.nombreNegocio;
         // Lógica para obtener los productos del negocio con el nombre de usuario dado
-        this.obtenerInformacionNegocio();
+        await this.obtenerInformacionNegocio();
+
+
+        document.title = this.nombreNegocio;
+        document
+            .querySelector('meta[property="og:title"]')
+            .setAttribute('content', this.title);
+        document
+            .querySelector('meta[property="og:description"]')
+            .setAttribute('content', this.negocio.descripcion);
+        document
+            .querySelector('meta[property="og:image"]')
+            .setAttribute('content', this.negocio.imagen);
+        document
+            .querySelector('meta[property="og:url"]')
+            .setAttribute('content', window.location.href);
 
     },
     beforeUnmount() {
