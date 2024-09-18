@@ -4,7 +4,7 @@
             <router-view></router-view>
         </div>
         <PieComponent />
-        
+
     </div>
 </template>
 
@@ -34,48 +34,53 @@ export default {
 </script>
 
 <style>
-html{
+html {
     overflow-y: auto;
 }
+
 /* width */
 ::-webkit-scrollbar {
-  width: 5px;
-  }
-  
-  /* Track */
-  ::-webkit-scrollbar-track {
-      
-      background: #f1f1f1;
-      }
-      
-      /* Handle */
-      ::-webkit-scrollbar-thumb {
-  background: #888;
+    width: 5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+
+    background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #888;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+    background: #555;
 }
-body{
-    background-color:#f0f0f0;
+
+body {
+    background-color: #f0f0f0;
 }
-.body{
-    width:calc(100svw -5 px);
-    min-height: calc(100svh  - 41.4px)!important;
+
+.body {
+    width: calc(100svw -5 px);
+    min-height: calc(100svh - 41.5px);
 }
+
 .pl-2 {
     padding-left: 10px;
 }
+
 .modalCategoriaContainer {
     position: absolute;
     z-index: 1233;
-    margin:0;
-    padding:0;
-    top:0;
-    left:0;
+    margin: 0;
+    padding: 0;
+    top: 0;
+    left: 0;
     width: 100%;
-    height: 100%;
+    height: 100svh;
     background-color: rgba(0, 0, 0, 0.8);
 }
 
@@ -88,18 +93,19 @@ body{
 }
 
 .btn-limpiar {
-  display: block;
-  background: linear-gradient(rgb(255, 255, 255),
-      rgb(214, 214, 214)) !important;
-  border: none;
-  border-radius: 2px;
+    display: block;
+    background: linear-gradient(rgb(255, 255, 255),
+            rgb(214, 214, 214)) !important;
+    border: none;
+    border-radius: 2px;
 }
 
 .btn-limpiar:hover {
-  background: linear-gradient(rgb(242, 242, 242),
-      rgb(201, 201, 201)) !important;
-  cursor: pointer;
+    background: linear-gradient(rgb(242, 242, 242),
+            rgb(201, 201, 201)) !important;
+    cursor: pointer;
 }
+
 .btn-menu {
     color: white;
     border: none;
@@ -112,9 +118,11 @@ body{
     background: linear-gradient(rgb(148, 193, 252), rgb(0, 87, 168)) !important;
     color: white;
 }
-.btn-menu:focus{
-    color:white !important;
+
+.btn-menu:focus {
+    color: white !important;
 }
+
 .navbar-toggler {
     outline: 0 !important;
     border: none !important;
@@ -125,8 +133,9 @@ body{
 
 .navbar-toggler:focus {
     outline: 0 !important;
-    background:lightgray !important;
+    background: lightgray !important;
 }
+
 .btn-menu-danger {
     color: white;
     border: none;
@@ -150,7 +159,7 @@ body{
 }
 
 .barra-busqueda {
-    border:none;
+    border: none;
     box-shadow: 0.2px 0.2px 2px !important;
     border-radius: 1px !important;
 }
@@ -168,20 +177,24 @@ body{
 .logo-img {
     animation: l2 2s infinite;
 }
+
 .form-control {
     border-radius: 4px !important;
     padding-right: 2.5rem;
     /* Espacio suficiente para el botón */
 }
-.nav-logo{
+
+.nav-logo {
     border-radius: 100%;
     width: 40px;
     height: 40px;
     margin-right: 10px;
 }
+
 .form-control:focus {
     box-shadow: none;
 }
+
 .pantalla-carga {
     z-index: 2;
     position: absolute;
@@ -204,13 +217,13 @@ body{
 }
 
 @media screen and (max-width: 992px) {
-    
-    .modalCategoria {
-    width: 90vw;
-}
-.body{
-    width:100svw;
 
-}
+    .modalCategoria {
+        width: 90vw;
+    }
+
+    .body {
+        width: 100svw;
+    }
 }
 </style>

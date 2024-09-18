@@ -7,13 +7,14 @@
         <div class="texto-carga">Cargando productos</div>
       </div>
     </div>
-    <div class="container mt-4 mb-2">
-      <h1 class="text-center">Listar Productos</h1>
+    <div class="container pt-4 mb-2">
+      <h1 class="text-center">Productos</h1>
       <div class="flex">
-        <div class="izquierda ancho-busqueda">
-          <input class="form-control barra-busqueda" v-model="busqueda" type="text" name="busqueda" id=""
+          <input class="form-control form-control-busqueda" v-model="busqueda" type="text" name="busqueda" id=""
             placeholder="Buscar" title="Ingrese una palabra clave..." />
-        </div>
+        <router-link class="flex-end" to="/u/nuevoProducto">
+          <img src="/recursos/plus.png" width="40" alt="">
+        </router-link>
       </div>
       <div class="ancho mt-2">
         <div class="mt-2" v-for="(categoria, index) in categoriasOrdenadas" :key="index" :id="categoria">
@@ -116,6 +117,7 @@
                       <label class="form-label" for="precio">Precio</label>
                       <input class="form-control" type="number" id="precio" v-model="productoModificar.producto_precio"
                         placeholder="Precio (sin $)" />
+                        <i class="small">Si el precio es 0, se publicará como "consultar"</i>
                     </div>
                     <div class="col-md-6">
                       <label class="form-label" for="stock">Stock (si no manejás stock de este producto poné -1)</label>
@@ -610,7 +612,13 @@ export default {
   transition: max-height 0.2s ease-in-out;
   /* Duración y función de la transición */
 }
-
+.form-control-busqueda{
+    border-radius: 20px !important;
+    display:flex;
+    width: 100%;
+  margin-right: 10px;
+  padding: 5px 15px;
+}
 .titulo-categoria:hover {
   background: rgb(232, 231, 231);
 }
@@ -720,7 +728,7 @@ img {
 
 .flex {
   display: flex;
-  justify-content: space-between;
+  width: 100%;
 }
 
 img {
@@ -755,12 +763,6 @@ th {
   max-width: 60ch;
 }
 
-.ancho-busqueda {
-  width: 400px;
-  height: 50px;
-  display: inline-flex;
-  margin-top: auto;
-}
 
 .form-switch {
   height: 2em !important;
@@ -777,10 +779,6 @@ th {
 }
 
 @media screen and (max-width: 992px) {
-  .ancho-busqueda {
-    width: 180px;
-  }
-
   .modalCategoria {
     width: 90vw;
   }

@@ -1,5 +1,5 @@
 <template>
-    <footer class="text-center">
+    <footer class="text-center" :class="{'margen-logueado' : logueado}">
   <!-- Copyright -->
   <div class="text-center p-2">
     <a href="https://puestito.online/"><img src="/favicon.ico" width="22" alt=""></a>
@@ -14,14 +14,28 @@
 
 <script>
 export default {
-
+data(){
+  return{
+    logueado: false
+  }
+},
+mounted(){
+  localStorage.getItem("usuario") ? this.logueado = true: this.logueado = false;
+}
 }
 </script>
 
 <style scoped>
+
 footer{
     position: relative;
     width: 100%;
-    bottom:0;
+}
+
+@media screen and (max-width: 992px) {
+
+  .margen-logueado{
+    margin-bottom: 70px;
+}
 }
 </style>

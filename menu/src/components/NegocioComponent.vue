@@ -1,5 +1,8 @@
 <template>
     <div>
+        <div v-if="usuarioLogueado">
+            <NavbarComponent></NavbarComponent>
+        </div>
         <div v-if="cargando" class="pantalla-carga text-center">
             <div class="logo-carga">
                 <img class="logo-img" src="/favicon.ico" width="50" alt="">
@@ -69,6 +72,21 @@
                         </div>
                     </div>
                     <hr>
+                    <div v-if="publicaciones && publicaciones.length > 0">
+                        <div class="carrusel">
+                            <div v-for="(publicacion, index) in publicaciones" :key="index"
+                                :class="{ 'carrusel-item': true, 'active': index === 0 }">
+                                <div class="publicacion-container">
+                                            <img class="imagen-publicacion" :src="publicacion.publicacion" alt=" " @click="agrandarPublicacion(publicacion.publicacion)"/>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                    </div>
+                    <div v-if="publicacionAgrandada" class="publicacion-agrandada">
+                        <button @click="cerrarAgrandarPublicacion" class="btn-close btn-close-agrandada"></button>
+                        <img :src="publicacionAgrandada" class="imagen-agrandada" alt="">
+                    </div>
                     <div class="text-center mt-2 mensajeWpp p-2" @click="enviarMensaje">
                         Enviá tu consulta
                         <img class="ml" src="/recursos/whatsapp.png" width="30" alt="">
@@ -100,8 +118,8 @@
                                                         <div class="item-nombre">
                                                             {{ producto.producto_nombre }}
                                                         </div>
-                                                        <div class="item-precio">
-                                                            ${{ producto.producto_precio }}
+                                                        <div class="item-precio">                                            
+                                                            {{ producto.producto_precio > 0 ? '$' + producto.producto_precio : 'Consultar precio'}}
                                                         </div>
                                                         <div class="item-descripcion"
                                                             v-if="producto.producto_descripcion">
@@ -240,9 +258,15 @@
 <script>
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import NavbarComponent from './NavbarComponent.vue';
 export default {
+    components:{
+        NavbarComponent
+    },
     data() {
         return {
+            publicacionAgrandada: '',
+            usuarioLogueado: false,
             isHidden: true,
             categoriaSeleccionada: null,
             mostrarModal: true,
@@ -250,6 +274,7 @@ export default {
             nombreNegocio: '',
             productos: [],      // Array para almacenar los productos del negocio
             busqueda: '',
+            publicaciones: [],
             negocio: '',
             cargando: true,
             carrito: [],
@@ -264,13 +289,15 @@ export default {
     },
 
     async mounted() {
-        window.addEventListener('scroll', this.handleScroll);
 
+        window.addEventListener('scroll', this.handleScroll);
+        
         // Obtener el nombre de usuario de la URL
         this.nombreUsuario = this.$route.params.nombreNegocio;
+        localStorage.getItem("usuario") == this.nombreUsuario ? this.usuarioLogueado = true : this.usuarioLogueado = false;
         // Lógica para obtener los productos del negocio con el nombre de usuario dado
         await this.obtenerInformacionNegocio();
-
+        await this.fetchPublicaciones();
 
         document.title = this.nombreNegocio;
         document
@@ -555,18 +582,59 @@ export default {
                 console.error("Error al cargar los productos:", error);
             }
         },
+        async fetchPublicaciones() {
+            try {
+                const response = await axios.get(`/publicaciones?usuario=${this.nombreUsuario}`);
+                this.publicaciones = response.data;
+            } catch (error) {
+                console.error(error);
+            }
+        },
         filteredProductos(categoria) {
             // Filtra los productos basándose en la categoría y en el valor de disponibilidad
             return this.productosFiltrados.filter(producto => producto.producto_categoria === categoria && producto.producto_disponibilidad === 1);
         },
         limpiarBusqueda() {
             this.busqueda = '';
-        }
+        },
+        agrandarPublicacion(publicacion){
+            this.publicacionAgrandada = publicacion;
+        },
+        cerrarAgrandarPublicacion(){
+            this.publicacionAgrandada ='';
+        },
     }
 };
 </script>
 
 <style scoped>
+.carrusel {
+    overflow-x:auto;
+    width: 100%;
+    display: inline-flex;
+}
+.carrusel::-webkit-scrollbar{
+    height: 5px;
+}
+.carrusel-item {
+    margin: 0px 5px;
+    text-align: center;
+    padding-bottom: 5px;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
+.publicacion-container {
+    overflow: hidden;
+    /* Asegura que la imagen no desborde el contenedor */
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    height: 100px;
+    width: 100px;
+}
+
+
 .mensajeWpp {
     cursor: pointer;
     font-size: 1.2rem;
@@ -688,6 +756,13 @@ export default {
     display: block;
     font-weight: normal;
     text-shadow: none;
+    background-color:rgba(0,0,0,0.3);
+    border-radius: 10svw;
+    padding: 5px 10px;
+}
+.link-dir:hover{
+    background-color:rgb(35, 35, 35);
+
 }
 
 .fondo-oscuro {
@@ -958,6 +1033,64 @@ ul {
     text-align: center;
     margin: auto;
 }
+.publicacion-agrandada {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgb(0, 0, 0); /* Fondo oscuro semi-transparente */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999; /* Asegura que esté por encima de todo */
+}
+
+.imagen-agrandada {
+    max-width: 90vw;
+    max-height: 90vh;
+    object-fit: contain; /* Ajusta la imagen sin distorsionarla */
+}
+
+.btn-close-agrandada {
+    position: absolute;
+    top: 20px; /* Ajusta según sea necesario */
+    right: 20px; /* Ajusta según sea necesario */
+    z-index: 10000; /* Asegura que el botón esté por encima de la imagen */
+    background-color: rgb(255, 255, 255); /* Fondo semi-transparente para el botón */
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.imagen-publicacion {
+    position: relative; /* Necesario para el posicionamiento del pseudo-elemento */
+    border-radius: 100%;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    background-color: white;
+    border: 8px solid rgb(29, 100, 255);
+}
+
+/* Pseudo-elemento para el borde con gradiente */
+.imagen-publicacion::before {
+    content: "";
+    position: absolute;
+    top: -5px; /* Ajusta el tamaño del borde */
+    left: -5px; /* Ajusta el tamaño del borde */
+    width: calc(100% + 10px); /* Asegúrate de que el borde se extienda más allá de la imagen */
+    height: calc(100% + 10px); /* Asegúrate de que el borde se extienda más allá de la imagen */
+    border-radius: 50%;
+    z-index: -1; /* Coloca el borde detrás de la imagen */
+}
+
+
+.imagen-publicacion:hover{
+    cursor:pointer;
+    border: rgb(112, 145, 255) 5px solid;
+}
 
 .error-content {
     text-align: center;
@@ -969,6 +1102,9 @@ ul {
 }
 
 @media screen and (max-width: 992px) {
+    .carrusel::-webkit-scrollbar{
+    display:none;
+}
     .ancho-busqueda {
         width: 100%;
     }

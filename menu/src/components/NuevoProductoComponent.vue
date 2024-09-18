@@ -1,12 +1,17 @@
 <template>
     <div>
         <NavbarComponent></NavbarComponent>
-        <div class="container mt-4 mb-2">
+        <div class="container pt-4 mb-2">
             <h1 class="text-center">Cargar Producto</h1>
 
             <form @submit.prevent="nuevoProducto(this.producto)" enctype="multipart/form-data">
                 <div class="row g-3 div-forms mt-2">
-                    <h4 class="titulo-div-forms mb-2">Información del Producto</h4>
+                    <div class="flex">
+                        <h4 class="titulo-div-forms mb-2">Información del Producto</h4>
+                        <router-link class="btn-back" to="/u/productos">
+                            <img src="/recursos/undo.png" width="40" alt="">
+                        </router-link>
+                    </div>
                     <div class="col-md-6">
                         <input class="form-control" type="text" id="nombre" v-model="producto.nombre"
                             placeholder="Nombre del Producto" required />
@@ -29,9 +34,10 @@
                             Agregar Categoría
                         </button>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6 text-center">
                         <input class="form-control" type="number" id="precio" v-model="producto.precio"
-                            placeholder="Precio (sin $)" />
+                            placeholder="Precio" />
+                            <i class="small">Si el precio es 0, se publicará como "consultar"</i>
                     </div>
                     <div class="col-md-6">
                         <input class="form-control" type="number" id="stock" v-model="producto.stock"
@@ -39,8 +45,8 @@
                     </div>
                     <div class="col-md-6">
                         <label class="form-label mr-2" for="imagen">Imagen (JPG/PNG)</label>
-                        <input class="form-control mb-3" type="file" name="imagen" id="imagen" accept="image/jpeg, image/png"
-                            @change="imagenSeleccionada($event)" />
+                        <input class="form-control mb-3" type="file" name="imagen" id="imagen"
+                            accept="image/jpeg, image/png" @change="imagenSeleccionada($event)" />
                     </div>
                 </div>
 
@@ -93,7 +99,8 @@
                                         placeholder="Nombre de la Categoría" required />
                                     <div class="modal-footer mt-2">
                                         <button type="button" class="btn" @click="cerrarCategoriaModal">Cerrar</button>
-                                        <button class="btn btn-agregar" type="submit" :disabled="!botonAgregarCategoriaEnabled">Agregar</button>
+                                        <button class="btn btn-agregar" type="submit"
+                                            :disabled="!botonAgregarCategoriaEnabled">Agregar</button>
                                     </div>
                                 </form>
                             </div>
@@ -133,7 +140,7 @@
                 </div>
             </div>
         </div>
-        <div class="text-end">
+        <div class="text-end margen-bot">
             <i> o importar listado desde Excel -></i>
             <button type="button" class="btn btn-importar" data-bs-toggle="modal" data-bs-target="#importar">
                 <img src="/recursos/xlsx.png" width="50" alt="" title="Importar desde Excel">
@@ -186,7 +193,7 @@ export default {
             this.agregarCategoriaModalAbierto = false;
         },
         agregarCategoriaModal() {
-            window.scrollTo({top:0, behavior: 'smooth'});
+            window.scrollTo({ top: 0, behavior: 'smooth' });
             this.agregarCategoriaModalAbierto = true;
         },
         cargarImportacion(evento) {
@@ -344,14 +351,14 @@ export default {
         },
 
         nuevoProducto(producto) {
-            if(producto.categoria == 'Categoría'){
+            if (producto.categoria == 'Categoría') {
                 Swal.fire({
-                            icon: 'error',
-                            text: 'Elegí o agregá una categoría.',
-                        });
-            } else{
+                    icon: 'error',
+                    text: 'Elegí o agregá una categoría.',
+                });
+            } else {
                 this.botonAgregarProductoEnabled = false;
-                if (!producto.stock){
+                if (!producto.stock) {
                     producto.stock = -1;
                 }
                 axios.post('/nuevoProducto', { producto: producto })
@@ -367,7 +374,7 @@ export default {
                                 toast.addEventListener('mouseleave', Swal.resumeTimer);
                             },
                         });
-    
+
                         Toast.fire({
                             icon: 'success',
                             title: 'Producto agregado.',
@@ -396,7 +403,7 @@ export default {
                         // Limpiar el campo de nombre de categoría
                         this.producto.categoria = this.categoria_nombre;
                         this.categoria_nombre = '';
-    
+
                         // Opcional: Puedes seleccionar automáticamente la nueva categoría
                         const Toast = Swal.mixin({
                             toast: true,
@@ -409,7 +416,7 @@ export default {
                                 toast.addEventListener('mouseleave', Swal.resumeTimer);
                             },
                         });
-    
+
                         Toast.fire({
                             icon: 'success',
                             title: 'Categoría agregada.',
@@ -424,7 +431,7 @@ export default {
                     });
             } catch (error) {
                 console.log(error)
-            } finally{
+            } finally {
                 this.botonAgregarCategoriaEnabled = true;
             }
         },
@@ -436,6 +443,13 @@ export default {
 
 
 <style scoped>
+
+.flex{
+    display:flex;
+}
+.btn-back{
+    margin-left: auto;
+}
 .pantalla-cargas {
     position: absolute;
     z-index: 5;
@@ -480,7 +494,10 @@ textarea {
 
 @media screen and (max-width: 992px) {
     .modalCategoria {
-    width: 90vw;
-}
+        width: 90vw;
+    }
+    .margen-bot{
+        margin-bottom: 50px;
+    }
 }
 </style>

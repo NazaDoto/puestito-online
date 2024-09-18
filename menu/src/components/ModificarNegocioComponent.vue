@@ -7,7 +7,7 @@
                 <div class="texto-carga">Cargando información</div>
             </div>
         </div>
-        <div class="container mt-4 mb-2 text-center">
+        <div class="container pt-4 mb-2 text-center">
             <!-- Mostrar información del negocio -->
             <div v-if="negocio">
                 <h1 class="text-center">Perfil</h1>
@@ -20,13 +20,13 @@
                     <div v-else class="textoTarjeta">
                         <h4 class="titulo-div-forms mb-2 mt-2">Esta es una cuenta Premium.</h4>
                         <h4 class="titulo-div-forms">Vence: {{ fechaVence }}</h4>
-                        <div class="flex">
-
+                        <div class="col-md-6 m-auto">
                             Tipo de Puestito:
-                                <select class="form-select selectTipo" name="tipo" id="" v-model="tipoPuestito" @change="cambiarTipoPuestito">
-                                    <option value="0">Menú (solo se muestran tus productos)</option>
-                                    <option value="1">Carrito (puedes recibir pedidos por WhatsApp)</option>
-                                </select>
+                            <select class="form-select selectTipo text-center" name="tipo" id="" v-model="tipoPuestito"
+                                @change="cambiarTipoPuestito">
+                                <option value="0">Menú (solo se muestran tus productos)</option>
+                                <option value="1">Carrito (pedidos por WhatsApp)</option>
+                            </select>
                         </div>
                     </div>
                     <hr class="m-2">
@@ -95,9 +95,33 @@
                                 </tr>
                             </tbody>
                         </table>
-                        <button class="btn btn-menu mt-2 mb-2" title="Modificar" data-bs-toggle="modal"
-                            data-bs-target="#modificarProducto">Modificar
-                            Datos</button>
+                        <div class="flex">
+                            <button class="btn btn-menu-danger" data-bs-toggle="modal"
+                                data-bs-target="#cerrarSesionModal2">
+                                Cerrar Sesión
+                            </button>
+                            <button class="btn btn-menu" title="Modificar" data-bs-toggle="modal"
+                                data-bs-target="#modificarProducto">Modificar
+                                Datos</button>
+                        </div>
+                        <div class="modal fade" id="cerrarSesionModal2" tabindex="-1"
+                            aria-labelledby="cerrarSesionModal2Label" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header text-center">
+                                        <h1 class="modal-title fs-5" id="cerrarSesionModal2Label">¿Cerrar sesión?</h1>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-footer text-center">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">No</button>
+                                        <button type="button" class="btn btn-menu-danger" data-bs-dismiss="modal"
+                                            @click="cerrarSesion">Sí, cerrar sesión</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <br>
 
@@ -201,23 +225,21 @@
                                                 accept="image/jpeg, image/png" @change="portadaSeleccionada">
                                         </div>
                                     </div>
-                                    <div class="text-end">
+                                    <div class="flex text-end">
                                         <button type="button" class="btn mt-3" data-bs-dismiss="modal">Cerrar</button>
                                         <button class="btn btn-menu mt-3" type="submit"
                                             data-bs-dismiss="modal">Modificar</button>
                                     </div>
                                 </form>
                             </div>
-
-
                         </div>
                     </div>
                 </div>
                 <!--Modal Cropper-->
-                <div v-show="modalCropImage" class="modalCategoriaContainer  text-center ">
+                <div v-show="modalCropImage" class="modalCategoriaContainer text-center ">
                     <div class="modalCategoria">
-                        <div class="modal-dialog modal-dialog-centered ">
-                            <div class="modal-content ">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
                                 <div class="modal-header pl-2">
                                     <h1 class="modal-title fs-5" id="agregarCategoriaLabel">Recortar Imagen</h1>
                                     <button type="button" class="btn-close" @click="cerrarCrop"
@@ -310,6 +332,10 @@ export default {
         this.obtenerInformacionNegocio();
     },
     methods: {
+        cerrarSesion() {
+            localStorage.clear(); // Elimina el token del almacenamiento local
+            router.push('/');
+        },
 
         mejorarPlan() {
             router.push('/u/planes');
@@ -336,7 +362,7 @@ export default {
             })
                 .catch((error) => {
                     console.error('Error al actualizar la información en la base de datos:', error);
-                this.obteniendoInfo = false;
+                    this.obteniendoInfo = false;
                 }).finally(() => {
                     this.obteniendoInfo = false;
                 });
@@ -362,9 +388,9 @@ export default {
             }
 
         },
-        async cambiarTipoPuestito(){
+        async cambiarTipoPuestito() {
             try {
-                await axios.put('/cambiarTipoPuestito', {tipo: this.tipoPuestito, usuario: this.negocio.usuario});
+                await axios.put('/cambiarTipoPuestito', { tipo: this.tipoPuestito, usuario: this.negocio.usuario });
             } catch (error) {
                 console.error("Error al cambiar el tipo: ", error);
             }
@@ -488,10 +514,21 @@ export default {
 </script>
 
 <style scoped>
-.selectTipo{
+.btn-menu-danger {
+    display: none;
+}
+
+.flex {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.selectTipo {
     width: auto;
     margin: auto;
 }
+
 .modal-dialog .modal-dialog-center {
     z-index: 1 !important;
 }
@@ -575,7 +612,16 @@ img {
     width: 60vw;
 }
 
+.btn-menu {
+    display: flex;
+    margin-left: auto !important;
+}
+
 @media screen and (max-width: 992px) {
+    .btn-menu-danger {
+        display: block;
+    }
+
     .modalCategoria {
         width: 90vw;
     }

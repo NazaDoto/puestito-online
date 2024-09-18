@@ -1,8 +1,8 @@
 <template>
   <div class="todo">
     <NavbarAdminComponent v-if="esAdmin()" />
-    <NavbarComponent v-else></NavbarComponent>
-    <div class="container mt-4 mb-2">
+
+    <div class="container pt-4 mb-2">
       <h1 class="text-center">Bienvenid@, {{ nombreNegocio }}</h1>
       <div v-if="esAdmin()" class="container ">
         <div class="col-md-6 mt-2">
@@ -11,125 +11,87 @@
 
       </div>
       <div v-else class="text-center">
-        <div class="row g-3 div-forms">
-          <div class="col-md-6">
-            <h2 class="titulo-div-forms mb-2">Perfil</h2>
-            <router-link class="btn btn-menu" to='/u/modificar'>Ver Información</router-link>
-          </div>
+        <img style="border-radius:100%;" v-if="negocio.imagen" :src="negocio.imagen" width="100" alt="">
+        <hr>
+        <div class="botones">
+          <router-link class="btn-inicio" to='/u/modificar'>
+            <img src="/recursos/user.png" width="50" height="50" alt="User">
+            Perfil</router-link>
+          <router-link class="btn-inicio" to='/u/productos'>
+            <img src="/recursos/productos.png" width="50" height="50" alt="Productos">Productos</router-link>
+        </div>
+        <div class="botones mt-2">
+          <router-link to="/u/crearqr" class="btn-inicio">
+            <img src="/recursos/qr.png" width="50" height="50" alt="QR"> Crear QR
+          </router-link>
+          <router-link to="/u/publicaciones" class="btn-inicio">
+            <img src="/recursos/image.png" width="50" height="50" alt="QR">Publicaciones
+          </router-link>
+        </div>
+        <div class="botones mt-2">
+          <router-link :to="'/' + nombreUsuario" class="btn-inicio">
+            <img src="/recursos/mipuestito.png" width="50" height="50" alt="User"> Mi Puestito
+          </router-link>
+          <a class="btn-inicio" @click="enviarMensaje">
+            <img src="/recursos/support.png" width="50" height="50" alt="User"> Soporte
+          </a>
         </div>
         <hr>
-        <div class="row g-3 div-forms mt-2">
-          <div class="col-md-6">
-            <h2 class="titulo-div-forms mb-2">Productos</h2>
-            <router-link class="btn btn-menu" to="/u/nuevoProducto">Nuevo Producto</router-link><br>
-            <router-link class="btn btn-menu" to='/u/productos'>Listar Productos</router-link>
-          </div>
-        </div>
-        <hr>
-        <div class="row g-3 div-forms mt-2">
-          <div class="col-md-6">
-            <h2 class="titulo-div-forms mb-2">
-              Tu link
-            </h2>
-            <a :href="'https://puestito.online/' + nombreUsuario" target="_blank">https://puestito.online/{{
-              nombreUsuario }}</a><br>
-          </div>
-        </div>
-        <hr>
-        <div v-if="fechaVence !== '2100'" class="div-forms mt-2">
-          <h2 class="titulo-div-forms mb-2">Tu código QR</h2>
-          <div class="col-md-6">
-            <label class="form-label" for="qrText">Texto1</label>
-            <div class="flex">
-              <input class="form-control" name="qrText" type="text" v-model="qrText">
-              <input class="form-control-color" type="color" name="qrTextColor" v-model="qrTextColor">
-            </div>
-          </div>
-          <div class="col-md-6">
-            <label class="form-label mt-2" for="qrTitle">Texto2</label>
-            <div class="flex">
-              <input class="form-control" name="qrTitle" type="text" v-model="qrTitle">
-              <input class="form-control-color" type="color" name="qrTitleColor" v-model="qrTitleColor">
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="justify-content-center">
-              <label class="form-label mt-2" for="qrPortada">Utilizar portada como fondo</label>
-              <input class="form-control-check" type="checkbox" name="qrPortada" id="" v-model="mostrarPortada"> <br>
-              <router-link v-if="mostrarPortada" to="/u/modificar">Cambiar portada</router-link>
-            </div>
-          </div>
-          <div v-if="!mostrarPortada" class="col-md-">
-            <label for="qrFondoColor" class="form-label mt-2">Color de fondo</label> <br>
-            <input class="form-control-color" type="color" name="qrFondoColor" v-model="qrFondoColor">
-          </div>
-          <div ref="contenido" class="mt-4 position-relative" >
-            <img v-if="mostrarPortada" class="portada" :src="negocio.portada" alt="">
-            <div v-else class="fondoColor" :style="{ backgroundColor: qrFondoColor }"></div>
-            <div class="p-4 frente">
-              <h5 class="mt-2 qr-text-consulta" :style="{ color: qrTextColor }">{{ qrText }}<p class="qr-text"
-                  :style="{ color: qrTitleColor }">{{ qrTitle }}</p>
-              </h5>
-              <a style="color:black;text-decoration: none;" ref="qrcode"
-                :href="'https://puestito.online/' + nombreUsuario" target="_blank"></a><br>
-            </div>
-          </div>
-          <div class="col-md-6">
-
-            <button @click="descargarQR" class="btn btn-menu margenbtn">Descargar QR</button>
-          </div>
-        </div>
+        
       </div>
     </div>
+
   </div>
 </template>
 
 <script>
-import QRCode from 'qrcode-generator';
-import NavbarComponent from "./NavbarComponent.vue";
 import NavbarAdminComponent from "./NavbarAdminComponent.vue";
 import { RouterLink } from "vue-router";
-import { saveAs } from 'file-saver'; // Importa la función saveAs de la biblioteca file-saver
-import html2canvas from 'html2canvas';
 import axios from 'axios';
+import Swal from "sweetalert2";
 export default {
   data() {
     return {
       nombreUsuario: '',
       nombreNegocio: '',
-      fechaVence: '',
       negocio: '',
-      qrText: '',
-      qrTitle: '',
-      qrTextColor: '',
-      qrTitleColor: '',
-      qrFondoColor: '#FFFFFF',
-      mostrarPortada: true,
     }
   },
   components: {
-    NavbarComponent,
     NavbarAdminComponent,
     "router-link": RouterLink,
   },
   mounted() {
     this.leerUsuario();
-    this.leerTextoQR();
-    if (this.nombreUsuario != 'admin') {
-      this.generarQR();
-    }
   },
   created() {
     // Realiza una solicitud HTTP para obtener los informes desde el servidor
     this.obtenerInformacionNegocio();
   },
   methods: {
-    leerTextoQR() {
-      this.qrText = localStorage.getItem('qrText') || 'CONSULTÁ EL';
-      this.qrTitle = localStorage.getItem('qrTitle') || 'MENÚ';
-      this.qrTextColor = localStorage.getItem('qrTextColor') || '#000000';
-      this.qrTitleColor = localStorage.getItem('qrTitleColor') || '#000000';
-    },
+    enviarMensaje() {
+            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+            // Verificar si el usuario está en un dispositivo móvil
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+
+            // Definir el enlace base según si es móvil o no
+            let baseLink = isMobile ? 'whatsapp://send' : 'https://web.whatsapp.com/send';
+
+            // Construir el enlace completo
+            const mensajeCompleto = `¡Hola Puestito Online! Tengo una consulta...`;
+            const numeroWhatsapp = `${baseLink}?phone=3853005369&text=${encodeURIComponent(mensajeCompleto)}`;
+            // Finalmente, abrimos una nueva ventana del navegador con el enlace generado
+            try {
+                window.open(numeroWhatsapp);
+                location.reload(1);
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    text: 'Por favor habilita las ventanas emergentes para ir a WhatsApp.' + error.response.data.message,
+                });
+            }
+        },
     async obtenerInformacionNegocio() {
       try {
         this.obteniendoInfo = true;
@@ -144,63 +106,56 @@ export default {
       }
 
     },
-    generarQR() {
-      // Obtén el nombre de usuario desde el almacenamiento local
-      const nombreUsuario = localStorage.getItem("nombre");
-
-      // Verifica si el nombre de usuario existe antes de generar el código QR
-      if (nombreUsuario) {
-        // Crea una instancia de la clase QRCode
-        const qr = QRCode(0, 'L');
-
-        // Define el tamaño del módulo del código QR
-        const tamaño = 9; // Ajusta el tamaño según tus necesidades
-        qr.size = tamaño;
-
-        // Define el contenido del código QR (puedes ajustar esto según tus necesidades)
-        const url = 'https://puestito.online/' + nombreUsuario;
-        qr.addData(url);
-        qr.make();
-
-        // Renderiza el código QR en el div con ref="qrcode"
-        this.renderQRCode(qr.createImgTag(tamaño, 0));
-      }
-    },
-    renderQRCode(qrCodeImageTag) {
-      // Renderiza la imagen del código QR en el div con ref="qrcode"
-      // Obtener el elemento al que deseas agregar la clase
-      const qrcodeElement = this.$refs.qrcode;
-
-      // Agregar la clase al elemento
-      qrcodeElement.innerHTML = qrCodeImageTag;
-      qrcodeElement.innerHTML += `<div class="mt-2" style="color:white;background: black;border-radius: 10px;">puestito.online/` + this.nombreUsuario + '</div>';
-
-    },
     leerUsuario() {
       this.nombreUsuario = localStorage.getItem("usuario");
       this.nombreNegocio = localStorage.getItem("nombre");
-      this.fechaVence = localStorage.getItem("año");
     },
     esAdmin() {
       return (localStorage.getItem("usuario") == "admin");
-    },
-    descargarQR() {
-      const contenidoDiv = this.$refs.contenido;
-      localStorage.setItem('qrText', this.qrText);
-      localStorage.setItem('qrTitle', this.qrTitle);
-      localStorage.setItem('qrTitleColor', this.qrTitleColor);
-      localStorage.setItem('qrTextColor', this.qrTextColor);
-      html2canvas(contenidoDiv, { backgroundColor: null }).then(canvas => {
-        canvas.toBlob(blob => {
-          saveAs(blob, 'contenido-' + this.nombreUsuario + '.png');
-        });
-      });
     },
   }
 };
 </script>
 
 <style scoped>
+.botones {
+  display: flex;
+  flex-wrap: wrap;
+  gap:20px;
+  justify-content: center;
+}
+
+.btn-inicio {
+  display: flex;
+  flex-direction: column; /* Organiza los elementos en una columna */
+  align-items: center; /* Centra el contenido horizontalmente */
+  text-align: center; /* Alinea el texto en el centro */
+  justify-content: center;
+  background-color: black; /* Fondo del botón */
+  color:white;
+  height: 20svh;
+  width: 20svh;
+  padding: 10px; /* Espacio interno del botón */
+  border-radius: 5px; /* Bordes redondeados del botón */
+  text-decoration: none; /* Quita el subrayado de los enlaces */
+}
+.btn-inicio:hover{
+  background-color: rgb(31, 31, 31);
+}
+
+.btn-contactar {
+  background-color: black;
+  border-radius: 20px;
+  color: white;
+  text-decoration: none;
+  padding: 7px;
+}
+
+.btn-contactar:hover {
+  background-color: rgb(31, 31, 31);
+}
+
+
 .form-control-color {
   border: none;
   padding: 1px;
@@ -288,6 +243,8 @@ export default {
 
 
 @media screen and (max-width: 992px) {
+
+
   .col-md-6 {
     display: block !important;
   }
@@ -307,7 +264,8 @@ export default {
   .portada {
     width: 100%;
   }
-  .fondoColor{
+
+  .fondoColor {
     width: 100%;
   }
 }

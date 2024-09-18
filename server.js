@@ -527,6 +527,8 @@ app.post('/nuevoProducto', (req, res) => {
     }
 });
 
+
+
 app.get(`/categorias`, (req, res) => {
 
     const usuario = req.query.usuario;
@@ -609,6 +611,43 @@ app.get("/productos", (req, res) => {
         }
     });
 });
+
+app.get('/publicaciones', (req, res) => {
+    const usuario = req.query.usuario;
+    const query = "SELECT * FROM publicaciones WHERE usuario_nombre = ?";
+    connection.query(query, usuario, (err, results) => {
+        if (err) {
+            res.status(500).json({ message: 'Error al obtener publicaciones' });
+        } else {
+            res.status(200).json(results);
+        }
+    })
+})
+
+app.post('/nuevaPublicacion', (req, res) => {
+    const { usuario, publicacion } = req.body;
+    const query = "INSERT INTO publicaciones (usuario_nombre, publicacion) VALUES (?, ?)";
+    connection.query(query, [usuario, publicacion], (err, result) => {
+        if (err) {
+            res.status(500).json({ message: 'Error al subir publicación' });
+        } else {
+            res.status(200).json({ message: 'Publicación subida correctamente.' });
+        }
+    })
+});
+
+app.delete('/borrarPublicacion', (req, res) => {
+    const id = req.query.id;
+    const query = "DELETE FROM publicaciones WHERE publicaciones.id = ?";
+    connection.query(query, id, (err, result) => {
+        if (err) {
+            res.status(500).json({ message: 'Error al borrar publicación' });
+        } else {
+            res.status(200).json({ message: 'Publicación borrada correctamente.' });
+        }
+    })
+})
+
 app.put('/actualizarDisponibilidad', (req, res) => {
     const { productoId, nuevoEstado } = req.body; // Suponiendo que envías el nuevo estado en el cuerpo de la solicitud JSON
     const sql = 'UPDATE productos SET producto_disponibilidad = ? WHERE producto_id = ?';
@@ -618,7 +657,6 @@ app.put('/actualizarDisponibilidad', (req, res) => {
         if (err) {
             res.status(500).json({ message: 'Error al actualizar el estado del producto' });
         } else {
-
             res.status(200).json({ message: 'Estado del producto actualizado correctamente' });
         }
     });

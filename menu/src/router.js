@@ -6,12 +6,14 @@ import RegistrarComponent from './components/RegistrarComponent.vue';
 import ListarNegociosComponent from './components/ListarNegociosComponent.vue';
 import NuevoProductoComponent from './components/NuevoProductoComponent.vue';
 import ListarProductosComponent from './components/ListarProductosComponent.vue';
-import ListarCategoriasComponent from './components/ListarCategoriasComponent.vue';
 import NegocioComponent from './components/NegocioComponent.vue';
 import ModificarNegocioComponent from './components/ModificarNegocioComponent.vue';
 import PlanesComponent from './components/PlanesComponent.vue';
 import SuccessComponent from './components/SuccessComponent.vue';
 import CalcularComponent from './components/CalcularComponent.vue';
+import CrearQRComponent from './components/CrearQRComponent.vue';
+import NuevaPublicacionComponent from './components/NuevaPublicacionComponent.vue';
+import PublicacionesComponent from './components/PublicacionesComponent.vue';
 
 
 const routes = [{
@@ -25,8 +27,23 @@ const routes = [{
         meta: { requiresAuth: false },
     },
     {
+        path: '/u/publicaciones',
+        component: PublicacionesComponent,
+        meta: { requiresAuth: true },
+    },
+    {
+        path: '/u/nuevapublicacion',
+        component: NuevaPublicacionComponent,
+        meta: { requiresAuth: true },
+    },
+    {
         path: '/u/home',
         component: InicioNegocioComponent,
+        meta: { requiresAuth: true },
+    },
+    {
+        path: '/u/crearqr',
+        component: CrearQRComponent,
         meta: { requiresAuth: true },
     },
 
@@ -69,11 +86,6 @@ const routes = [{
     {
         path: '/u/productos',
         component: ListarProductosComponent,
-        meta: { requiresAuth: true },
-    },
-    {
-        path: '/u/categorias',
-        component: ListarCategoriasComponent,
         meta: { requiresAuth: true },
     },
     {
