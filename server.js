@@ -626,11 +626,10 @@ app.get('/publicaciones', (req, res) => {
 
 app.post('/nuevaPublicacion', (req, res) => {
     const { usuario, publicacion } = req.body;
-    console.log(usuario, publicacion);
     const query = "INSERT INTO publicaciones (usuario_nombre, publicacion) VALUES (?, ?)";
     connection.query(query, [usuario, publicacion], (err, result) => {
         if (err) {
-            res.status(500).json({ message: 'Error al subir publicación' + err });
+            res.status(500).json({ message: 'Error al subir publicación' });
         } else {
             res.status(200).json({ message: 'Publicación subida correctamente.' });
         }
