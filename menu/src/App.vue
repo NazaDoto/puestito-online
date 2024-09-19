@@ -196,7 +196,7 @@ body {
 }
 
 .pantalla-carga {
-    z-index: 2;
+    z-index: 20;
     position: absolute;
     top: 0;
     left: 0;
