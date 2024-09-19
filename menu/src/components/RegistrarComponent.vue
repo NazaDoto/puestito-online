@@ -445,9 +445,24 @@ export default {
                 usuario: this.usuario,
             });
             try {
-                window.open(await datos.data.response.init_point, "_blank");
+                // Abrir la ventana emergente antes de la operación asíncrona
+                const nuevaVentana = window.open('', '_blank');
+
+                const urlPago = await datos.data.response.init_point;
+
+                if (nuevaVentana) {
+                    // Redirigir a la URL de MercadoPago en la ventana ya abierta
+                    nuevaVentana.location.href = urlPago;
+                } else {
+                    throw new Error('No se pudo abrir la ventana emergente.');
+                }
+
+                // Procesar el external_reference
                 this.ref = JSON.parse(datos.data.response.external_reference);
+
+                // Verificar el pago
                 const verificado = await this.verificarPago();
+
                 if (verificado === "approved") {
                     this.registrarMejora();
                     this.cargandoPago = false;
@@ -458,12 +473,15 @@ export default {
                         text: "No se pudo verificar el pago.",
                     });
                 }
+
             } catch (error) {
+                this.cargandoPago = false;
                 Swal.fire({
                     icon: 'error',
-                    text: 'Por favor habilita las ventanas emergentes para ir a MercadoPago.' + error.response.data.message,
+                    text: 'Por favor habilita las ventanas emergentes para ir a MercadoPago.' + (error.response?.data?.message || error.message),
                 });
             }
+
         },
         async contratarPlan() {
             try {
@@ -479,7 +497,16 @@ export default {
                         .toISOString()
                         .slice(0, 19)
                         .replace("T", " ");
-                    window.open(await datos.data.response.init_point, "_blank");
+                    const nuevaVentana = window.open('', '_blank');
+
+                    const urlPago = await datos.data.response.init_point;
+
+                    if (nuevaVentana) {
+                        // Redirigir a la URL de MercadoPago en la ventana ya abierta
+                        nuevaVentana.location.href = urlPago;
+                    } else {
+                        throw new Error('No se pudo abrir la ventana emergente.');
+                    }
                     this.ref = JSON.parse(datos.data.response.external_reference);
                     const verificado = await this.verificarPago();
                     if (verificado === "approved") {
