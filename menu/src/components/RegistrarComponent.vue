@@ -459,7 +459,10 @@ export default {
                     });
                 }
             } catch (error) {
-                console.log(error);
+                Swal.fire({
+                    icon: 'error',
+                    text: 'Por favor habilita las ventanas emergentes para ir a MercadoPago.' + error.response.data.message,
+                });
             }
         },
         async contratarPlan() {
@@ -490,7 +493,10 @@ export default {
                         });
                     }
                 } catch (error) {
-                    console.log(error);
+                    Swal.fire({
+                        icon: 'error',
+                        text: 'Por favor habilita las ventanas emergentes para ir a MercadoPago.' + error.response.data.message,
+                    });
                 }
             } catch (error) {
                 console.log(error);
@@ -593,9 +599,11 @@ export default {
 .form-control-fact {
     height: 40px;
 }
-.flex{
+
+.flex {
     display: flex;
 }
+
 .subtitulo {
     font-weight: normal;
     font-size: 14px;

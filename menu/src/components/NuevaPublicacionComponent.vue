@@ -89,10 +89,10 @@ export default {
                         router.push('/u/publicaciones');
                     }, 1000);
                 })
-                    .catch(() => {
+                    .catch((er) => {
                         Swal.fire({
                             icon: 'error',
-                            text: 'No se pudo publicar.',
+                            text: 'No se pudo publicar.' + er,
                         });
                     });
 

@@ -53,7 +53,8 @@
                                 <div class="precio-plan">
                                     $2500
                                 </div>
-                                <button class="btn btn-menu" @click="elegirPlan(1)">CONTRATAR</button>
+                                <button class="btn btn-menu" @click="elegirPlan(1)">
+                                    <img src="/recursos/mercadopago.png" width="50" alt="">CONTRATAR<br>(MercadoPago)</button>
                             </div>
                             <div class="border p-2 m-2 col-md-3">
                                 <div class="titulo-plan">
@@ -62,7 +63,8 @@
                                 <div class="precio-plan">
                                     $12500
                                 </div>
-                                <button class="btn btn-menu" @click="elegirPlan(6)">CONTRATAR</button>
+                                <button class="btn btn-menu" @click="elegirPlan(6)">
+                                    <img src="/recursos/mercadopago.png" width="50" alt="">CONTRATAR<br>(MercadoPago)</button>
                             </div>
                             <div class="border p-2 m-2 col-md-3">
                                 <div class="titulo-plan">
@@ -71,7 +73,8 @@
                                 <div class="precio-plan">
                                     $20000
                                 </div>
-                                <button class="btn btn-menu" @click="elegirPlan(12)">CONTRATAR</button>
+                                <button class="btn btn-menu" @click="elegirPlan(12)">
+                                    <img src="/recursos/mercadopago.png" width="50" alt="">CONTRATAR<br>(MercadoPago)</button>
                             </div>
                         </div>
                     </div>

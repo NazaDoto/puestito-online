@@ -624,15 +624,7 @@ export default {
     border-bottom-left-radius: 5px;
 }
 
-.publicacion-container {
-    overflow: hidden;
-    /* Asegura que la imagen no desborde el contenedor */
-    justify-content: center;
-    align-items: center;
-    border-radius: 5px;
-    height: 100px;
-    width: 100px;
-}
+
 
 
 .mensajeWpp {
@@ -1062,34 +1054,52 @@ ul {
     font-size: 1.5rem;
     cursor: pointer;
 }
-
+.publicacion-container {
+    overflow: hidden;
+    /* Asegura que la imagen no desborde el contenedor */
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    height: 100px;
+    width: 100px;
+    display:flex;
+}
 .imagen-publicacion {
-    position: relative; /* Necesario para el posicionamiento del pseudo-elemento */
-    border-radius: 100%;
-    width: 100%;
-    height: 100%;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, #33f043, #3ce6ad, #27d0dc, #237dcc, #2873ff); /* Gradiente de Instagram */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px; /* Espacio entre la imagen y el borde */
+    cursor: pointer;
+    position: relative;
     object-fit: cover;
-    display: block;
-    background-color: white;
-    border: 8px solid rgb(29, 100, 255);
 }
 
+.imagen-publicacion img{
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: white; /* Fondo blanco para simular el borde interno de la historia */
+}
 /* Pseudo-elemento para el borde con gradiente */
 .imagen-publicacion::before {
-    content: "";
     position: absolute;
     top: -5px; /* Ajusta el tamaño del borde */
     left: -5px; /* Ajusta el tamaño del borde */
     width: calc(100% + 10px); /* Asegúrate de que el borde se extienda más allá de la imagen */
     height: calc(100% + 10px); /* Asegúrate de que el borde se extienda más allá de la imagen */
     border-radius: 50%;
+    background-color: white;
     z-index: -1; /* Coloca el borde detrás de la imagen */
 }
 
 
 .imagen-publicacion:hover{
     cursor:pointer;
-    border: rgb(112, 145, 255) 5px solid;
+    border: rgb(112, 145, 255) 1px solid;
 }
 
 .error-content {
