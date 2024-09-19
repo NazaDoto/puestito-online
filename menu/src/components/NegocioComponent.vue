@@ -53,9 +53,7 @@
 
                                 </div>
                                 <div class="text-center redes">
-                                    <a class="link-dir" v-if="negocio.direccion"
-                                        :href="'https://www.google.com/maps/search/' + encodeURIComponent(negocio.direccion)"
-                                        target="_blank">{{ negocio.direccion }}</a>
+                                    <h4 v-if="negocio.direccion">{{ negocio.direccion }}</h4>
                                     <a v-if="negocio.instagram" class="mauto"
                                         :href="'https://instagram.com/' + negocio.instagram" target="blank"><img
                                             width='40' src="/recursos/instagram.png"></a>
@@ -72,20 +70,34 @@
                         </div>
                     </div>
                     <hr>
-                    <div v-if="publicaciones && publicaciones.length > 0">
+                    <div v-if="publicaciones && publicaciones.length > 0" class="justify-content-center">
                         <div class="carrusel">
                             <div v-for="(publicacion, index) in publicaciones" :key="index"
                                 :class="{ 'carrusel-item': true, 'active': index === 0 }">
                                 <div class="publicacion-container">
-                                            <img class="imagen-publicacion" :src="publicacion.publicacion" alt=" " @click="agrandarPublicacion(publicacion.publicacion)"/>
+                                    <img class="imagen-publicacion" :src="publicacion.publicacion" alt=" "
+                                        @click="agrandarPublicacion(index)" />
                                 </div>
                             </div>
                         </div>
-                        <hr>
-                    </div>
-                    <div v-if="publicacionAgrandada" class="publicacion-agrandada">
-                        <button @click="cerrarAgrandarPublicacion" class="btn-close btn-close-agrandada"></button>
-                        <img :src="publicacionAgrandada" class="imagen-agrandada" alt="">
+                        <hr class="hr-mobile">
+                        <div v-if="publicacionAgrandada !== null" class="publicacion-agrandada">
+                            <button @click="cerrarAgrandarPublicacion" class="btn-close btn-close-agrandada"></button>
+
+                            <!-- Botón para ir a la publicación anterior -->
+                            <button v-if="indiceAgrandada > 0" @click="agrandarPublicacion(indiceAgrandada - 1)"
+                                class="btn-anterior">
+                            <img src="/recursos/previous.png" width="20" alt=""></button>
+                            
+                            <!-- Botón para ir a la siguiente publicación -->
+                            <button v-if="indiceAgrandada < publicaciones.length - 1"
+                            @click="agrandarPublicacion(indiceAgrandada + 1)"
+                            class="btn-siguiente">
+                            <img src="/recursos/next.png" width="20" alt=""></button>
+
+                            <!-- Imagen agrandada -->
+                            <img :src="publicaciones[publicacionAgrandada].publicacion" class="imagen-agrandada" alt="">
+                        </div>
                     </div>
                     <div class="text-center mt-2 mensajeWpp p-2" @click="enviarMensaje">
                         Enviá tu consulta
@@ -118,8 +130,9 @@
                                                         <div class="item-nombre">
                                                             {{ producto.producto_nombre }}
                                                         </div>
-                                                        <div class="item-precio">                                            
-                                                            {{ producto.producto_precio > 0 ? '$' + producto.producto_precio : 'Consultar precio'}}
+                                                        <div class="item-precio">
+                                                            {{ producto.producto_precio > 0 ? '$' +
+                                                                producto.producto_precio : 'Consultar precio' }}
                                                         </div>
                                                         <div class="item-descripcion"
                                                             v-if="producto.producto_descripcion">
@@ -260,12 +273,12 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import NavbarComponent from './NavbarComponent.vue';
 export default {
-    components:{
+    components: {
         NavbarComponent
     },
     data() {
         return {
-            publicacionAgrandada: '',
+            publicacionAgrandada: null,
             usuarioLogueado: false,
             isHidden: true,
             categoriaSeleccionada: null,
@@ -279,6 +292,7 @@ export default {
             cargando: true,
             carrito: [],
             total: 0,
+            indiceAgrandada: null,
             pedido: {
                 nombre: '',
                 medio: 'Transferencia',
@@ -291,7 +305,7 @@ export default {
     async mounted() {
 
         window.addEventListener('scroll', this.handleScroll);
-        
+
         // Obtener el nombre de usuario de la URL
         this.nombreUsuario = this.$route.params.nombreNegocio;
         localStorage.getItem("usuario") == this.nombreUsuario ? this.usuarioLogueado = true : this.usuarioLogueado = false;
@@ -585,7 +599,7 @@ export default {
         async fetchPublicaciones() {
             try {
                 const response = await axios.get(`/publicaciones?usuario=${this.nombreUsuario}`);
-                this.publicaciones = response.data;
+                this.publicaciones = response.data.sort((a, b) => b.id - a.id);
             } catch (error) {
                 console.error(error);
             }
@@ -597,11 +611,13 @@ export default {
         limpiarBusqueda() {
             this.busqueda = '';
         },
-        agrandarPublicacion(publicacion){
-            this.publicacionAgrandada = publicacion;
+        agrandarPublicacion(indice) {
+            this.indiceAgrandada = indice;
+            this.publicacionAgrandada = indice;  // Establece la publicación agrandada
         },
-        cerrarAgrandarPublicacion(){
-            this.publicacionAgrandada ='';
+        cerrarAgrandarPublicacion() {
+            this.indiceAgrandada = null;
+            this.publicacionAgrandada = null;  // Cierra la vista agrandada
         },
     }
 };
@@ -609,19 +625,24 @@ export default {
 
 <style scoped>
 .carrusel {
-    overflow-x:auto;
+    overflow-x: auto;
     width: 100%;
     display: inline-flex;
+    padding-bottom: 10px;
+    margin: auto;
 }
-.carrusel::-webkit-scrollbar{
+
+.carrusel::-webkit-scrollbar {
     height: 5px;
 }
+
+.carrusel::-webkit-scrollbar-thumb {
+    border-radius: 5px;
+
+}
+
 .carrusel-item {
-    margin: 0px 5px;
     text-align: center;
-    padding-bottom: 5px;
-    border-bottom-right-radius: 5px;
-    border-bottom-left-radius: 5px;
 }
 
 
@@ -640,6 +661,7 @@ export default {
 
 .error-content {
     height: 100%;
+    padding-top: 20svh;
 }
 
 .flex {
@@ -748,12 +770,13 @@ export default {
     display: block;
     font-weight: normal;
     text-shadow: none;
-    background-color:rgba(0,0,0,0.3);
+    background-color: rgba(0, 0, 0, 0.3);
     border-radius: 10svw;
     padding: 5px 10px;
 }
-.link-dir:hover{
-    background-color:rgb(35, 35, 35);
+
+.link-dir:hover {
+    background-color: rgb(35, 35, 35);
 
 }
 
@@ -1025,35 +1048,74 @@ ul {
     text-align: center;
     margin: auto;
 }
+
 .publicacion-agrandada {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color: rgb(0, 0, 0); /* Fondo oscuro semi-transparente */
+    background-color: rgb(0, 0, 0);
+    /* Fondo oscuro semi-transparente */
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 9999; /* Asegura que esté por encima de todo */
+    z-index: 9999;
+    overflow: hidden;
+    /* Asegura que esté por encima de todo */
 }
 
 .imagen-agrandada {
-    max-width: 90vw;
-    max-height: 90vh;
-    object-fit: contain; /* Ajusta la imagen sin distorsionarla */
+    max-height: 60vh;
+    max-width: 80vw;
+    object-fit: contain;
+    /* Ajusta la imagen sin distorsionarla */
 }
 
 .btn-close-agrandada {
     position: absolute;
-    top: 20px; /* Ajusta según sea necesario */
-    right: 20px; /* Ajusta según sea necesario */
-    z-index: 10000; /* Asegura que el botón esté por encima de la imagen */
-    background-color: rgb(255, 255, 255); /* Fondo semi-transparente para el botón */
+    top: 20px;
+    /* Ajusta según sea necesario */
+    right: 20px;
+    /* Ajusta según sea necesario */
+    z-index: 10000;
+    /* Asegura que el botón esté por encima de la imagen */
+    background-color: rgba(255, 255, 255,1) !important;
+    opacity: 1;
+    border-radius: 100%;
+    font-size: 1rem;
+    padding: 5px;
+    cursor: pointer;
+}
+
+.btn-anterior {
+    position: absolute;
+    /* Ajusta según sea necesario */
+    left: 10svw;
+    /* Ajusta según sea necesario */
+    z-index: 10000;
+    /* Asegura que el botón esté por encima de la imagen */
+    background-color:rgba(0,0,0,0) !important;
+    /* Fondo semi-transparente para el botón */
     border: none;
     font-size: 1.5rem;
     cursor: pointer;
 }
+
+.btn-siguiente {
+    position: absolute;
+    /* Ajusta según sea necesario */
+    right: 10svw;
+    /* Ajusta según sea necesario */
+    z-index: 10000;
+    /* Asegura que el botón esté por encima de la imagen */
+    background-color: rgba(0,0,0,0) !important;
+    /* Fondo semi-transparente para el botón */
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
 .publicacion-container {
     overflow: hidden;
     /* Asegura que la imagen no desborde el contenedor */
@@ -1062,43 +1124,53 @@ ul {
     border-radius: 5px;
     height: 100px;
     width: 100px;
-    display:flex;
+    display: flex;
 }
+
 .imagen-publicacion {
-    width: 80px;
-    height: 80px;
+    width: 90px;
+    height: 90px;
     border-radius: 50%;
-    background: linear-gradient(45deg, #33f043, #3ce6ad, #27d0dc, #237dcc, #2873ff); /* Gradiente de Instagram */
+    background: linear-gradient(45deg, #33f043, #3ce6ad, #27d0dc, #237dcc, #2873ff);
+    /* Gradiente de Instagram */
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 4px; /* Espacio entre la imagen y el borde */
+    padding: 4px;
+    /* Espacio entre la imagen y el borde */
     cursor: pointer;
     position: relative;
     object-fit: cover;
 }
 
-.imagen-publicacion img{
+.imagen-publicacion img {
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    background-color: white; /* Fondo blanco para simular el borde interno de la historia */
+    background-color: white;
+    /* Fondo blanco para simular el borde interno de la historia */
 }
+
 /* Pseudo-elemento para el borde con gradiente */
 .imagen-publicacion::before {
     position: absolute;
-    top: -5px; /* Ajusta el tamaño del borde */
-    left: -5px; /* Ajusta el tamaño del borde */
-    width: calc(100% + 10px); /* Asegúrate de que el borde se extienda más allá de la imagen */
-    height: calc(100% + 10px); /* Asegúrate de que el borde se extienda más allá de la imagen */
+    top: -5px;
+    /* Ajusta el tamaño del borde */
+    left: -5px;
+    /* Ajusta el tamaño del borde */
+    width: calc(100% + 10px);
+    /* Asegúrate de que el borde se extienda más allá de la imagen */
+    height: calc(100% + 10px);
+    /* Asegúrate de que el borde se extienda más allá de la imagen */
     border-radius: 50%;
     background-color: white;
-    z-index: -1; /* Coloca el borde detrás de la imagen */
+    z-index: -1;
+    /* Coloca el borde detrás de la imagen */
 }
 
 
-.imagen-publicacion:hover{
-    cursor:pointer;
+.imagen-publicacion:hover {
+    cursor: pointer;
     border: rgb(112, 145, 255) 1px solid;
 }
 
@@ -1111,10 +1183,29 @@ ul {
     min-height: calc(100svh - 97.4px);
 }
 
-@media screen and (max-width: 992px) {
-    .carrusel::-webkit-scrollbar{
-    display:none;
+.hr-mobile {
+    visibility: hidden;
 }
+
+@media screen and (max-width: 992px) {
+    .btn-siguiente{
+        right:1svw;
+    }
+    .btn-anterior{
+        left:1svw;
+    }
+    .hr-mobile {
+        visibility: visible;
+    }
+
+    .carrusel {
+        padding-bottom: 0;
+    }
+
+    .carrusel::-webkit-scrollbar {
+        display: none;
+    }
+
     .ancho-busqueda {
         width: 100%;
     }

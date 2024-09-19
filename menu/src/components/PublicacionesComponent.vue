@@ -112,7 +112,7 @@ export default {
         async fetchPublicaciones() {
             try {
                 const response = await axios.get(`/publicaciones?usuario=${this.nombreUsuario}`);
-                this.publicaciones = response.data;
+                this.publicaciones = response.data.sort((a, b) => b.id - a.id);
             } catch (error) {
                 console.error(error);
             } finally {

@@ -1,6 +1,14 @@
 <template>
     <div>
         <NavbarComponent></NavbarComponent>
+        <div v-show="subiendoPublicacion" class="pantalla-carga text-center">
+            <div class="logo-carga">
+                <img class="logo-img" src="/favicon.ico" width="50" alt="">
+                <div class="texto-carga">
+                    Subiendo Publicación
+                </div>
+            </div>
+        </div>
         <div class="container pt-4 text-center">
             <h1>Subir Publicación</h1>
             <router-link class="m-auto" to="/u/publicaciones">
@@ -13,14 +21,18 @@
                         accept="image/jpeg, image/png" @change="imagenSeleccionada($event)" />
                     <label for="textoPublicacion">Escribe un texto (opcional)</label>
                     <input type="text" class="form-control" v-model="textoPublicacion" maxlength="50">
-                    <div class="preview-publicacion col-md-6 m-auto mt-2" id="canvasPublicacion">
-                        <div class="contenedor-imagen">
-                            <img v-if="imgCargada" class="img-publicacion" :src="imgCargada" alt="Imagen cargada">
-                            <p v-if="imgCargada && textoPublicacion" class="texto-publicacion">{{ textoPublicacion }}</p>
+                    <div v-if="imgCargada" class="col-md-6 m-auto mt-2 mb-2">
+                        <div class="preview-publicacion" id="canvasPublicacion">
+                            <div class="contenedor-imagen">
+                                <img class="img-publicacion" :src="imgCargada" alt="Imagen cargada">
+                                <p v-if="textoPublicacion" class="texto-publicacion">{{ textoPublicacion }}</p>
+                            </div>
                         </div>
                     </div>
+                    <div class="text-center">
 
-                    <button type="submit" class="btn btn-menu" v-if="imgCargada">Subir</button>
+                        <button type="submit" class="btn btn-menu" v-if="imgCargada">Subir</button>
+                    </div>
                 </form>
             </div>
             <div v-show="cargandoImagen" class="pantalla-cargas text-center">
@@ -53,6 +65,7 @@ export default {
             publicacion: '',
             textoPublicacion: '',
             widthImg: 0,
+            subiendoPublicacion: false,
         }
     },
     mounted() {
@@ -64,6 +77,7 @@ export default {
         },
         async subir() {
             try {
+                this.subiendoPublicacion = true;
                 const canvasElement = document.getElementById("canvasPublicacion");
                 const canvas = await html2canvas(canvasElement);
                 const imgData = canvas.toDataURL("image/png");
@@ -98,6 +112,8 @@ export default {
 
             } catch (error) {
                 console.error("Error al subir la publicación:", error);
+            } finally {
+                this.subiendoPublicacion = true;
             }
         },
         imagenSeleccionada(event) {
@@ -128,35 +144,44 @@ export default {
 </script>
 
 <style scoped>
-
 .preview-publicacion {
     height: auto;
+    padding: 0 !important;
+    display: flex;
+    justify-items: center;
 }
 
 .contenedor-imagen {
-    position: relative; /* Permite que los elementos hijos con posición absoluta se posicionen dentro de este contenedor */
+    position: relative;
+    /* Permite que los elementos hijos con posición absoluta se posicionen dentro de este contenedor */
     display: inline-block;
 }
 
 .img-publicacion {
+    background-color: white;
+    align-content: center;
     max-width: 100%;
     display: block;
-    background-color: white;
 }
 
 .texto-publicacion {
     word-wrap: break-word;
     position: absolute;
-    bottom: 10%; /* Posiciona el texto desde el fondo de la imagen */
-    left: 50%; /* Centra horizontalmente */
-    transform: translateX(-50%); /* Ajusta la posición horizontal */
+    bottom: 10%;
+    /* Posiciona el texto desde el fondo de la imagen */
+    left: 50%;
+    /* Centra horizontalmente */
+    transform: translateX(-50%);
+    /* Ajusta la posición horizontal */
     color: white;
     background-color: rgba(0, 0, 0, 0.6);
     font-size: 1.3rem;
     padding: 5px 10px;
-    width: 100%; /* Para que el texto no ocupe todo el ancho de la imagen */
+    width: 100%;
+    /* Para que el texto no ocupe todo el ancho de la imagen */
     text-align: center;
-    z-index: 2; /* Asegura que el texto esté por encima de la imagen */
+    z-index: 2;
+    /* Asegura que el texto esté por encima de la imagen */
 }
 
 
