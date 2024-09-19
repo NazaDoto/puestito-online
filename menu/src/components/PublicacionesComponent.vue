@@ -10,6 +10,14 @@
                     </div>
                 </div>
             </div>
+            <div v-show="borrandoPublicacion" class="pantalla-carga text-center">
+                <div class="logo-carga">
+                    <img class="logo-img" src="/favicon.ico" width="50" alt="">
+                    <div class="texto-carga">
+                        Borrando Publicacion
+                    </div>
+                </div>
+            </div>
             <h1>Publicaciones</h1>
             <p v-if="publicaciones.length == 0">No hay publicaciones aún.</p>
             <router-link class="m-auto" to="/u/nuevapublicacion">
@@ -61,6 +69,7 @@ export default {
             publicaciones: [],
             cargandoPublicaciones: true,
             publicacionPorBorrar: '',
+            borrandoPublicacion: false,
         }
     },
     mounted() {
@@ -74,6 +83,7 @@ export default {
         },
         async borrarPublicacion() {
             try {
+                this.borrandoPublicacion = true;
                 await axios.delete(`/borrarPublicacion?id=${this.publicacionPorBorrar}`).then(() => {
                     const Toast = Swal.mixin({
                         toast: true,
@@ -104,6 +114,9 @@ export default {
 
             } catch (error) {
                 console.error(error);
+            } finally{
+                this.borrandoPublicacion = false;
+
             }
         },
         setImageWidth(event) {
