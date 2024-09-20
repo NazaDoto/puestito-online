@@ -170,7 +170,7 @@
                 <div v-else-if="nombreNegocio">
                     <div class="error-content">
                         <h1 class="display-1" v-if="negocio.imagen">
-                            <img :src="negocio.imagen" width="100" alt="">
+                            <img :src="negocio.imagen" width="100" alt="" style="border-radius:100%;">
                         </h1>
                         <h2 class="display-4">{{ nombreNegocio }}</h2>
                         <p v-if="negocio.instagram || negocio.facebook" class="lead">Estamos construyendo nuestro
