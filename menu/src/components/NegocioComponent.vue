@@ -87,13 +87,12 @@
                             <!-- Botón para ir a la publicación anterior -->
                             <button v-if="indiceAgrandada > 0" @click="agrandarPublicacion(indiceAgrandada - 1)"
                                 class="btn-anterior">
-                            <img src="/recursos/previous.png" width="20" alt=""></button>
-                            
+                                <img src="/recursos/previous.png" width="20" alt=""></button>
+
                             <!-- Botón para ir a la siguiente publicación -->
                             <button v-if="indiceAgrandada < publicaciones.length - 1"
-                            @click="agrandarPublicacion(indiceAgrandada + 1)"
-                            class="btn-siguiente">
-                            <img src="/recursos/next.png" width="20" alt=""></button>
+                                @click="agrandarPublicacion(indiceAgrandada + 1)" class="btn-siguiente">
+                                <img src="/recursos/next.png" width="20" alt=""></button>
 
                             <!-- Imagen agrandada -->
                             <img :src="publicaciones[publicacionAgrandada].publicacion" class="imagen-agrandada" alt="">
@@ -166,6 +165,22 @@
                                 No se encontraron resultados para esa búsqueda.
                             </div>
                         </div>
+                    </div>
+                </div>
+                <div v-else-if="nombreNegocio">
+                    <div class="error-content">
+                        <h1 class="display-1" v-if="negocio.imagen">
+                            <img :src="negocio.imagen" width="100" alt="">
+                        </h1>
+                        <h2 class="display-4">{{ nombreNegocio }}</h2>
+                        <p v-if="negocio.instagram || negocio.facebook" class="lead">Estamos construyendo nuestro
+                            puestito.<br>¡Seguinos en nuestras redes!</p>
+                        <a v-if="negocio.instagram" class="mauto" :href="'https://instagram.com/' + negocio.instagram"
+                            target="blank"><img width='40' src="/recursos/instagram.png"></a>
+                        <a v-if="negocio.facebook" class="mauto" :href="'https://facebook.com/' + negocio.facebook"
+                            target="blank"><img width='36' src="/recursos/facebook.png"></a> <br>
+                        <p class="mt-3" v-if="negocio.direccion">{{ negocio.direccion }}</p>
+                        <router-link to="/">Volver a Puestito Online</router-link>
                     </div>
                 </div>
                 <div v-else>
@@ -1080,7 +1095,7 @@ ul {
     /* Ajusta según sea necesario */
     z-index: 10000;
     /* Asegura que el botón esté por encima de la imagen */
-    background-color: rgba(255, 255, 255,1) !important;
+    background-color: rgba(255, 255, 255, 1) !important;
     opacity: 1;
     border-radius: 100%;
     font-size: 1rem;
@@ -1095,7 +1110,7 @@ ul {
     /* Ajusta según sea necesario */
     z-index: 10000;
     /* Asegura que el botón esté por encima de la imagen */
-    background-color:rgba(0,0,0,0) !important;
+    background-color: rgba(0, 0, 0, 0) !important;
     /* Fondo semi-transparente para el botón */
     border: none;
     font-size: 1.5rem;
@@ -1109,7 +1124,7 @@ ul {
     /* Ajusta según sea necesario */
     z-index: 10000;
     /* Asegura que el botón esté por encima de la imagen */
-    background-color: rgba(0,0,0,0) !important;
+    background-color: rgba(0, 0, 0, 0) !important;
     /* Fondo semi-transparente para el botón */
     border: none;
     font-size: 1.5rem;
@@ -1188,12 +1203,14 @@ ul {
 }
 
 @media screen and (max-width: 992px) {
-    .btn-siguiente{
-        right:1svw;
+    .btn-siguiente {
+        right: 1svw;
     }
-    .btn-anterior{
-        left:1svw;
+
+    .btn-anterior {
+        left: 1svw;
     }
+
     .hr-mobile {
         visibility: visible;
     }
