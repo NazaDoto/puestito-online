@@ -33,6 +33,9 @@ app.use(express.json());
 app.use(morgan('dev'));
 app.use(fileUpload());
 
+app.use('/u', express.static(path.join(__dirname, 'u')));
+
+
 
 if (env == 'dev') {
     connection = mysql.createPool({
@@ -112,29 +115,78 @@ app.put('/modificarVencimiento', (req, res) => {
 });
 
 app.post('/register', (req, res) => {
-    const { usuario, contraseña, nombre, fechaVence, email, imagen, portada, direccion, telefono, descripcion, instagram, facebook, rubro } = req.body;
+    let imagenUploadPath = '';
+    let portadaUploadPath = '';
+
+    // Extrae los datos del cuerpo de la solicitud
+    const { usuario, contraseña, nombre, fechaVence, email, direccion, telefono, descripcion, instagram, facebook, rubro, imagen, portada } = req.body;
+
+    // Define el directorio de almacenamiento relativo: [usuario]/recursos
+    const relativeDirectory = path.join('u', usuario, 'recursos');
+    const absoluteDirectory = path.join(__dirname, relativeDirectory);
+
+    // Crea el directorio si no existe
+    if (!fs.existsSync(absoluteDirectory)) {
+        fs.mkdirSync(absoluteDirectory, { recursive: true });
+    }
+
+    // Función para guardar una imagen base64 en el servidor
+    const guardarImagenBase64 = (base64Data, nombreArchivo, carpeta) => {
+        const base64Image = base64Data.split(';base64,').pop();
+        const rutaCompleta = path.join(carpeta, nombreArchivo);
+        fs.writeFileSync(rutaCompleta, base64Image, { encoding: 'base64' });
+        return rutaCompleta;
+    };
+
+    // Guarda la imagen si está presente
+    if (imagen) {
+        const imagenFileName = `${Date.now()}_imagen.jpg`;
+        try {
+            const rutaCompleta = guardarImagenBase64(imagen, imagenFileName, absoluteDirectory);
+            imagenUploadPath = 'https://puestito.online:3500/' + path.join(relativeDirectory, imagenFileName); // Almacena solo la ruta relativa
+        } catch (error) {
+            console.error('Error al guardar la imagen:', error);
+            return res.status(500).json({ message: 'Error al guardar la imagen' });
+        }
+    }
+
+    // Guarda la portada si está presente
+    if (portada) {
+        const portadaFileName = `${Date.now()}_portada.jpg`;
+        try {
+            const rutaCompleta = guardarImagenBase64(portada, portadaFileName, absoluteDirectory);
+            portadaUploadPath = 'https://puestito.online:3500/' + path.join(relativeDirectory, portadaFileName); // Almacena solo la ruta relativa
+        } catch (error) {
+            console.error('Error al guardar la portada:', error);
+            return res.status(500).json({ message: 'Error al guardar la portada' });
+        }
+    }
 
     // Hashea la contraseña antes de almacenarla en la base de datos
     bcrypt.hash(contraseña, saltRounds, (err, hash) => {
         if (err) {
             console.error('Error al hashear la contraseña:', err);
-            res.status(500).json({ message: 'Error al registrar usuario' });
+            return res.status(500).json({ message: 'Error al registrar usuario' });
         } else {
-            // Guarda el hash en la base de datos junto con el usuario
+            // Guarda la información del usuario junto con las rutas de las imágenes (si existen)
             const query = 'INSERT INTO usuarios (usuario_nombre, usuario_contraseña, usuario_nombre_negocio, usuario_fecha_vencimiento, usuario_correo, usuario_imagen, usuario_portada, usuario_direccion, usuario_telefono, usuario_descripcion, usuario_instagram, usuario_facebook, usuario_rubro) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-            connection.query(query, [usuario, hash, nombre, fechaVence, email, imagen, portada, direccion, telefono, descripcion, instagram, facebook, rubro], (err, result) => {
+            connection.query(query, [usuario, hash, nombre, fechaVence, email, imagenUploadPath || null, portadaUploadPath || null, direccion, telefono, descripcion, instagram, facebook, rubro], (err, result) => {
                 if (err) {
-                    if (err.code == 'ER_DUP_ENTRY') {
-                        res.status(500).json({ message: 'Ya existe este usuario. Por favor elige otro nombre de usuario.' });
+                    if (err.code === 'ER_DUP_ENTRY') {
+                        return res.status(500).json({ message: 'Ya existe este usuario. Por favor elige otro nombre de usuario.' });
                     }
                     console.error('Error al registrar usuario:', err);
+                    return res.status(500).json({ message: 'Error al registrar usuario' });
                 } else {
-                    res.status(200).json({ message: 'Usuario registrado exitosamente' });
+                    return res.status(200).json({ message: 'Usuario registrado exitosamente' });
                 }
             });
         }
     });
 });
+
+
+
 
 // Ruta para iniciar sesión
 app.post('/login', (req, res) => {
@@ -388,11 +440,57 @@ app.put('/cambiarTipoPuestito', (req, res) => {
             res.status(200).json({ message: 'Se cambió el tipo' });
         }
     })
-})
+});
+
+
 app.put('/modificarPerfil', (req, res) => {
+    let imagenUploadPath = '';
+    let portadaUploadPath = '';
     const { negocio } = req.body;
+
+    // Define el directorio de almacenamiento relativo: [usuario]/recursos
+    const relativeDirectory = path.join('u', negocio.usuario, 'recursos');
+    const absoluteDirectory = path.join(__dirname, relativeDirectory);
+
+    // Crea el directorio si no existe
+    if (!fs.existsSync(absoluteDirectory)) {
+        fs.mkdirSync(absoluteDirectory, { recursive: true });
+    }
+
+    // Función para guardar una imagen base64 en el servidor
+    const guardarImagenBase64 = (base64Data, nombreArchivo, carpeta) => {
+        const base64Image = base64Data.split(';base64,').pop();
+        const rutaCompleta = path.join(carpeta, nombreArchivo);
+        fs.writeFileSync(rutaCompleta, base64Image, { encoding: 'base64' });
+        return rutaCompleta;
+    };
+
+    // Guarda la imagen si está presente
+    if (negocio.imagen) {
+        const imagenFileName = `${Date.now()}_imagen.jpg`;
+        try {
+            const rutaCompleta = guardarImagenBase64(negocio.imagen, imagenFileName, absoluteDirectory);
+            imagenUploadPath = 'https://puestito.online:3500/' + path.join(relativeDirectory, imagenFileName); // Almacena solo la ruta relativa
+        } catch (error) {
+            console.error('Error al guardar la imagen:', error);
+            return res.status(500).json({ message: 'Error al guardar la imagen' });
+        }
+    }
+
+    // Guarda la portada si está presente
+    if (negocio.portada) {
+        const portadaFileName = `${Date.now()}_portada.jpg`;
+        try {
+            const rutaCompleta = guardarImagenBase64(negocio.portada, portadaFileName, absoluteDirectory);
+            portadaUploadPath = 'https://puestito.online:3500/' + path.join(relativeDirectory, portadaFileName); // Almacena solo la ruta relativa
+        } catch (error) {
+            console.error('Error al guardar la portada:', error);
+            return res.status(500).json({ message: 'Error al guardar la portada' });
+        }
+    }
+
     query = 'UPDATE usuarios SET usuario_nombre_negocio = ?, usuario_correo = ?, usuario_telefono = ?, usuario_descripcion = ?, usuario_imagen = ?, usuario_portada = ?, usuario_direccion = ?, usuario_instagram = ?, usuario_facebook = ?, usuario_rubro = ? WHERE usuario_nombre = ?';
-    connection.query(query, [negocio.nombre, negocio.correo, negocio.telefono, negocio.descripcion, negocio.imagen, negocio.portada, negocio.direccion, negocio.instagram, negocio.facebook, negocio.rubro, negocio.usuario], (err, result) => {
+    connection.query(query, [negocio.nombre, negocio.correo, negocio.telefono, negocio.descripcion, imagenUploadPath || null, portadaUploadPath || null, negocio.direccion, negocio.instagram, negocio.facebook, negocio.rubro, negocio.usuario], (err, result) => {
         if (err) {
             console.error('Error al modificar producto:', err);
             res.status(500).json({ message: 'Error al modificar producto' });
@@ -401,6 +499,8 @@ app.put('/modificarPerfil', (req, res) => {
         }
     });
 });
+
+
 app.put('/modificarPerfilAdmin', (req, res) => {
     const { negocio } = req.body;
     query = 'UPDATE usuarios SET  usuario_contraseña = ?, usuario_nombre_negocio = ?, usuario_fecha_vencimiento = ?, usuario_correo = ?, usuario_telefono = ?, usuario_descripcion = ?, usuario_imagen = ?, usuario_portada = ?, usuario_direccion = ?, usuario_instagram = ?, usuario_facebook = ?, usuario_rubro = ? WHERE usuario_nombre = ?';

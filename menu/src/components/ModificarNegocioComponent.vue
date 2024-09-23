@@ -51,7 +51,7 @@
                                         <strong>Portada:</strong>
                                     </td>
                                     <td v-if="negocio.portada">
-                                        <img class="imagen" :src="negocio.portada" alt=" ">
+                                        <img class="imagen round" :src="negocio.portada" alt=" ">
                                     </td>
                                     <td v-else>Sin portada.</td>
                                 </tr>

@@ -58,7 +58,7 @@
                                         :href="'https://instagram.com/' + negocio.instagram" target="blank"><img
                                             width='40' src="/recursos/instagram.png"></a>
                                     <a v-if="negocio.facebook" class="mauto"
-                                        :href="'https://facebook.com/' + negocio.facebook" target="blank"><img
+                                        :href="negocio.facebook" target="blank"><img
                                             width='36' src="/recursos/facebook.png"></a> <br>
                                     <div class="text-center">
                                         <img v-show="isHidden" src="/recursos/scroll-down.png" class="scroll-down"
@@ -330,13 +330,37 @@ export default {
 
         document.title = this.nombreNegocio;
         document
+            .querySelector('meta[name="title"]')
+            .setAttribute('content', this.nombreNegocio);
+        document
             .querySelector('meta[property="og:title"]')
             .setAttribute('content', this.nombreNegocio);
+        document
+            .querySelector('meta[name="twitter:title"]')
+            .setAttribute('content', this.nombreNegocio);
+        document
+            .querySelector('meta[itemprop="title"]')
+            .setAttribute('content', this.nombreNegocio);
+        document
+            .querySelector('meta[name="description"]')
+            .setAttribute('content', this.negocio.descripcion);
+        document
+            .querySelector('meta[name="dc.description"]')
+            .setAttribute('content', this.negocio.descripcion);
         document
             .querySelector('meta[property="og:description"]')
             .setAttribute('content', this.negocio.descripcion);
         document
+            .querySelector('meta[itemprop="description"]')
+            .setAttribute('content', this.negocio.descripcion);
+        document
             .querySelector('meta[property="og:image"]')
+            .setAttribute('content', this.negocio.imagen);
+        document
+            .querySelector('meta[name="twitter:image"]')
+            .setAttribute('content', this.negocio.imagen);
+        document
+            .querySelector('meta[itemprop="image"]')
             .setAttribute('content', this.negocio.imagen);
         document
             .querySelector('meta[property="og:url"]')
