@@ -327,44 +327,8 @@ export default {
         // Lógica para obtener los productos del negocio con el nombre de usuario dado
         await this.obtenerInformacionNegocio();
         await this.fetchPublicaciones();
-
-        document.title = this.nombreNegocio;
-        document
-            .querySelector('meta[name="title"]')
-            .setAttribute('content', this.nombreNegocio);
-        document
-            .querySelector('meta[property="og:title"]')
-            .setAttribute('content', this.nombreNegocio);
-        document
-            .querySelector('meta[name="twitter:title"]')
-            .setAttribute('content', this.nombreNegocio);
-        document
-            .querySelector('meta[itemprop="title"]')
-            .setAttribute('content', this.nombreNegocio);
-        document
-            .querySelector('meta[name="description"]')
-            .setAttribute('content', this.negocio.descripcion);
-        document
-            .querySelector('meta[name="dc.description"]')
-            .setAttribute('content', this.negocio.descripcion);
-        document
-            .querySelector('meta[property="og:description"]')
-            .setAttribute('content', this.negocio.descripcion);
-        document
-            .querySelector('meta[itemprop="description"]')
-            .setAttribute('content', this.negocio.descripcion);
-        document
-            .querySelector('meta[property="og:image"]')
-            .setAttribute('content', this.negocio.imagen);
-        document
-            .querySelector('meta[name="twitter:image"]')
-            .setAttribute('content', this.negocio.imagen);
-        document
-            .querySelector('meta[itemprop="image"]')
-            .setAttribute('content', this.negocio.imagen);
-        document
-            .querySelector('meta[property="og:url"]')
-            .setAttribute('content', window.location.href);
+        await this.actualizarOG();
+        
 
     },
     beforeUnmount() {
@@ -402,6 +366,45 @@ export default {
         }
     },
     methods: {
+        async actualizarOG(){
+            document.title = this.nombreNegocio;
+        document
+            .querySelector('meta[name="title"]')
+            .setAttribute('content', this.nombreNegocio);
+        document
+            .querySelector('meta[property="og:title"]')
+            .setAttribute('content', this.nombreNegocio);
+        document
+            .querySelector('meta[name="twitter:title"]')
+            .setAttribute('content', this.nombreNegocio);
+        document
+            .querySelector('meta[itemprop="title"]')
+            .setAttribute('content', this.nombreNegocio);
+        document
+            .querySelector('meta[name="description"]')
+            .setAttribute('content', this.negocio.descripcion);
+        document
+            .querySelector('meta[name="DC.description"]')
+            .setAttribute('content', this.negocio.descripcion);
+        document
+            .querySelector('meta[property="og:description"]')
+            .setAttribute('content', this.negocio.descripcion);
+        document
+            .querySelector('meta[itemprop="description"]')
+            .setAttribute('content', this.negocio.descripcion);
+        document
+            .querySelector('meta[property="og:image"]')
+            .setAttribute('content', this.negocio.imagen);
+        document
+            .querySelector('meta[name="twitter:image"]')
+            .setAttribute('content', this.negocio.imagen);
+        document
+            .querySelector('meta[itemprop="image"]')
+            .setAttribute('content', this.negocio.imagen);
+        document
+            .querySelector('meta[property="og:url"]')
+            .setAttribute('content', window.location.href);
+        },
         handleScroll() {
             let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
             if (scrollTop === 0) {
