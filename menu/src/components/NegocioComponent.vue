@@ -57,9 +57,8 @@
                                     <a v-if="negocio.instagram" class="mauto"
                                         :href="'https://instagram.com/' + negocio.instagram" target="blank"><img
                                             width='40' src="/recursos/instagram.png"></a>
-                                    <a v-if="negocio.facebook" class="mauto"
-                                        :href="negocio.facebook" target="blank"><img
-                                            width='36' src="/recursos/facebook.png"></a> <br>
+                                    <a v-if="negocio.facebook" class="mauto" :href="negocio.facebook"
+                                        target="blank"><img width='36' src="/recursos/facebook.png"></a> <br>
                                     <div class="text-center">
                                         <img v-show="isHidden" src="/recursos/scroll-down.png" class="scroll-down"
                                             :class="{ 'fade-in-out': isHidden }" alt="">
@@ -156,7 +155,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="ver-carrito" v-if="carrito.length > 0">
+                            <div :class="usuarioLogueado ? 'ver-carrito-log' : 'ver-carrito'" v-if="carrito.length > 0">
                                 <button class="ver-carrito-btn" data-bs-toggle="modal"
                                     data-bs-target="#modalCarrito">Ver Carrito ${{ total
                                     }}</button>
@@ -173,8 +172,10 @@
                             <img :src="negocio.imagen" width="100" alt="" style="border-radius:100%;">
                         </h1>
                         <h2 class="display-4">{{ nombreNegocio }}</h2>
-                        <p v-if="negocio.instagram || negocio.facebook" class="lead">Estamos construyendo nuestro
-                            puestito.<br>¡Seguinos en nuestras redes!</p>
+                        <p class="lead">Estamos construyendo nuestro
+                            puestito.<br></p>
+                        <p v-if="negocio.instagram || negocio.facebook">¡Seguinos en nuestras redes!</p>
+                        <p v-else>¡Volvé pronto!</p>
                         <a v-if="negocio.instagram" class="mauto" :href="'https://instagram.com/' + negocio.instagram"
                             target="blank"><img width='40' src="/recursos/instagram.png"></a>
                         <a v-if="negocio.facebook" class="mauto" :href="'https://facebook.com/' + negocio.facebook"
@@ -328,7 +329,7 @@ export default {
         await this.obtenerInformacionNegocio();
         await this.fetchPublicaciones();
         await this.actualizarOG();
-        
+
 
     },
     beforeUnmount() {
@@ -366,44 +367,44 @@ export default {
         }
     },
     methods: {
-        async actualizarOG(){
+        async actualizarOG() {
             document.title = this.nombreNegocio;
-        document
-            .querySelector('meta[name="title"]')
-            .setAttribute('content', this.nombreNegocio);
-        document
-            .querySelector('meta[property="og:title"]')
-            .setAttribute('content', this.nombreNegocio);
-        document
-            .querySelector('meta[name="twitter:title"]')
-            .setAttribute('content', this.nombreNegocio);
-        document
-            .querySelector('meta[itemprop="title"]')
-            .setAttribute('content', this.nombreNegocio);
-        document
-            .querySelector('meta[name="description"]')
-            .setAttribute('content', this.negocio.descripcion);
-        document
-            .querySelector('meta[name="DC.description"]')
-            .setAttribute('content', this.negocio.descripcion);
-        document
-            .querySelector('meta[property="og:description"]')
-            .setAttribute('content', this.negocio.descripcion);
-        document
-            .querySelector('meta[itemprop="description"]')
-            .setAttribute('content', this.negocio.descripcion);
-        document
-            .querySelector('meta[property="og:image"]')
-            .setAttribute('content', this.negocio.imagen);
-        document
-            .querySelector('meta[name="twitter:image"]')
-            .setAttribute('content', this.negocio.imagen);
-        document
-            .querySelector('meta[itemprop="image"]')
-            .setAttribute('content', this.negocio.imagen);
-        document
-            .querySelector('meta[property="og:url"]')
-            .setAttribute('content', window.location.href);
+            document
+                .querySelector('meta[name="title"]')
+                .setAttribute('content', this.nombreNegocio);
+            document
+                .querySelector('meta[property="og:title"]')
+                .setAttribute('content', this.nombreNegocio);
+            document
+                .querySelector('meta[name="twitter:title"]')
+                .setAttribute('content', this.nombreNegocio);
+            document
+                .querySelector('meta[itemprop="title"]')
+                .setAttribute('content', this.nombreNegocio);
+            document
+                .querySelector('meta[name="description"]')
+                .setAttribute('content', this.negocio.descripcion);
+            document
+                .querySelector('meta[name="DC.description"]')
+                .setAttribute('content', this.negocio.descripcion);
+            document
+                .querySelector('meta[property="og:description"]')
+                .setAttribute('content', this.negocio.descripcion);
+            document
+                .querySelector('meta[itemprop="description"]')
+                .setAttribute('content', this.negocio.descripcion);
+            document
+                .querySelector('meta[property="og:image"]')
+                .setAttribute('content', this.negocio.imagen);
+            document
+                .querySelector('meta[name="twitter:image"]')
+                .setAttribute('content', this.negocio.imagen);
+            document
+                .querySelector('meta[itemprop="image"]')
+                .setAttribute('content', this.negocio.imagen);
+            document
+                .querySelector('meta[property="og:url"]')
+                .setAttribute('content', window.location.href);
         },
         handleScroll() {
             let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
@@ -785,6 +786,14 @@ export default {
 .ver-carrito {
     position: fixed;
     bottom: 10px;
+    right: 0;
+    z-index: 2;
+    text-align: end;
+    width: 100%;
+}
+.ver-carrito-log {
+    position: fixed;
+    bottom: 80px;
     right: 0;
     z-index: 2;
     text-align: end;

@@ -139,27 +139,39 @@ app.post('/register', (req, res) => {
     };
 
     // Guarda la imagen si está presente
-    if (imagen) {
-        const imagenFileName = `${Date.now()}_imagen.jpg`;
+    if (negocio.imagen && negocio.imagen.startsWith('data:image/')) {
+        const imagenFileName = `logo.jpg`;
         try {
-            const rutaCompleta = guardarImagenBase64(imagen, imagenFileName, absoluteDirectory);
-            imagenUploadPath = 'https://puestito.online:3500/' + path.join(relativeDirectory, imagenFileName); // Almacena solo la ruta relativa
+            const rutaCompleta = guardarImagenBase64(negocio.imagen, imagenFileName, absoluteDirectory);
+            if (env == 'dev') {
+                imagenUploadPath = 'http://localhost:3500/' + path.join(relativeDirectory, imagenFileName);
+            } else {
+                imagenUploadPath = 'https://puestito.online:3500/' + path.join(relativeDirectory, imagenFileName); // Almacena solo la ruta relativa
+            }
         } catch (error) {
             console.error('Error al guardar la imagen:', error);
             return res.status(500).json({ message: 'Error al guardar la imagen' });
         }
+    } else {
+        imagenUploadPath = negocio.imagen;
     }
 
     // Guarda la portada si está presente
-    if (portada) {
-        const portadaFileName = `${Date.now()}_portada.jpg`;
+    if (negocio.portada && negocio.portada.startsWith('data:image/')) {
+        const portadaFileName = `portada.jpg`;
         try {
-            const rutaCompleta = guardarImagenBase64(portada, portadaFileName, absoluteDirectory);
-            portadaUploadPath = 'https://puestito.online:3500/' + path.join(relativeDirectory, portadaFileName); // Almacena solo la ruta relativa
+            const rutaCompleta = guardarImagenBase64(negocio.portada, portadaFileName, absoluteDirectory);
+            if (env == 'dev') {
+                portadaUploadPath = 'http://localhost:3500/' + path.join(relativeDirectory, portadaFileName);
+            } else {
+                portadaUploadPath = 'https://puestito.online:3500/' + path.join(relativeDirectory, portadaFileName); // Almacena solo la ruta relativa
+            }
         } catch (error) {
             console.error('Error al guardar la portada:', error);
             return res.status(500).json({ message: 'Error al guardar la portada' });
         }
+    } else {
+        portadaUploadPath = negocio.portada;
     }
 
     // Hashea la contraseña antes de almacenarla en la base de datos
@@ -466,31 +478,43 @@ app.put('/modificarPerfil', (req, res) => {
     };
 
     // Guarda la imagen si está presente
-    if (negocio.imagen) {
-        const imagenFileName = `${Date.now()}_imagen.jpg`;
+    if (negocio.imagen && negocio.imagen.startsWith('data:image/')) {
+        const imagenFileName = `logo.jpg`;
         try {
             const rutaCompleta = guardarImagenBase64(negocio.imagen, imagenFileName, absoluteDirectory);
-            imagenUploadPath = 'https://puestito.online:3500/' + path.join(relativeDirectory, imagenFileName); // Almacena solo la ruta relativa
+            if (env == 'dev') {
+                imagenUploadPath = 'http://localhost:3500/' + path.join(relativeDirectory, imagenFileName);
+            } else {
+                imagenUploadPath = 'https://puestito.online:3500/' + path.join(relativeDirectory, imagenFileName); // Almacena solo la ruta relativa
+            }
         } catch (error) {
             console.error('Error al guardar la imagen:', error);
             return res.status(500).json({ message: 'Error al guardar la imagen' });
         }
+    } else {
+        imagenUploadPath = negocio.imagen;
     }
 
     // Guarda la portada si está presente
-    if (negocio.portada) {
-        const portadaFileName = `${Date.now()}_portada.jpg`;
+    if (negocio.portada && negocio.portada.startsWith('data:image/')) {
+        const portadaFileName = `portada.jpg`;
         try {
             const rutaCompleta = guardarImagenBase64(negocio.portada, portadaFileName, absoluteDirectory);
-            portadaUploadPath = 'https://puestito.online:3500/' + path.join(relativeDirectory, portadaFileName); // Almacena solo la ruta relativa
+            if (env == 'dev') {
+                portadaUploadPath = 'http://localhost:3500/' + path.join(relativeDirectory, portadaFileName);
+            } else {
+                portadaUploadPath = 'https://puestito.online:3500/' + path.join(relativeDirectory, portadaFileName); // Almacena solo la ruta relativa
+            }
         } catch (error) {
             console.error('Error al guardar la portada:', error);
             return res.status(500).json({ message: 'Error al guardar la portada' });
         }
+    } else {
+        portadaUploadPath = negocio.portada;
     }
 
     query = 'UPDATE usuarios SET usuario_nombre_negocio = ?, usuario_correo = ?, usuario_telefono = ?, usuario_descripcion = ?, usuario_imagen = ?, usuario_portada = ?, usuario_direccion = ?, usuario_instagram = ?, usuario_facebook = ?, usuario_rubro = ? WHERE usuario_nombre = ?';
-    connection.query(query, [negocio.nombre, negocio.correo, negocio.telefono, negocio.descripcion, imagenUploadPath || null, portadaUploadPath || null, negocio.direccion, negocio.instagram, negocio.facebook, negocio.rubro, negocio.usuario], (err, result) => {
+    connection.query(query, [negocio.nombre, negocio.correo, negocio.telefono, negocio.descripcion, imagenUploadPath, portadaUploadPath, negocio.direccion, negocio.instagram, negocio.facebook, negocio.rubro, negocio.usuario], (err, result) => {
         if (err) {
             console.error('Error al modificar producto:', err);
             res.status(500).json({ message: 'Error al modificar producto' });
@@ -602,14 +626,43 @@ app.post('/nuevoProducto', (req, res) => {
                 }
             });
         } else {
-
             const { producto } = req.body;
+
+            let imagenUploadPath = '';
+            // Define el directorio de almacenamiento relativo: [usuario]/recursos
+            const relativeDirectory = path.join('u', producto.usuario, 'productos');
+            const absoluteDirectory = path.join(__dirname, relativeDirectory);
+
+            // Crea el directorio si no existe
+            if (!fs.existsSync(absoluteDirectory)) {
+                fs.mkdirSync(absoluteDirectory, { recursive: true });
+            }
+
+            const guardarImagenBase64 = (base64Data, nombreArchivo, carpeta) => {
+                const base64Image = base64Data.split(';base64,').pop();
+                const rutaCompleta = path.join(carpeta, nombreArchivo);
+                fs.writeFileSync(rutaCompleta, base64Image, { encoding: 'base64' });
+                return rutaCompleta;
+            };
+
+            const imagenFileName = `${producto.nombre}_${Date.now()}.jpg`;
+            try {
+                const rutaCompleta = guardarImagenBase64(producto.imagen, imagenFileName, absoluteDirectory);
+                if (env == 'dev') {
+                    imagenUploadPath = 'http://localhost:3500/' + path.join(relativeDirectory, imagenFileName);
+                } else {
+                    imagenUploadPath = 'https://puestito.online:3500/' + path.join(relativeDirectory, imagenFileName); // Almacena solo la ruta relativa
+                }
+            } catch (error) {
+                console.error('Error al guardar la publicación:', error);
+                return res.status(500).json({ message: 'Error al guardar la publicación' });
+            }
             connection.query(sql, [
                 producto.nombre,
                 producto.descripcion,
                 producto.categoria,
                 producto.precio,
-                producto.imagen,
+                imagenUploadPath,
                 producto.stock,
                 producto.usuario
             ], (err, result) => {
@@ -727,7 +780,44 @@ app.get('/publicaciones', (req, res) => {
 app.post('/nuevaPublicacion', (req, res) => {
     const { usuario, publicacion } = req.body;
     const query = "INSERT INTO publicaciones (usuario_nombre, publicacion) VALUES (?, ?)";
-    connection.query(query, [usuario, publicacion], (err, result) => {
+    let imagenUploadPath = '';
+
+    // Define el directorio de almacenamiento relativo: [usuario]/recursos
+    const relativeDirectory = path.join('u', usuario, 'publicaciones');
+    const absoluteDirectory = path.join(__dirname, relativeDirectory);
+
+    // Crea el directorio si no existe
+    if (!fs.existsSync(absoluteDirectory)) {
+        fs.mkdirSync(absoluteDirectory, { recursive: true });
+    }
+
+    // Función para guardar una imagen base64 en el servidor
+    const guardarImagenBase64 = (base64Data, nombreArchivo, carpeta) => {
+        const base64Image = base64Data.split(';base64,').pop();
+        const rutaCompleta = path.join(carpeta, nombreArchivo);
+        fs.writeFileSync(rutaCompleta, base64Image, { encoding: 'base64' });
+        return rutaCompleta;
+    };
+
+    // Guarda la imagen si está presente
+    if (publicacion) {
+        const imagenFileName = `${Date.now()}.jpg`;
+        try {
+            const rutaCompleta = guardarImagenBase64(publicacion, imagenFileName, absoluteDirectory);
+            if (env == 'dev') {
+                imagenUploadPath = 'http://localhost:3500/' + path.join(relativeDirectory, imagenFileName);
+            } else {
+                imagenUploadPath = 'https://puestito.online:3500/' + path.join(relativeDirectory, imagenFileName); // Almacena solo la ruta relativa
+            }
+        } catch (error) {
+            console.error('Error al guardar la publicación:', error);
+            return res.status(500).json({ message: 'Error al guardar la publicación' });
+        }
+    } else {
+        return res.status(500).json({ message: 'No se subió la publicación.' });
+    }
+
+    connection.query(query, [usuario, imagenUploadPath], (err, result) => {
         if (err) {
             res.status(500).json({ message: 'Error al subir publicación' });
         } else {
@@ -737,16 +827,35 @@ app.post('/nuevaPublicacion', (req, res) => {
 });
 
 app.delete('/borrarPublicacion', (req, res) => {
-    const id = req.query.id;
-    const query = "DELETE FROM publicaciones WHERE publicaciones.id = ?";
-    connection.query(query, id, (err, result) => {
+    const publicacion = req.query.publicacion;
+    let filePath = '';
+
+    // Define el path absoluto del archivo
+    if (env == 'dev') {
+        filePath = publicacion.replace('http://localhost:3500/', ''); // Asegúrate de que publicacion tenga la ruta relativa correcta
+    } else {
+        filePath = publicacion.replace('https://puestito.online:3500/', '');
+    }
+
+    // Primero, intenta eliminar el archivo del sistema de archivos
+    fs.unlink(filePath, (err) => {
         if (err) {
-            res.status(500).json({ message: 'Error al borrar publicación' });
-        } else {
-            res.status(200).json({ message: 'Publicación borrada correctamente.' });
+            console.error('Error al eliminar el archivo:', err);
+            return res.status(500).json({ message: 'Error al eliminar el archivo' });
         }
-    })
-})
+
+        // Si el archivo se elimina correctamente, eliminamos el registro de la base de datos
+        const query = "DELETE FROM publicaciones WHERE publicaciones.publicacion = ?";
+        connection.query(query, [publicacion], (error, result) => {
+            if (error) {
+                console.error('Error al eliminar la publicación de la base de datos:', error);
+                return res.status(500).json({ message: 'Error al eliminar la publicación de la base de datos' });
+            }
+
+            res.status(200).json({ message: 'Publicación y archivo eliminados correctamente' });
+        });
+    });
+});
 
 app.put('/actualizarDisponibilidad', (req, res) => {
     const { productoId, nuevoEstado } = req.body; // Suponiendo que envías el nuevo estado en el cuerpo de la solicitud JSON
@@ -767,8 +876,16 @@ app.put('/modificarProducto', (req, res) => {
     const sqlSinImg = `UPDATE productos SET producto_nombre = ?, producto_descripcion = ?, producto_categoria = ?, producto_precio = ?, producto_stock = ? WHERE producto_id = ?`;
     const sql = `UPDATE productos SET producto_nombre = ?, producto_descripcion = ?, producto_categoria = ?, producto_precio = ?, producto_stock = ?, producto_imagen = ? WHERE producto_id = ?`;
 
+    // Función para guardar la imagen base64
+    const guardarImagenBase64 = (base64Data, nombreArchivo, carpeta) => {
+        const base64Image = base64Data.split(';base64,').pop();
+        const rutaCompleta = path.join(carpeta, nombreArchivo);
+        fs.writeFileSync(rutaCompleta, base64Image, { encoding: 'base64' });
+        return rutaCompleta;
+    };
+
+    // Si no hay imagen nueva, solo actualiza los campos sin la imagen
     if (producto.producto_imagen == null) {
-        const { producto } = req.body;
         connection.query(sqlSinImg, [
             producto.producto_nombre,
             producto.producto_descripcion,
@@ -785,40 +902,138 @@ app.put('/modificarProducto', (req, res) => {
             }
         });
     } else {
+        // Si hay una imagen nueva, procede a actualizarla también
+        let imagenUploadPath = '';
+        const relativeDirectory = path.join('u', producto.usuario_nombre, 'productos');
+        const absoluteDirectory = path.join(__dirname, relativeDirectory);
 
-        const { producto } = req.body;
-        connection.query(sql, [
-            producto.producto_nombre,
-            producto.producto_descripcion,
-            producto.producto_categoria,
-            producto.producto_precio,
-            producto.producto_stock,
-            producto.producto_imagen,
-            producto.producto_id
-        ], (err, result) => {
-            if (err) {
-                console.error('Error al modificar producto:', err);
-                res.status(500).json({ message: 'Error al modificar producto' });
-            } else {
-                res.status(200).json({ message: 'Producto modificado exitosamente' });
+        // Crea el directorio si no existe
+        if (!fs.existsSync(absoluteDirectory)) {
+            fs.mkdirSync(absoluteDirectory, { recursive: true });
+        }
+
+        // Verifica si la imagen es base64
+        if (producto.producto_imagen.startsWith('data:image/')) {
+            const imagenFileName = `${producto.producto_nombre}_${Date.now()}.jpg`;
+            try {
+                const rutaCompleta = guardarImagenBase64(producto.producto_imagen, imagenFileName, absoluteDirectory);
+
+                const queryGET = 'SELECT producto_imagen FROM productos WHERE producto_id = ?';
+                connection.query(queryGET, [producto.producto_id], (err, result) => {
+                    if (err) {
+                        console.error('Error al obtener la imagen del producto:', err);
+                        return res.status(500).json({ message: 'Error al obtener la imagen del producto' });
+                    }
+
+                    if (result[0].producto_imagen && result[0].producto_imagen !== '') {
+                        const oldImagePath = env === 'dev' ? result[0].producto_imagen.replace('http://localhost:3500/', '') : result[0].producto_imagen.replace('https://puestito.online:3500/', '');
+
+                        // Elimina la imagen antigua
+                        fs.unlink(path.join(__dirname, oldImagePath), (err) => {
+                            if (err) {
+                                console.error('Error al eliminar imagen anterior:', err);
+                            }
+                        });
+                    }
+
+                    // Establece la nueva ruta de la imagen
+                    imagenUploadPath = env === 'dev' ?
+                        `http://localhost:3500/${path.join(relativeDirectory, imagenFileName)}` :
+                        `https://puestito.online:3500/${path.join(relativeDirectory, imagenFileName)}`;
+
+                    // Actualiza los datos en la base de datos, incluida la imagen
+                    connection.query(sql, [
+                        producto.producto_nombre,
+                        producto.producto_descripcion,
+                        producto.producto_categoria,
+                        producto.producto_precio,
+                        producto.producto_stock,
+                        imagenUploadPath,
+                        producto.producto_id
+                    ], (err, result) => {
+                        if (err) {
+                            console.error('Error al modificar producto:', err);
+                            return res.status(500).json({ message: 'Error al modificar producto' });
+                        }
+                        return res.status(200).json({ message: 'Producto modificado exitosamente' });
+                    });
+                });
+            } catch (error) {
+                console.error('Error al guardar la nueva imagen:', error);
+                return res.status(500).json({ message: 'Error al guardar la imagen' });
             }
-        });
+        } else {
+            // Si la imagen no es base64, solo actualiza el resto de los datos
+            imagenUploadPath = producto.producto_imagen;
+            connection.query(sql, [
+                producto.producto_nombre,
+                producto.producto_descripcion,
+                producto.producto_categoria,
+                producto.producto_precio,
+                producto.producto_stock,
+                imagenUploadPath,
+                producto.producto_id
+            ], (err, result) => {
+                if (err) {
+                    console.error('Error al modificar producto:', err);
+                    res.status(500).json({ message: 'Error al modificar producto' });
+                } else {
+                    res.status(200).json({ message: 'Producto modificado exitosamente' });
+                }
+            });
+        }
+    }
+});
+
+app.delete('/eliminarProducto', (req, res) => {
+    const productoId = req.query.id; // Usar req.query si el ID viene de la URL
+    let filePath = '';
+
+    if (!productoId) {
+        return res.status(400).json({ message: 'Falta el ID del producto' });
     }
 
-});
-app.delete('/eliminarProducto', (req, res) => {
-    const productoId = req.body.productoId;
-    console.log(productoId);
-    const sql = 'DELETE FROM productos WHERE producto_id = ?';
+    const obtenerPathImagen = 'SELECT producto_imagen FROM productos WHERE producto_id = ?';
 
-    connection.query(sql, productoId, (err, result) => {
+    // Obtener la ruta de la imagen asociada al producto
+    connection.query(obtenerPathImagen, [productoId], (err, result) => {
         if (err) {
-            res.status(500).json({ message: 'Error al eliminar producto' });
-        } else {
-            res.status(200).json({ message: 'Producto eliminado' });
+            console.error('Error al obtener la imagen del producto:', err);
+            return res.status(500).json({ message: 'Error al obtener la imagen del producto' });
         }
+
+        if (result.length === 0) {
+            return res.status(404).json({ message: 'Producto no encontrado' });
+        }
+
+        // Determinar la ruta del archivo según el entorno
+        if (env === 'dev') {
+            filePath = path.join(__dirname, result[0].producto_imagen.replace('http://localhost:3500/', ''));
+        } else {
+            filePath = path.join(__dirname, result[0].producto_imagen.replace('https://puestito.online:3500/', ''));
+        }
+
+        // Intentar eliminar el archivo del sistema de archivos
+        fs.unlink(filePath, (err) => {
+            if (err && err.code !== 'ENOENT') { // Si el error no es 'file not found'
+                console.error('Error al eliminar el archivo:', err);
+                return res.status(500).json({ message: 'Error al eliminar el archivo' });
+            }
+
+            // Eliminar el producto de la base de datos
+            const sql = 'DELETE FROM productos WHERE producto_id = ?';
+            connection.query(sql, [productoId], (err, result) => {
+                if (err) {
+                    console.error('Error al eliminar el producto de la base de datos:', err);
+                    return res.status(500).json({ message: 'Error al eliminar producto' });
+                }
+
+                res.status(200).json({ message: 'Producto y archivo eliminados correctamente' });
+            });
+        });
     });
 });
+
 
 app.post('/verificar-usuario', (req, res) => {
     const usuario = req.body.usuario;

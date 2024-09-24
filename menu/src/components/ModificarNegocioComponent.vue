@@ -51,7 +51,7 @@
                                         <strong>Portada:</strong>
                                     </td>
                                     <td v-if="negocio.portada">
-                                        <img class="imagen round" :src="negocio.portada" alt=" ">
+                                        <img class="imagen" :src="negocio.portada" alt=" ">
                                     </td>
                                     <td v-else>Sin portada.</td>
                                 </tr>
@@ -225,9 +225,9 @@
                                                 accept="image/jpeg, image/png" @change="portadaSeleccionada">
                                         </div>
                                     </div>
-                                    <div class="flex text-end">
-                                        <button type="button" class="btn mt-3" data-bs-dismiss="modal">Cerrar</button>
-                                        <button class="btn btn-menu mt-3" type="submit"
+                                    <div class="flex mt-3">
+                                        <button type="button" class="btn" data-bs-dismiss="modal">Cerrar</button>
+                                        <button class="btn btn-menu" type="submit"
                                             data-bs-dismiss="modal">Modificar</button>
                                     </div>
                                 </form>
@@ -348,7 +348,7 @@ export default {
                     toast: true,
                     position: 'bottom-end',
                     showConfirmButton: false,
-                    timer: 2000,
+                    timer: 1000,
                     timerProgressBar: true,
                     didOpen: (toast) => {
                         toast.addEventListener('mouseenter', Swal.stopTimer)
@@ -359,6 +359,9 @@ export default {
                     icon: 'success',
                     title: 'Datos modificados.'
                 });
+                setTimeout(function () {
+                            location.reload();
+                        }, 1000);
             })
                 .catch((error) => {
                     console.error('Error al actualizar la información en la base de datos:', error);
@@ -413,10 +416,10 @@ export default {
                             }
                             this.cropperPortada = new Cropper(cropperCanvas, {
                                 template: `<cropper-canvas background style='height:50vh;'>
-                                    <cropper-image alt='Lol' rotatable=false></cropper-image>
+                                    <cropper-image  initial-center-size='contain' alt='Crop' scalable=true translatable></cropper-image>
                                         <cropper-shade hidden></cropper-shade>
                                         <cropper-handle  action='move' plain></cropper-handle>
-                                        <cropper-selection initial-coverage='0.5' aspect-ratio='0.75' movable resizable zoomable>
+                                        <cropper-selection initial-coverage='0.5' aspect-ratio='0.75'  movable resizable>
                                             <cropper-grid role='grid' covered></cropper-grid>
                                             <cropper-crosshair centered></cropper-crosshair>
                                             <cropper-handle action='move'
@@ -467,10 +470,10 @@ export default {
                             }
                             this.cropper = new Cropper(cropperCanvas, {
                                 template: `<cropper-canvas background style='height:50vh;'>
-                                    <cropper-image  alt='Lol' rotatable=false></cropper-image>
+                                    <cropper-image  initial-center-size='contain' alt='Crop' scalable=true translatable></cropper-image>
                                         <cropper-shade hidden></cropper-shade>
                                         <cropper-handle  action='move' plain></cropper-handle>
-                                        <cropper-selection initial-coverage='0.5' aspect-ratio='1' movable resizable zoomable>
+                                        <cropper-selection initial-coverage='0.5' aspect-ratio='1'  movable resizable>
                                             <cropper-grid role='grid' covered></cropper-grid>
                                             <cropper-crosshair centered></cropper-crosshair>
                                             <cropper-handle action='move'
@@ -521,6 +524,7 @@ export default {
 .flex {
     display: flex;
     justify-content: center;
+    text-align: center;
     align-items: center;
 }
 
@@ -613,8 +617,8 @@ img {
 }
 
 .btn-menu {
-    display: flex;
     margin-left: auto !important;
+    text-align: center;
 }
 
 @media screen and (max-width: 992px) {

@@ -28,7 +28,7 @@
                 <div v-for="(publicacion, index) in publicaciones" :key="index">
                     <div class="item-publicacion">
                         <div class="btn-borrar">
-                            <button @click="publicacionPorBorrarMethod(publicacion.id)" class="btn-close"
+                            <button @click="publicacionPorBorrarMethod(publicacion.publicacion)" class="btn-close"
                                 data-bs-toggle="modal" data-bs-target="#borrarPublicacion"></button>
                         </div>
                         <img class="publicacion" :src="publicacion.publicacion" alt="">
@@ -84,7 +84,7 @@ export default {
         async borrarPublicacion() {
             try {
                 this.borrandoPublicacion = true;
-                await axios.delete(`/borrarPublicacion?id=${this.publicacionPorBorrar}`).then(() => {
+                await axios.delete(`/borrarPublicacion?publicacion=${this.publicacionPorBorrar}`).then(() => {
                     const Toast = Swal.mixin({
                         toast: true,
                         position: 'bottom-end',

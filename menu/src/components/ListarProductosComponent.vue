@@ -458,9 +458,7 @@ export default {
       }).then((result) => {
         if (result.isConfirmed) {
           axios
-            .delete("/eliminarProducto", {
-              data: { productoId: productoId },
-            })
+            .delete(`/eliminarProducto?id=${productoId}`)
             .then(() => {
               const index = this.productos.findIndex(
                 (producto) => producto.producto_id === productoId
@@ -553,10 +551,10 @@ export default {
               }
               this.cropper = new Cropper(cropperCanvas, {
                 template: `<cropper-canvas background style='height:50vh;'>
-                                    <cropper-image alt='Lol' rotatable=false>asd</cropper-image>
+                  <cropper-image  initial-center-size='contain' alt='Crop' scalable=true translatable></cropper-image>
                                         <cropper-shade hidden></cropper-shade>
                                         <cropper-handle  action='move' plain></cropper-handle>
-                                        <cropper-selection initial-coverage='0.5' aspect-ratio='1' movable resizable zoomable>
+                                        <cropper-selection initial-coverage='0.5' aspect-ratio='1'  movable resizable>
                                             <cropper-grid role='grid' covered></cropper-grid>
                                             <cropper-crosshair centered></cropper-crosshair>
                                             <cropper-handle action='move'
