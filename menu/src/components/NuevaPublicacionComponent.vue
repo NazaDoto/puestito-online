@@ -145,7 +145,6 @@ export default {
 
 <style scoped>
 .preview-publicacion {
-    height: auto;
     padding: 0 !important;
     display: flex;
     justify-items: center;
