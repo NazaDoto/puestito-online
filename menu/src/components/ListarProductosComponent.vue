@@ -117,8 +117,8 @@
                       <label class="form-label" for="precio">Precio</label>
                       <input class="form-control" type="number" id="precio" v-model="productoModificar.producto_precio"
                         placeholder="Precio (sin $)" />
-                        <i class="small">Si el precio es 0, se publicará como "consultar"</i>
-                    </div>
+                        <i class="small">Si el precio es menor a 0, se publicará como "consultar precio"</i>
+                      </div>
                     <div class="col-md-6">
                       <label class="form-label" for="stock">Stock (si no manejás stock de este producto poné -1)</label>
                       <input class="form-control" type="number" id="stock" v-model="productoModificar.producto_stock"

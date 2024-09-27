@@ -2,13 +2,13 @@
   <div>
     <NavbarAdminComponent></NavbarAdminComponent>
     <div v-if="cargando" class="pantalla-carga text-center">
-            <div class="logo-carga">
-                <img class="logo-img" src="/favicon.ico" width="50" alt="">
-                <div class="texto-carga">
-                    Cargando negocios
-                </div>
-            </div>
+      <div class="logo-carga">
+        <img class="logo-img" src="/favicon.ico" width="50" alt="">
+        <div class="texto-carga">
+          Cargando negocios
         </div>
+      </div>
+    </div>
     <div class="container mt-4 mb-2">
       <h1>Negocios</h1>
       <div class="izquierda ancho-busqueda">
@@ -40,11 +40,11 @@
 
           </div>
           <div class="item-texto-block-end">
-            <a v-if="negocio.instagram" class="m-2" :href="'https://instagram.com/'+negocio.instagram" target="blank"><img width='40'
-                src="/recursos/instagram.png"></a>
+            <a v-if="negocio.instagram" class="m-2" :href="'https://instagram.com/' + negocio.instagram"
+              target="blank"><img width='40' src="/recursos/instagram.png"></a>
             <div v-else>Sin Instagram</div>
-            <a v-if="negocio.facebook" class="m-2" :href="'https://facebook.com/'+negocio.facebook" target="blank"><img width='36'
-                src="/recursos/facebook.png"></a>
+            <a v-if="negocio.facebook" class="m-2" :href="'https://facebook.com/' + negocio.facebook" target="blank"><img
+                width='36' src="/recursos/facebook.png"></a>
             <div v-else>Sin Facebook</div>
           </div>
           <!-- Botón para dirigirse al menú -->
@@ -101,6 +101,40 @@
                     placeholder="Descripción">
                 </div>
                 <div>
+                  <label class="form-label" for="rubro">Rubro</label>
+                  <select class="form-select" name="rubro" id="rubro" v-model="negocioModificar.rubro">
+                    <option value="Elegí tu rubro" selected disabled>Elegí tu rubro</option>
+                    <option value="Artesanías">Artesanías</option>
+                    <option value="Bar/Restaurante">Bar/Restaurante</option>
+                    <option value="Carnicería">Carnicería</option>
+                    <option value="Consultorio">Consultorio</option>
+                    <option value="Estética">Estética</option>
+                    <option value="Farmacia">Farmacia</option>
+                    <option value="Ferretería">Ferretería</option>
+                    <option value="Fiambrería">Fiambrería</option>
+                    <option value="Florería">Florería</option>
+                    <option value="Heladería">Heladería</option>
+                    <option value="Indumentaria">Indumentaria</option>
+                    <option value="Inmobiliaria">Inmobiliaria</option>
+                    <option value="Juguetería">Juguetería</option>
+                    <option value="Librería">Librería</option>
+                    <option value="Limpieza">Limpieza</option>
+                    <option value="Panadería">Panadería</option>
+                    <option value="Peluquería">Peluquería</option>
+                    <option value="Polirubro">Polirubro</option>
+                    <option value="Pollería">Pollería</option>
+                    <option value="Repostería">Repostería</option>
+                    <option value="Rotisería">Rotisería</option>
+                    <option value="Reparación/mantenimiento">Reparación/mantenimiento
+                    </option>
+                    <option value="Servicios">Servicios</option>
+                    <option value="Supermercado">Supermercado</option>
+                    <option value="Tecnología">Tecnología</option>
+                    <option value="Verdulería">Verdulería</option>
+                    <option value="Veterinaria/Forrajería">Veterinaria/Forrajería</option>
+                  </select>
+                </div>
+                <div>
                   <input class="form-control" type="date" id="fechaVence" v-model="negocioModificar.fechaVence"
                     placeholder="Fecha de Vencimiento">
                 </div>
@@ -152,10 +186,12 @@ export default {
         descripcion: '',
         correo: '',
         direccion: '',
+        rubro: '',
         telefono: '',
         instagram: '',
         facebook: '',
         imagen: '',
+        portada: '',
         fechaVence: '',
       },
     }
@@ -176,7 +212,7 @@ export default {
         confirmButtonText: "Sí, eliminar!",
       }).then((result) => {
         if (result.isConfirmed) {
-          axios.delete('/eliminarNegocio', {data: {usuario: usuario}}).then(() => {
+          axios.delete('/eliminarNegocio', { data: { usuario: usuario } }).then(() => {
             const Toast = Swal.mixin({
               toast: true,
               position: 'bottom-end',
@@ -205,7 +241,7 @@ export default {
       });
     },
     modificarPerfil(negocio) {
-      negocio.fechaVence  = new Date (negocio.fechaVence).toISOString().slice(0, 19).replace("T", " ");
+      negocio.fechaVence = new Date(negocio.fechaVence).toISOString().slice(0, 19).replace("T", " ");
       axios.put('/modificarPerfilAdmin', { negocio: negocio }).then(() => {
         const Toast = Swal.mixin({
           toast: true,
@@ -242,6 +278,7 @@ export default {
       this.negocioModificar.telefono = negocio.telefono;
       this.negocioModificar.instagram = negocio.instagram;
       this.negocioModificar.facebook = negocio.facebook;
+      this.negocioModificar.rubro = negocio.rubro;
       this.negocioModificar.imagen = negocio.imagen;
       this.negocioModificar.fechaVence = format(new Date(negocio.fechaVence), 'yyyy-MM-dd');
       console.log(this.negocioModificar)

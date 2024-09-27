@@ -130,7 +130,7 @@
                                                         </div>
                                                         <div class="item-precio">
                                                             {{ producto.producto_precio > 0 ? '$' +
-                                                                producto.producto_precio : 'Consultar precio' }}
+                                                                producto.producto_precio : producto.producto_precio < 0 ? 'Consultar precio' : 'Gratis' }}
                                                         </div>
                                                         <div class="item-descripcion"
                                                             v-if="producto.producto_descripcion">

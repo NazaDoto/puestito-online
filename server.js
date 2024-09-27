@@ -273,6 +273,7 @@ app.post('/comprobar-vencimiento', (req, res) => {
 
 
 app.get('/listarNegocios', async(req, res) => {
+    console.log('asd')
     try {
         const query = "SELECT * from usuarios WHERE usuario_nombre != 'admin'";
         connection.query(query, async(error, results) => {
@@ -288,6 +289,7 @@ app.get('/listarNegocios', async(req, res) => {
                         correo: negocio.usuario_correo,
                         telefono: negocio.usuario_telefono,
                         descripcion: negocio.usuario_descripcion,
+                        rubro: negocio.usuario_rubro,
                         imagen: negocio.usuario_imagen,
                         instagram: negocio.usuario_instagram,
                         facebook: negocio.usuario_facebook,

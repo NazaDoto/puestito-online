@@ -37,7 +37,7 @@
                     <div class="col-md-6 text-center">
                         <input class="form-control" type="number" id="precio" v-model="producto.precio"
                             placeholder="Precio" />
-                            <i class="small">Si el precio es 0, se publicará como "consultar"</i>
+                            <i class="small">Si el precio es menor a 0, se publicará como "consultar precio"</i>
                     </div>
                     <div class="col-md-6">
                         <input class="form-control" type="number" id="stock" v-model="producto.stock"
