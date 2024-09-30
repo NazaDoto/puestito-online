@@ -107,7 +107,7 @@
                 <div v-for="(negocio, negocioIndex) in grupo" :key="negocioIndex"
                   :class="{ 'carrusel-item': true, 'active': negocioIndex === 0 }">
                   <div class="item-container">
-                    <router-link class="item-texto-block-end" :to="'/' + negocio.usuario" target="_blank">
+                    <router-link class="item-texto-block-end" :to="'/' + negocio.usuario">
                       <div class="imagen" v-if="negocio.imagen">
                         <img class="imagen-negocio" :src="negocio.imagen" alt=" " />
                       </div>
