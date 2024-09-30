@@ -42,7 +42,7 @@
                         </div>
                         <div class="col-md-6">
                             <input class="form-control" type="text" id="descripcion" v-model="negocio.descripcion"
-                                placeholder="Descripción (40 caracteres)" maxlength="40" />
+                                placeholder="Descripción (opcional)" maxlength="40" />
                         </div>
                         <div class="col-md-6">
                             <select class="form-select" name="rubro" id="rubro" v-model="negocio.rubro">
@@ -87,15 +87,15 @@
                         </div>
                         <div class="col-md-6">
                             <input class="form-control" type="number" id="telefono" v-model="negocio.telefono"
-                                placeholder="Teléfono (completo, por ej. 5493855223287)" />
+                                placeholder="Teléfono" />
                         </div>
                         <div class="col-md-6">
                             <input class="form-control" type="text" id="instagram" v-model="negocio.instagram"
-                                placeholder="Usuario de Instagram (por ej. puestito.online)" />
+                                placeholder="Usuario de Instagram (opcional)" />
                         </div>
                         <div class="col-md-6">
                             <input class="form-control" type="text" id="facebook" v-model="negocio.facebook"
-                                placeholder="Usuario de Facebook (por ej. puestito.online)" />
+                                placeholder="Usuario de Facebook (opcional)" />
                         </div>
                         <div class="col-md-6">
                             <label class="form-label text-center" for="imagen">Logo (JPG/PNG)</label>

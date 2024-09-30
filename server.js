@@ -139,10 +139,10 @@ app.post('/register', (req, res) => {
     };
 
     // Guarda la imagen si está presente
-    if (negocio.imagen && negocio.imagen.startsWith('data:image/')) {
+    if (imagen && imagen.startsWith('data:image/')) {
         const imagenFileName = `logo.jpg`;
         try {
-            const rutaCompleta = guardarImagenBase64(negocio.imagen, imagenFileName, absoluteDirectory);
+            const rutaCompleta = guardarImagenBase64(imagen, imagenFileName, absoluteDirectory);
             if (env == 'dev') {
                 imagenUploadPath = 'http://localhost:3500/' + path.join(relativeDirectory, imagenFileName);
             } else {
@@ -153,11 +153,11 @@ app.post('/register', (req, res) => {
             return res.status(500).json({ message: 'Error al guardar la imagen' });
         }
     } else {
-        imagenUploadPath = negocio.imagen;
+        imagenUploadPath = imagen;
     }
 
     // Guarda la portada si está presente
-    if (negocio.portada && negocio.portada.startsWith('data:image/')) {
+    if (portada && portada.startsWith('data:image/')) {
         const portadaFileName = `portada.jpg`;
         try {
             const rutaCompleta = guardarImagenBase64(negocio.portada, portadaFileName, absoluteDirectory);
@@ -171,7 +171,7 @@ app.post('/register', (req, res) => {
             return res.status(500).json({ message: 'Error al guardar la portada' });
         }
     } else {
-        portadaUploadPath = negocio.portada;
+        portadaUploadPath = portada;
     }
 
     // Hashea la contraseña antes de almacenarla en la base de datos
