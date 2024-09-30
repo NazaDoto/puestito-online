@@ -37,7 +37,26 @@
           </a>
         </div>
         <hr>
-        
+        <div class="center">
+          <button class="btn-menu-danger" data-bs-toggle="modal" data-bs-target="#cerrarSesionModal">
+                  Salir
+                </button>
+                <div class="modal fade" id="cerrarSesionModal" tabindex="-1" aria-labelledby="cerrarSesionModalLabel"
+                  aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header text-center">
+                        <h1 class="modal-title fs-5" id="cerrarSesionModalLabel">¿Cerrar sesión?</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-footer text-center">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                        <button type="button" class="btn btn-menu-danger" data-bs-dismiss="modal" @click="cerrarSesion">Sí, cerrar sesión</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+        </div>
       </div>
     </div>
 
@@ -46,6 +65,7 @@
 
 <script>
 import NavbarAdminComponent from "./NavbarAdminComponent.vue";
+import router from "@/router";
 import { RouterLink } from "vue-router";
 import axios from 'axios';
 import Swal from "sweetalert2";
@@ -113,11 +133,18 @@ export default {
     esAdmin() {
       return (localStorage.getItem("usuario") == "admin");
     },
+    cerrarSesion() {
+      localStorage.clear(); // Elimina el token del almacenamiento local
+      router.push('/');
+    },
   }
 };
 </script>
 
 <style scoped>
+.btn-menu-danger{
+  padding: 10px;
+}
 .botones {
   display: flex;
   flex-wrap: wrap;
