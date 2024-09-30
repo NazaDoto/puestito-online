@@ -543,7 +543,7 @@ export default {
                 //aqui cortaria el while
                 this.cargandoPago = false;
                 localStorage.setItem("año", añoNuevo);
-                router.push("/u/login");
+                router.push("/");
                 const Toast = Swal.mixin({
                     toast: true,
                     position: "bottom-end",
@@ -576,7 +576,7 @@ export default {
             await axios
                 .post("/register", this.negocio)
                 .then(() => {
-                    router.push("/u/login");
+                    router.push("/");
                     const Toast = Swal.mixin({
                         toast: true,
                         position: "bottom-end",

@@ -181,7 +181,7 @@
                         <a v-if="negocio.facebook" class="mauto" :href="'https://facebook.com/' + negocio.facebook"
                             target="blank"><img width='36' src="/recursos/facebook.png"></a> <br>
                         <p class="mt-3" v-if="negocio.direccion">{{ negocio.direccion }}</p>
-                        <router-link to="/">Volver a Puestito Online</router-link>
+                        <router-link to="/p/">Volver a Puestito Online</router-link>
                     </div>
                 </div>
                 <div v-else>
@@ -190,7 +190,7 @@
                         <h2 class="display-4">Puestito no encontrado</h2>
                         <p class="lead">Lo sentimos, el puestito que buscas no se encuentra disponible o no tiene
                             productos disponibles.</p>
-                        <router-link to="/">Volver a Puestito Online</router-link>
+                        <router-link to="/p/">Volver a Puestito Online</router-link>
                     </div>
                 </div>
             </div>

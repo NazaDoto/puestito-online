@@ -22,8 +22,8 @@
           <div class="col-md-8">
             <button type="submit" class="btn btn-entrar">Entrar</button>
           </div>
-          <router-link class="mt-4" to="/u/planes">¿Registrar Negocio?</router-link>
-          <router-link class="mt-4" to="/">Volver a Puestito Online</router-link>
+          <router-link class="mt-4" to="/u/planes">¡Quiero mi Puestito!</router-link>
+            <router-link class="mt-4 div-ver btn-ver" to="/p/">Ver Puestitos</router-link>
         </form>
       </div>
     </div>
@@ -111,6 +111,16 @@ export default {
 </script>
 
 <style scoped>
+.div-ver{
+  background: black;
+  border-radius: 10px;
+  width: 80%;
+}
+.btn-ver{
+  color:white;
+  text-decoration: none;
+  font-size: 1.1rem;
+}
 
 a {
   text-decoration: none;

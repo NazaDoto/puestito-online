@@ -18,8 +18,7 @@ import PublicacionesComponent from './components/PublicacionesComponent.vue';
 
 const routes = [{
         path: '/',
-        component: InicioComponent,
-        meta: { requiresAuth: false },
+        component: LoginComponent
     },
     {
         path: '/u/calcular',
@@ -48,8 +47,9 @@ const routes = [{
     },
 
     {
-        path: '/u/login',
-        component: LoginComponent,
+        path: '/p/',
+        component: InicioComponent,
+        meta: { requiresAuth: false },
     },
     {
         path: '/u/registrar',
@@ -108,7 +108,7 @@ router.beforeEach((to, from, next) => {
         // Verifica si la ruta requiere autenticación
         if (!token) {
             // Si no hay token y la ruta requiere autenticación, redirige a /login
-            next('/u/login');
+            next('/');
         } else {
             // Si hay token, permite que el usuario continúe navegando
             next();

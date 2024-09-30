@@ -24,7 +24,7 @@
                 <div class="caja">
                     <img src="/recursos/decline.png" width="100">                    
                     <h1>No se pudo realizar el pago.</h1>
-                    <router-link class="btn btn-menu mt-3" to="/u/login">Volver</router-link>
+                    <router-link class="btn btn-menu mt-3" to="/">Volver</router-link>
                 </div>
             </div>
         </div>
@@ -33,7 +33,7 @@
                 <div class="caja">
                     <img src="/recursos/pending.png" width="100">
                     <h1>Pago Pendiente.</h1>
-                    <router-link class="btn btn-menu mt-3" to="/u/login">Volver</router-link>
+                    <router-link class="btn btn-menu mt-3" to="/">Volver</router-link>
                 </div>
             </div>
         </div>

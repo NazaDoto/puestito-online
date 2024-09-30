@@ -7,7 +7,7 @@
       </router-link>
       <!-- Botón de login -->
       <router-link v-if="usuario" to="/u/home">Mi Negocio</router-link>
-      <router-link v-else to="/u/login">Login</router-link>
+      <router-link v-else to="/">Login</router-link>
     </nav>
 </template>
 
