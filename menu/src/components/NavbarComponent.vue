@@ -35,8 +35,13 @@
               <router-link class="nav-link" to="/u/publicaciones">Publicaciones</router-link>
             </li>
             <li class="test nav-item">
+              <router-link class="nav-link" to="/u/crearqr">Crear QR</router-link>
+            </li>
+            <li class="test nav-item">
               <router-link class="nav-link" to='/u/modificar'>Pefil</router-link>
             </li>
+            <li class="test nav-item"><router-link :to="'/'+ leerUsuario() " class="nav-link">Mi Puestito
+          </router-link></li>
             <li class="test nav-item">
               <button class="nav-link" data-bs-toggle="modal" data-bs-target="#cerrarSesionModal">
                 Salir

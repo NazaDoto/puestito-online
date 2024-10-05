@@ -18,7 +18,7 @@ import PublicacionesComponent from './components/PublicacionesComponent.vue';
 
 const routes = [{
         path: '/',
-        component: LoginComponent
+        component: InicioComponent,
     },
     {
         path: '/u/calcular',
@@ -47,8 +47,8 @@ const routes = [{
     },
 
     {
-        path: '/p/',
-        component: InicioComponent,
+        path: '/u/login',
+        component: LoginComponent,
         meta: { requiresAuth: false },
     },
     {

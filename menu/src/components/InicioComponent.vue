@@ -2,42 +2,54 @@
   <div>
     <nav class="navbar navbar-dark bg-black">
       <div class="container">
-        <div class="flex ">
+        <div class="flex space-around">
           <router-link to="/"><img src="/favicon.ico" alt="" class="nav-logo"></router-link>
-          <div class="ancho-busqueda input-group mauto">
-            <input class="form-control" v-model="busqueda" type="text" name="busqueda" id=""
-              placeholder="Buscar puestitos o rubros..." title="Ingrese una palabra clave..." />
-            <button v-if="busqueda" class="btn-close btn-limpiar-busqueda" @click="limpiarBusqueda"></button>
-          </div>
-          <div class="end btn-login">
-            <router-link class="inline-end c-white" v-if="usuario" to="/u/home"><svg xmlns="http://www.w3.org/2000/svg"
-                width="28" fill="currentColor" class="bi bi-box-arrow-in-right" viewBox="0 0 16 16">
-                <path fill-rule="evenodd"
-                  d="M6 3.5a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-2a.5.5 0 0 0-1 0v2A1.5 1.5 0 0 0 6.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-8A1.5 1.5 0 0 0 5 3.5v2a.5.5 0 0 0 1 0z" />
-                <path fill-rule="evenodd"
-                  d="M11.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H1.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708z" />
-              </svg></router-link>
-            <router-link class="inline-end c-white" v-else to="/"><svg xmlns="http://www.w3.org/2000/svg"
-                width="28" fill="currentColor" class="bi bi-box-arrow-in-right" viewBox="0 0 16 16">
-                <path fill-rule="evenodd"
-                  d="M6 3.5a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-2a.5.5 0 0 0-1 0v2A1.5 1.5 0 0 0 6.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-8A1.5 1.5 0 0 0 5 3.5v2a.5.5 0 0 0 1 0z" />
-                <path fill-rule="evenodd"
-                  d="M11.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H1.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708z" />
-              </svg></router-link>
+          <div class="inline">
+            <div class="btn-login"><router-link class="inline-end c-white" to="/u/planes">Registrar <svg
+                  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" fill="currentColor"
+                  class="bi bi-box-arrow-in-right">
+                  <path d="M12 20h9"></path>
+                  <path d="M16.5 3.5a2.121 2.121 0 0 1 3 0l1 1a2.121 2.121 0 0 1 0 3L7 21H3v-4L16.5 3.5z"></path>
+                </svg></router-link></div>
+            <div class=" btn-login">
+              <router-link v-if="usuario" class="inline-end c-white" to="/u/home">Mi Puestito <svg
+                  xmlns="http://www.w3.org/2000/svg" width="28" fill="currentColor" class="bi bi-box-arrow-in-right"
+                  viewBox="0 0 16 16">
+                  <path fill-rule="evenodd"
+                    d="M6 3.5a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-2a.5.5 0 0 0-1 0v2A1.5 1.5 0 0 0 6.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-8A1.5 1.5 0 0 0 5 3.5v2a.5.5 0 0 0 1 0z" />
+                  <path fill-rule="evenodd"
+                    d="M11.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H1.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708z" />
+                </svg></router-link>
+              <router-link v-else class="inline-end c-white" to="/u/login">Ingresar <svg
+                  xmlns="http://www.w3.org/2000/svg" width="28" fill="currentColor" class="bi bi-box-arrow-in-right"
+                  viewBox="0 0 16 16">
+                  <path fill-rule="evenodd"
+                    d="M6 3.5a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-2a.5.5 0 0 0-1 0v2A1.5 1.5 0 0 0 6.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-8A1.5 1.5 0 0 0 5 3.5v2a.5.5 0 0 0 1 0z" />
+                  <path fill-rule="evenodd"
+                    d="M11.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H1.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708z" />
+                </svg></router-link>
+  
+            </div>
           </div>
         </div>
       </div>
       <!-- Logo -->
 
     </nav>
-    <nav class="navbar bg-dark c-white mtb-0">
-      <div class="container">
+    <nav class="navbar fondo-difu c-white mtb-0">
+      <div class="ancho-busqueda input-group mauto">
+        <input class="form-control" v-model="busqueda" type="text" name="busqueda" id=""
+          placeholder="Buscar puestitos o rubros..." title="Ingrese una palabra clave..." />
+        <button v-if="busqueda" class="btn-close btn-limpiar-busqueda" @click="limpiarBusqueda"></button>
+      </div>
+      <div class="container space-around">
         <select class="navbar-filter" name="rubro" id="rubro" v-model="rubro">
           <option value="Todos" selected>Todos</option>
           <option v-for="(rubro, index) in rubrosUnicos" :key="index" :value="rubro">
             {{ rubro }}
           </option>
         </select>
+
         <button class="navbar-filter" @click="mostrarMapa">
           {{
             !mapaMostrado2
@@ -47,6 +59,7 @@
           }}
         </button>
       </div>
+
     </nav>
     <div class="container2">
       <div v-if="cargando" class="pantalla-carga text-center">
@@ -182,7 +195,7 @@ export default {
   },
   mounted() {
     if (this.$route.params) {
-        router.push("/p/", this.$route.params);
+      router.push("/", this.$route.params);
     }
     this.obtenerUsuario()
   },
@@ -368,6 +381,11 @@ export default {
   padding: 4px;
 }
 
+.space-around {
+  justify-content: space-around;
+  margin-top: 5px;
+}
+
 .btn-limpiar-busqueda {
   position: absolute;
   top: 50%;
@@ -431,11 +449,15 @@ export default {
   outline: none;
 }
 
+.fondo-difu {
+  background-color: black;
+
+}
+
 .flex {
   display: flex;
   width: 100%;
   justify-content: space-between;
-  align-items: center;
 }
 
 .inline {
@@ -495,7 +517,7 @@ export default {
 
 .btn-login {
   padding: 7px;
-  border-radius: 100%;
+  border-radius: 20px;
 }
 
 .btn-login:hover {
@@ -631,7 +653,7 @@ ul {
   margin-top: 0px;
   margin-bottom: 0px;
   padding-top: 0;
-  padding-bottom: 0;
+  padding-bottom: 5px;
 }
 
 .item-texto-block-end:hover {
@@ -639,6 +661,10 @@ ul {
 }
 
 @media screen and (max-width: 992px) {
+  .space-around {
+    justify-content: space-between;
+  }
+
   ::-webkit-scrollbar {
     display: none;
   }
@@ -648,7 +674,7 @@ ul {
   }
 
   .ancho-busqueda {
-    width: 100%;
+    width: 90%;
   }
 
   .ancho-busqueda2 {

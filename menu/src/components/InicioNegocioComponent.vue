@@ -39,7 +39,7 @@
         <hr>
         <div class="center">
           <button class="btn-menu-danger" data-bs-toggle="modal" data-bs-target="#cerrarSesionModal">
-                  Salir
+                  Cerrar Sesión
                 </button>
                 <div class="modal fade" id="cerrarSesionModal" tabindex="-1" aria-labelledby="cerrarSesionModalLabel"
                   aria-hidden="true">

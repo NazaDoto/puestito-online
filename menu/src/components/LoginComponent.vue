@@ -23,7 +23,7 @@
             <button type="submit" class="btn btn-entrar">Entrar</button>
           </div>
           <router-link class="mt-4" to="/u/planes">¡Quiero mi Puestito!</router-link>
-            <router-link class="mt-4 div-ver btn-ver" to="/p/">Ver Puestitos</router-link>
+            <router-link class="mt-4 div-ver btn-ver" to="/">Volver a Puestito Online</router-link>
         </form>
       </div>
     </div>
