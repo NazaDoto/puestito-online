@@ -5,14 +5,13 @@
         <div class="flex space-around">
           <router-link to="/"><img src="/favicon.ico" alt="" class="nav-logo"></router-link>
           <div class="inline">
-            <div class="btn-login"><router-link class="inline-end c-white" to="/u/planes">Registrar <svg
+            <router-link class="btn-login inline-end c-white" to="/u/planes">Registrar <svg
                   xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" fill="currentColor"
                   class="bi bi-box-arrow-in-right">
                   <path d="M12 20h9"></path>
                   <path d="M16.5 3.5a2.121 2.121 0 0 1 3 0l1 1a2.121 2.121 0 0 1 0 3L7 21H3v-4L16.5 3.5z"></path>
-                </svg></router-link></div>
-            <div class=" btn-login">
-              <router-link v-if="usuario" class="inline-end c-white" to="/u/home">Mi Puestito <svg
+                </svg></router-link>
+              <router-link v-if="usuario" class=" btn-login inline-end c-white" to="/u/home">Mi Puestito <svg
                   xmlns="http://www.w3.org/2000/svg" width="28" fill="currentColor" class="bi bi-box-arrow-in-right"
                   viewBox="0 0 16 16">
                   <path fill-rule="evenodd"
@@ -29,7 +28,6 @@
                     d="M11.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H1.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708z" />
                 </svg></router-link>
   
-            </div>
           </div>
         </div>
       </div>
