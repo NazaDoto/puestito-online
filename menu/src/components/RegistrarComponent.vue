@@ -308,7 +308,7 @@ export default {
                 });
 
                 // Convertir el canvas a una imagen de alta calidad
-                this.negocioModificar.portada = canvas.toDataURL('image/jpeg', 0.9); // Ajusta el segundo parámetro (0.9) para la calidad, donde 1.0 es la mejor calidad
+                this.negocio.portada = canvas.toDataURL('image/jpeg', 0.9); // Ajusta el segundo parámetro (0.9) para la calidad, donde 1.0 es la mejor calidad
             } catch (error) {
                 console.error('Error al guardar la imagen recortada:', error);
             } finally {
