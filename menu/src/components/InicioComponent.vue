@@ -117,10 +117,10 @@
               <div class="carrusel">
                 <div v-for="(negocio, negocioIndex) in grupo" :key="negocioIndex"
                   :class="{ 'carrusel-item': true, 'active': negocioIndex === 0 }">
-                  <div class="item-container">
-                    <router-link class="item-texto-block-end" :to="'/' + negocio.usuario">
+                  <div :class="negocio.location ? 'item-container' : 'item-container-flex'">
+                    <router-link :class="negocio.location ? 'item-texto-block-end' : 'item-texto-block-end-flex'" :to="'/' + negocio.usuario">
                       <div class="imagen" v-if="negocio.imagen">
-                        <img class="imagen-negocio" :src="negocio.imagen" alt=" " />
+                        <img class="imagen-negocio" :src="negocio.imagen" @error="imagenError" alt=" " />
                       </div>
                       <div v-else>
                         <img src="/recursos/missing.png" alt="" class="imagen-negocio">
@@ -129,8 +129,8 @@
                         {{ negocio.nombre }}
                       </div>
                     </router-link>
-                    <div class="item-btn">
-                      <a v-if="negocio.location !== null" class="cursor-pointer mt-1" @click="localizar(negocio)"><img
+                    <div class="item-btn" v-if="negocio.location !== null">
+                      <a  class="cursor-pointer mt-1" @click="localizar(negocio)"><img
                           src="/recursos/pin.png" width="30" alt="" /></a>
                     </div>
                   </div>
@@ -192,6 +192,8 @@ export default {
     this.fetchNegocios();
   },
   mounted() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
     if (this.$route.params) {
       router.push("/", this.$route.params);
     }
@@ -254,6 +256,9 @@ export default {
     },
   },
   methods: {
+    imagenError(event) {
+    event.target.src = '/recursos/missing.png'; // Ruta de la imagen alternativa
+  },
     obtenerUsuario() {
       this.usuario = localStorage.getItem('usuario');
     },
@@ -512,7 +517,6 @@ export default {
 .ancho-busqueda2 {
   width: 35%;
 }
-
 .btn-login {
   padding: 7px;
   border-radius: 20px;
@@ -599,11 +603,25 @@ ul {
   width: 150px;
   overflow: hidden;
   /* Asegura que la imagen no desborde el contenedor */
-  justify-content: center;
-  align-items: center;
   border-radius: 5px;
 }
-
+.item-container-flex {
+  height: 215px;
+  width: 150px;
+  overflow: hidden;
+  /* Asegura que la imagen no desborde el contenedor */
+  border-radius: 5px;
+  display:flex;
+}
+.item-texto-block-end {
+  text-decoration: none;
+  padding: 5px 0px;
+}
+.item-texto-block-end-flex {
+  text-decoration: none;
+  padding: 5px 0px;
+  margin: auto;
+}
 .imagen-negocio {
   width: 150px;
   height: 150px;
@@ -642,10 +660,7 @@ ul {
   padding: 0px;
 }
 
-.item-texto-block-end {
-  text-decoration: none;
-  padding: 5px 0px;
-}
+
 
 .mtb-0 {
   margin-top: 0px;
@@ -655,6 +670,9 @@ ul {
 }
 
 .item-texto-block-end:hover {
+  cursor: pointer;
+}
+.item-texto-block-end-flex:hover {
   cursor: pointer;
 }
 

@@ -35,7 +35,7 @@
                 <div class="item-container mt-2" v-for="(producto, index) in filteredProductos(categoria)" :key="index">
                   <div class="item-imagen" v-if="producto.producto_imagen">
                     <div>
-                      <img class="imagen" :src="producto.producto_imagen" alt=" ">
+                      <img class="imagen" :src="producto.producto_imagen" @error="imagenError" alt=" ">
                     </div>
                   </div>
                   <!-- Nombre del producto -->
@@ -261,6 +261,9 @@ export default {
       modalHeight: '',
     };
   },
+  mounted() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
   created() {
     // Realiza una solicitud HTTP para obtener los informes desde el servidor
     this.fetchProductos();
@@ -296,7 +299,11 @@ export default {
       return [...new Set(this.productosFiltrados.map(producto => producto.producto_categoria))];
     }
   },
+  
   methods: {
+    imagenError(event) {
+    event.target.src = '/recursos/missing.png'; // Ruta de la imagen alternativa
+  },
     modificarCategoria() {
       axios.put('/modificarCategoria', { usuario: this.usuario, categoriaVieja: this.categoriaVieja, categoriaNueva: this.categoriaNueva }).then(() => {
         const Toast = Swal.mixin({

@@ -2,7 +2,7 @@
     <footer class="text-center" :class="{'margen-logueado' : logueado}">
   <!-- Copyright -->
   <div class="text-center p-2">
-    <a href="https://puestito.online/"><img src="/favicon.ico" width="22" alt=""></a>
+    <router-link to="/"><img src="/favicon.ico" width="22" alt=""></router-link>
     <div style="margin-left:10px; display: inline;">
       Puestito Online
     </div>

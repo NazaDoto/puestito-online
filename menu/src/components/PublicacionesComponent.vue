@@ -75,6 +75,8 @@ export default {
     mounted() {
         this.nombreUsuario = localStorage.getItem("usuario");
         this.fetchPublicaciones();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
     },
     methods: {
         publicacionPorBorrarMethod(id){

@@ -326,6 +326,7 @@ export default {
         };
     },
     mounted() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     },
     created() {
         // Realiza una solicitud HTTP para obtener los informes desde el servidor

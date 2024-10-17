@@ -106,6 +106,8 @@ export default {
   },
   mounted() {
     this.checkAuthentication();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
   },
 };
 </script>

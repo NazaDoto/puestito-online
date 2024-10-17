@@ -13,22 +13,23 @@
         </div>
         <div v-else>
             <div class="absolute">
-                <nav class="navbar navbar-dark bg-dark" :class="{ 'navbar-hidden': isHidden }">
+                <nav class="navbar navbar-dark bg-black" :class="{ 'navbar-hidden': isHidden }">
                     <div class="container">
                         <div class="flex">
-                            <a @click="scrollToInicio" href="#"><img class="nav-logo" :src="negocio.imagen" alt=""></a>
+                            <a @click="scrollToInicio" href="#"><img class="nav-logo" :src="negocio.imagen" @error="imagenError" alt=""></a>
                             <div class="ancho-busqueda input-group mcenter">
                                 <input class="form-control" v-model="busqueda" type="text" name="busqueda" id=""
                                     placeholder="Buscar producto" title="Ingrese una palabra clave...">
                                 <button class="btn-close btn-limpiar-busqueda" @click="limpiarBusqueda"></button>
                             </div>
-                            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                                aria-expanded="false" aria-label="Toggle navigation">
+                            <button v-if="!usuarioLogueado" class="navbar-toggler" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                                aria-controls="navbarSupportedContent" aria-expanded="false"
+                                aria-label="Toggle navigation">
                                 <span class="navbar-toggler-icon"></span>
                             </button>
                         </div>
-                        <div class="collapse navbar-collapse text-end bg-dark" id="navbarSupportedContent">
+                        <div class="collapse navbar-collapse text-end bg-black" id="navbarSupportedContent">
                             <ul class="navbar-nav m-2">
                                 <div v-for="(categoria, index) in categoriasOrdenadas" :key="index">
                                     <li class="nav-item">
@@ -45,7 +46,7 @@
                     <div class="presentacion">
                         <!-- Imagen del negocio con texto superpuesto -->
                         <div class="imagen-container">
-                            <img v-if="negocio.portada" :src="negocio.portada" alt="" class="img-negocio">
+                            <img v-if="negocio.portada" :src="negocio.portada" @error="imagenError" class="img-negocio">
                             <img v-else src="/recursos/missing.png" class="img-negocio" alt="">
                             <div class="texto-superpuesto">BIENVENIDOS
                                 <div class="texto-superpuesto2">{{ negocio.descripcion }}
@@ -67,18 +68,20 @@
                             </div>
                         </div>
                     </div>
-                    <hr>
-                    <div v-if="publicaciones && publicaciones.length > 0" class="justify-content-center">
+                    <div class="text-center mensajeWpp p-2 mt-2" @click="enviarMensaje">
+                        Enviá tu consulta
+                        <img class="ml" src="/recursos/whatsapp.png" width="30" alt="">
+                    </div>
+                    <div v-if="publicaciones && publicaciones.length > 0" class="justify-content-center mt-2">
                         <div class="carrusel">
                             <div v-for="(publicacion, index) in publicaciones" :key="index"
                                 :class="{ 'carrusel-item': true, 'active': index === 0 }">
                                 <div class="publicacion-container">
-                                    <img class="imagen-publicacion" :src="publicacion.publicacion" alt=" "
+                                    <img class="imagen-publicacion" :src="publicacion.publicacion" @error="imagenError" alt=" "
                                         @click="agrandarPublicacion(index)" />
                                 </div>
                             </div>
                         </div>
-                        <hr class="hr-mobile">
                         <div v-if="publicacionAgrandada !== null" class="publicacion-agrandada">
                             <button @click="cerrarAgrandarPublicacion" class="btn-close btn-close-agrandada"></button>
 
@@ -96,11 +99,7 @@
                             <img :src="publicaciones[publicacionAgrandada].publicacion" class="imagen-agrandada" alt="">
                         </div>
                     </div>
-                    <div class="text-center mt-2 mensajeWpp p-2" @click="enviarMensaje">
-                        Enviá tu consulta
-                        <img class="ml" src="/recursos/whatsapp.png" width="30" alt="">
-                    </div>
-                    <hr>
+                    
                     <div class="body-container">
                         <div class="ancho">
                             <div class="mt-2" v-for="(categoria, index) in categoriasOrdenadas" :key="index"
@@ -118,7 +117,7 @@
                                                 v-for="(producto, index) in filteredProductos(categoria)" :key="index">
                                                 <div class="item-imagen" v-if="producto.producto_imagen">
                                                     <div>
-                                                        <img class="imagen" :src="producto.producto_imagen" alt=" ">
+                                                        <img class="imagen" :src="producto.producto_imagen" @error="imagenError" alt=" ">
                                                     </div>
                                                 </div>
                                                 <!-- Nombre del producto -->
@@ -129,158 +128,162 @@
                                                         </div>
                                                         <div class="item-precio">
                                                             {{ producto.producto_precio > 0 ? '$' +
-                                                                producto.producto_precio : producto.producto_precio < 0 ? 'Consultar precio' : 'Gratis' }}
-                                                        </div>
-                                                        <div class="item-descripcion"
-                                                            v-if="producto.producto_descripcion">
-                                                            "{{ producto.producto_descripcion }}"
+                                                                producto.producto_precio : producto.producto_precio < 0
+                                                                ? 'Consultar precio' : 'Gratis' }} </div>
+                                                                <div class="item-descripcion"
+                                                                    v-if="producto.producto_descripcion">
+                                                                    "{{ producto.producto_descripcion }}"
+                                                                </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                                <div v-if="negocio.tipo == 1" class="item-texto-block-end">
-                                                    <button class="btn-mas" @click="agregarAlCarrito(producto)">
-                                                        +
-                                                    </button>
-                                                    <div class="cantidad">
-                                                        {{ producto.cantidadSeleccionada }}
+                                                    <div v-if="negocio.tipo == 1" class="item-texto-block-end">
+                                                        <button class="btn-mas" @click="agregarAlCarrito(producto)">
+                                                            +
+                                                        </button>
+                                                        <div class="cantidad">
+                                                            {{ producto.cantidadSeleccionada }}
+                                                        </div>
+                                                        <button class="btn-menos" @click="quitarDelCarrito(producto)"
+                                                            :disabled="!producto.cantidadSeleccionada">
+                                                            -
+                                                        </button>
                                                     </div>
-                                                    <button class="btn-menos" @click="quitarDelCarrito(producto)"
-                                                        :disabled="!producto.cantidadSeleccionada">
-                                                        -
-                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div :class="usuarioLogueado ? 'ver-carrito-log' : 'ver-carrito'" v-if="carrito.length > 0">
-                                <button class="ver-carrito-btn" data-bs-toggle="modal"
-                                    data-bs-target="#modalCarrito">Ver Carrito ${{ total
-                                    }}</button>
-                            </div>
-                            <div v-if="productosFiltrados.length === 0" class="text-center mt-3">
-                                No se encontraron resultados para esa búsqueda.
+                                <div :class="usuarioLogueado ? 'ver-carrito-log' : 'ver-carrito'"
+                                    v-if="carrito.length > 0">
+                                    <button class="ver-carrito-btn" data-bs-toggle="modal"
+                                        data-bs-target="#modalCarrito">Ver Carrito ${{ total
+                                        }}</button>
+                                </div>
+                                <div v-if="productosFiltrados.length === 0" class="text-center mt-3">
+                                    No se encontraron resultados para esa búsqueda.
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div v-else-if="nombreNegocio">
-                    <div class="error-content">
-                        <h1 class="display-1" v-if="negocio.imagen">
-                            <img :src="negocio.imagen" width="100" alt="" style="border-radius:100%;">
-                        </h1>
-                        <h2 class="display-4">{{ nombreNegocio }}</h2>
-                        <p class="lead">Estamos construyendo nuestro
-                            puestito.<br></p>
-                        <p v-if="negocio.instagram || negocio.facebook">¡Seguinos en nuestras redes!</p>
-                        <p v-else>¡Volvé pronto!</p>
-                        <a v-if="negocio.instagram" class="mauto" :href="'https://instagram.com/' + negocio.instagram"
-                            target="blank"><img width='40' src="/recursos/instagram.png"></a>
-                        <a v-if="negocio.facebook" class="mauto" :href="'https://facebook.com/' + negocio.facebook"
-                            target="blank"><img width='36' src="/recursos/facebook.png"></a> <br>
-                        <p class="mt-3" v-if="negocio.direccion">{{ negocio.direccion }}</p>
-                        <router-link to="/">Volver a Puestito Online</router-link>
-                    </div>
-                </div>
-                <div v-else>
-                    <div class="error-content">
-                        <h1 class="display-1 text-danger">404</h1>
-                        <h2 class="display-4">Puestito no encontrado</h2>
-                        <p class="lead">Lo sentimos, el puestito que buscas no se encuentra disponible o no tiene
-                            productos disponibles.</p>
-                        <router-link to="/">Volver a Puestito Online</router-link>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="modal fade" id="modalCarrito" tabindex="-1" aria-labelledby="modalCarritoLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">¿Todo listo para encargar?</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="item-container mt-2" v-for="(producto, index) in carrito" :key="index">
-                            <div class="item-imagen" v-if="producto.producto_imagen">
-                                <div>
-                                    <img class="imagen" :src="producto.producto_imagen" alt=" ">
-                                </div>
-                            </div>
-                            <!-- Nombre del producto -->
-                            <div class="item-texto-block">
-                                <div class="item-texto-block-start">
-                                    <div class="item-nombre">
-                                        {{ producto.producto_nombre }}
-                                    </div>
-                                    <div class="item-precio">
-                                        ${{ producto.producto_precio }}
-                                    </div>
-                                    <div class="item-descripcion" v-if="producto.producto_descripcion">
-                                        "{{ producto.producto_descripcion }}"
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="item-texto-block-end">
-                                <button class="btn-mas" @click="agregarAlCarrito(producto)">
-                                    +
-                                </button>
-                                <div class="cantidad">
-                                    {{ producto.cantidadSeleccionada }}
-                                </div>
-                                <button class="btn-menos" @click="quitarDelCarrito(producto)"
-                                    :disabled="!producto.cantidadSeleccionada">
-                                    -
-                                </button>
-                            </div>
+                    <div v-else-if="nombreNegocio">
+                        <div class="error-content">
+                            <h1 class="display-1" v-if="negocio.imagen">
+                                <img :src="negocio.imagen" @error="imagenError" width="100" alt="" style="border-radius:100%;">
+                            </h1>
+                            <h2 class="display-4">{{ nombreNegocio }}</h2>
+                            <p class="lead">Estamos construyendo nuestro
+                                puestito.<br></p>
+                            <p v-if="negocio.instagram || negocio.facebook">¡Seguinos en nuestras redes!</p>
+                            <p v-else>¡Volvé pronto!</p>
+                            <a v-if="negocio.instagram" class="mauto"
+                                :href="'https://instagram.com/' + negocio.instagram" target="blank"><img width='40'
+                                    src="/recursos/instagram.png"></a>
+                            <a v-if="negocio.facebook" class="mauto" :href="'https://facebook.com/' + negocio.facebook"
+                                target="blank"><img width='36' src="/recursos/facebook.png"></a> <br>
+                            <p class="mt-3" v-if="negocio.direccion">{{ negocio.direccion }}</p>
+                            <router-link to="/">Volver a Puestito Online</router-link>
                         </div>
-                        <h4 class="text-end mt-4">Total: ${{ total }}</h4>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-limpiar" data-bs-dismiss="modal" aria-label="Close"
-                            @click="limpiarCarrito">Limpiar carrito</button>
-                        <button type="button" class="btn btn-menu" :disabled="!carrito.length > 0"
-                            data-bs-toggle="modal" data-bs-target="#modalPedido">Realizar pedido</button>
+                    <div v-else>
+                        <div class="error-content">
+                            <h1 class="display-1 text-danger">404</h1>
+                            <h2 class="display-4">Puestito no encontrado</h2>
+                            <p class="lead">Lo sentimos, el puestito que buscas no se encuentra disponible o no tiene
+                                productos disponibles.</p>
+                            <router-link to="/">Volver a Puestito Online</router-link>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="modal fade" id="modalPedido" tabindex="-1" aria-labelledby="modalPedidoLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Información del pedido</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <form @submit.prevent="realizarPedido">
+            <div class="modal fade" id="modalCarrito" tabindex="-1" aria-labelledby="modalCarritoLabel"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">¿Todo listo para encargar?</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
                         <div class="modal-body">
-                            <label class="mt-2" for="nombre">Nombre y Apellido</label>
-                            <input type="text" id="nombre" class="form-control" placeholder="(obligatorio)"
-                                v-model="pedido.nombre" required>
-                            <label class="mt-2" for="medioPago">Medio de Pago</label>
-                            <select class="form-control form-select" id="medioPago" v-model="pedido.medio" required>
-                                <option value="Transferencia">Transferencia</option>
-                                <option value="Efectivo">Efectivo</option>
-                            </select>
-                            <label class="mt-2" for="direccion">Dirección de entrega</label>
-                            <input type="text" id="direccion" class="form-control" placeholder="(opcional)"
-                                v-model="pedido.direccion">
-                            <label class="mt-2" for="detalles">Detalles del pedido</label>
-                            <input type="text" id="detalles" class="form-control" placeholder="(opcional)"
-                                v-model="pedido.detalle">
+                            <div class="item-container mt-2" v-for="(producto, index) in carrito" :key="index">
+                                <div class="item-imagen" v-if="producto.producto_imagen">
+                                    <div>
+                                        <img class="imagen" :src="producto.producto_imagen" @error="imagenError" alt=" ">
+                                    </div>
+                                </div>
+                                <!-- Nombre del producto -->
+                                <div class="item-texto-block">
+                                    <div class="item-texto-block-start">
+                                        <div class="item-nombre">
+                                            {{ producto.producto_nombre }}
+                                        </div>
+                                        <div class="item-precio">
+                                            ${{ producto.producto_precio }}
+                                        </div>
+                                        <div class="item-descripcion" v-if="producto.producto_descripcion">
+                                            "{{ producto.producto_descripcion }}"
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item-texto-block-end">
+                                    <button class="btn-mas" @click="agregarAlCarrito(producto)">
+                                        +
+                                    </button>
+                                    <div class="cantidad">
+                                        {{ producto.cantidadSeleccionada }}
+                                    </div>
+                                    <button class="btn-menos" @click="quitarDelCarrito(producto)"
+                                        :disabled="!producto.cantidadSeleccionada">
+                                        -
+                                    </button>
+                                </div>
+                            </div>
+                            <h4 class="text-end mt-4">Total: ${{ total }}</h4>
                         </div>
                         <div class="modal-footer">
-                            <button type="submit" class="btn btn-menu" :disabled="!carrito.length > 0">Realizar
-                                pedido</button>
+                            <button type="button" class="btn btn-limpiar" data-bs-dismiss="modal" aria-label="Close"
+                                @click="limpiarCarrito">Limpiar carrito</button>
+                            <button type="button" class="btn btn-menu" :disabled="!carrito.length > 0"
+                                data-bs-toggle="modal" data-bs-target="#modalPedido">Realizar pedido</button>
                         </div>
-                    </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="modalPedido" tabindex="-1" aria-labelledby="modalPedidoLabel"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Información del pedido</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form @submit.prevent="realizarPedido">
+                            <div class="modal-body">
+                                <label class="mt-2" for="nombre">Nombre y Apellido</label>
+                                <input type="text" id="nombre" class="form-control" placeholder="(obligatorio)"
+                                    v-model="pedido.nombre" required>
+                                <label class="mt-2" for="medioPago">Medio de Pago</label>
+                                <select class="form-control form-select" id="medioPago" v-model="pedido.medio" required>
+                                    <option value="Transferencia">Transferencia</option>
+                                    <option value="Efectivo">Efectivo</option>
+                                </select>
+                                <label class="mt-2" for="direccion">Dirección de entrega</label>
+                                <input type="text" id="direccion" class="form-control" placeholder="(opcional)"
+                                    v-model="pedido.direccion">
+                                <label class="mt-2" for="detalles">Detalles del pedido</label>
+                                <input type="text" id="detalles" class="form-control" placeholder="(opcional)"
+                                    v-model="pedido.detalle">
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-menu" :disabled="!carrito.length > 0">Realizar
+                                    pedido</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 </template>
 
 <script>
@@ -318,7 +321,7 @@ export default {
     },
 
     async mounted() {
-
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         window.addEventListener('scroll', this.handleScroll);
 
         // Obtener el nombre de usuario de la URL
@@ -366,6 +369,9 @@ export default {
         }
     },
     methods: {
+        imagenError(event) {
+            event.target.src = '/recursos/missing.png'; // Ruta de la imagen alternativa
+        },
         async actualizarOG() {
             document.title = this.nombreNegocio;
             document
@@ -670,7 +676,6 @@ export default {
     overflow-x: auto;
     width: 100%;
     display: inline-flex;
-    padding-bottom: 10px;
     margin: auto;
 }
 
@@ -790,6 +795,7 @@ export default {
     text-align: end;
     width: 100%;
 }
+
 .ver-carrito-log {
     position: fixed;
     bottom: 80px;
@@ -1001,7 +1007,8 @@ export default {
 
 .titulo-categoria {
     font-size: 1.3rem;
-    background: white;
+    background: black;
+    color: white;
     /* background:  rgb(254, 255, 174); */
     width: 100%;
     margin: 0px;
@@ -1012,7 +1019,7 @@ export default {
 }
 
 .titulo-categoria:hover {
-    background: rgb(232, 231, 231);
+    background: rgb(39, 39, 39);
 }
 
 .tarjetaProducto {

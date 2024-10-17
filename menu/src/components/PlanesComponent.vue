@@ -98,6 +98,8 @@ export default {
     },
     mounted() {
         this.usuario = localStorage.getItem("usuario");
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
     },
     methods: {
         elegirPlan(plan) {

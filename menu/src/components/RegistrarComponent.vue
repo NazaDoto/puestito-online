@@ -232,6 +232,8 @@ export default {
     },
     mounted() {
         this.obtenerPlan();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
     },
     methods: {
         restrictInput(event) {

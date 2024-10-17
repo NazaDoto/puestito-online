@@ -36,7 +36,7 @@
                     </div>
                     <div class="col-md-6 text-center">
                         <input class="form-control" type="number" id="precio" v-model="producto.precio"
-                            placeholder="Precio" />
+                            placeholder="Precio" required/>
                             <i class="small">Si el precio es menor a 0, se publicará como "consultar precio"</i>
                     </div>
                     <div class="col-md-6">
@@ -437,6 +437,7 @@ export default {
         },
     },
     mounted() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     },
 };
 </script>

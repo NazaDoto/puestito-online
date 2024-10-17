@@ -55,6 +55,8 @@ export default {
     },
     mounted() {
         this.guardarPago();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
     },
     methods: {
         cerrarVentana(){
