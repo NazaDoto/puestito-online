@@ -20,275 +20,217 @@
                     <div v-else class="textoTarjeta">
                         <h4 class="titulo-div-forms mb-2 mt-2">Esta es una cuenta Premium.</h4>
                         <h4 class="titulo-div-forms">Vence: {{ fechaVence }}</h4>
-                        <div class="col-md-6 m-auto">
-                            Tipo de Puestito:
-                            <select class="form-select selectTipo text-center" name="tipo" id="" v-model="tipoPuestito"
-                                @change="cambiarTipoPuestito">
-                                <option value="0">Menú (solo se muestran tus productos)</option>
-                                <option value="1">Carrito (pedidos por WhatsApp)</option>
-                            </select>
-                        </div>
                     </div>
-                    <hr class="m-2">
-                    <div class="textoTarjeta">
-                        <table class="table table-light table-striped">
-                            <thead>
-                                <th></th>
-                                <th></th>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>
-                                        <strong>Logo:</strong>
-                                    </td>
-                                    <td v-if="negocio.imagen">
-                                        <img class="imagen round" :src="negocio.imagen" alt=" ">
-                                    </td>
-                                    <td v-else>Sin logo.</td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <strong>Portada:</strong>
-                                    </td>
-                                    <td v-if="negocio.portada">
-                                        <img class="imagen" :src="negocio.portada" alt=" ">
-                                    </td>
-                                    <td v-else>Sin portada.</td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <strong>Nombre:</strong>
-                                    </td>
-                                    <td>{{ negocio.nombre }}</td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <strong>Correo:</strong>
-                                    </td>
-                                    <td>{{ negocio.correo }}</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Teléfono:</strong></td>
-                                    <td>{{ negocio.telefono }}</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Dirección:</strong></td>
-                                    <td>{{ negocio.direccion }}</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Descripción:</strong></td>
-                                    <td>{{ negocio.descripcion }}</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Rubro:</strong></td>
-                                    <td>{{ negocio.rubro }}</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Instagram:</strong></td>
-                                    <td v-if="negocio.instagram">{{ negocio.instagram }}</td>
-                                    <td v-else>Sin instagram.</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Facebook:</strong></td>
-                                    <td v-if="negocio.facebook">{{ negocio.facebook }}</td>
-                                    <td v-else>Sin facebook.</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <div class="flex">
-                            <button class="btn btn-menu-danger" data-bs-toggle="modal"
-                                data-bs-target="#cerrarSesionModal2">
-                                Cerrar Sesión
-                            </button>
-                            <button class="btn btn-menu" title="Modificar" data-bs-toggle="modal"
-                                data-bs-target="#modificarProducto">Modificar
-                                Datos</button>
-                        </div>
-                        <div class="modal fade" id="cerrarSesionModal2" tabindex="-1"
-                            aria-labelledby="cerrarSesionModal2Label" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header text-center">
-                                        <h1 class="modal-title fs-5" id="cerrarSesionModal2Label">¿Cerrar sesión?</h1>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                            aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-footer text-center">
-                                        <button type="button" class="btn btn-secondary"
-                                            data-bs-dismiss="modal">No</button>
-                                        <button type="button" class="btn btn-menu-danger" data-bs-dismiss="modal"
-                                            @click="cerrarSesion">Sí, cerrar sesión</button>
-                                    </div>
-                                </div>
+                    <hr>
+                    <div class="editar-perfil mt-4 text-start p-4">
+                        <div class="item-perfil" v-if="!esPremium">
+                            <div class="">
+                                <h3>Tipo</h3>
+                                <select class="form-select" name="tipo" id="" v-model="tipoPuestito"
+                                    @change="cambiarTipoPuestito">
+                                    <option value="0">Menú (solo se muestran tus productos)</option>
+                                    <option value="1">Carrito (pedidos por WhatsApp)</option>
+                                </select>
                             </div>
                         </div>
-                    </div>
-                    <br>
+                        <form @submit.prevent="modificarPerfil">
+                            <div class="item-perfil mt-4 text-center">
+                                <div class="seccion-perfil text-start">
+                                    <h3>Logo</h3>
+                                    <!-- Input de archivo oculto -->
+                                    <input class="form-control" type="file" name="imagen" id="imagen"
+                                        accept="image/jpeg, image/png" @change="imagenSeleccionada"
+                                        style="display: none;">
 
+                                    <!-- Etiqueta o botón personalizado que actúa como disparador -->
+                                    <a class="btn btn-link" @click="triggerFileInput('imagen')">Editar</a>
+                                </div>
+                                <img v-if="negocio.imagen" class="imagen round" :src="negocio.imagen" alt=""
+                                    @error="imagenError">
+                            </div>
+                            <div class="item-perfil mt-4 text-center">
+                                <div class="seccion-perfil text-start">
+                                    <h3>Portada</h3>
+                                    <input class="form-control" type="file" name="portada" id="portada"
+                                        accept="image/jpeg, image/png" @change="portadaSeleccionada" style="display: none;">
+                                        <a class="btn btn-link" @click="triggerFileInput('portada')">Editar</a>
+                                </div>
+                                <img v-if="negocio.imagen" class="imagen" :src="negocio.portada" alt=""
+                                    @error="imagenError">
+                            </div>
+                            <div class="item-perfil mt-4">
+                                <div class="seccion-perfil">
+                                    <h3>Datos</h3>
+                                </div>
+                                <div class="">
+                                    <label class="form-label" for="nombre">Nombre</label>
+                                    <input class="form-control" type="text" id="nombre" name="nombre"
+                                        v-model="negocioModificar.nombre" placeholder="Nombre del Negocio" required>
+                                </div>
+                                <div class="mt-2">
+                                    <label class="form-label" for="correo">Correo</label>
+                                    <input class="form-control" type="email" id="correo"
+                                        v-model="negocioModificar.correo" placeholder="Correo">
+                                </div>
+                                <div class="mt-2">
+                                    <label class="form-label" for="telefono">Teléfono</label>
+                                    <input class="form-control" type="number" id="telefono"
+                                        v-model="negocioModificar.telefono" placeholder="Teléfono">
+                                </div>
+                                <div class="mt-2">
+                                    <label class="form-label" for="direccion">Dirección</label>
+                                    <input class="form-control" type="text" id="direccion"
+                                        v-model="negocioModificar.direccion" placeholder="Dirección">
+                                </div>
+                                <div class="mt-2">
+                                    <label class="form-label" for="descripcion">Descripción</label>
+                                    <input class="form-control" type="text" id="descripcion"
+                                        v-model="negocioModificar.descripcion" placeholder="Descripción" maxlength="40">
+                                </div>
+                                <div class="mt-2">
+                                    <label class="form-label" for="rubro">Rubro</label>
+                                    <select class="form-select" name="rubro" id="rubro"
+                                        v-model="negocioModificar.rubro">
+                                        <option value="Elegí tu rubro" selected disabled>Elegí tu rubro</option>
+                                        <option value="Artesanías">Artesanías</option>
+                                        <option value="Bar/Restaurante">Bar/Restaurante</option>
+                                        <option value="Carnicería">Carnicería</option>
+                                        <option value="Consultorio">Consultorio</option>
+                                        <option value="Estética">Estética</option>
+                                        <option value="Farmacia">Farmacia</option>
+                                        <option value="Ferretería">Ferretería</option>
+                                        <option value="Fiambrería">Fiambrería</option>
+                                        <option value="Florería">Florería</option>
+                                        <option value="Heladería">Heladería</option>
+                                        <option value="Indumentaria">Indumentaria</option>
+                                        <option value="Inmobiliaria">Inmobiliaria</option>
+                                        <option value="Juguetería">Juguetería</option>
+                                        <option value="Librería">Librería</option>
+                                        <option value="Limpieza">Limpieza</option>
+                                        <option value="Panadería">Panadería</option>
+                                        <option value="Peluquería">Peluquería</option>
+                                        <option value="Polirubro">Polirubro</option>
+                                        <option value="Pollería">Pollería</option>
+                                        <option value="Repostería">Repostería</option>
+                                        <option value="Rotisería">Rotisería</option>
+                                        <option value="Reparación/mantenimiento">Reparación/mantenimiento
+                                        </option>
+                                        <option value="Servicios">Servicios</option>
+                                        <option value="Supermercado">Supermercado</option>
+                                        <option value="Tecnología">Tecnología</option>
+                                        <option value="Verdulería">Verdulería</option>
+                                        <option value="Veterinaria/Forrajería">Veterinaria/Forrajería</option>
+                                    </select>
+                                </div>
+                                <div class="mt-2">
+                                    <label class="form-label" for="instagram">Instagram</label>
+                                    <input class="form-control" type="text" id="instagram"
+                                        v-model="negocioModificar.instagram" placeholder="Instagram">
+                                </div>
+                                <div class="mt-2">
+                                    <label class="form-label" for="facebook">Facebook</label>
+                                    <input class="form-control" type="text" id="facebook"
+                                        v-model="negocioModificar.facebook" placeholder="Facebook">
+                                </div>
+                                <div class="flex mt-3">
+                                    <button class="btn btn-menu-danger" data-bs-toggle="modal"
+                                        data-bs-target="#cerrarSesionModal2">
+                                        Cerrar Sesión
+                                    </button>
+                                    <button class="btn btn-menu" type="submit">Guardar</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
                 </div>
 
 
-                <!-- MODAL MODIFICAR-->
-                <div class="modal fade" id="modificarProducto" tabindex="-1" aria-labelledby="modificarDatosLabel"
-                    aria-hidden="true" ref="modalModificar">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content ">
-                            <div class="modal-header">
-                                <h1 class="modal-title fs-5" id="modificarDatosLabel">Modificar Datos</h1>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <form @submit.prevent="modificarPerfil">
-                                    <div class="row g-3 div-forms text-start">
-                                        <h4 class="titulo-div-forms mb-2">Información del Negocio</h4>
-                                        <div>
-                                            <label class="form-label" for="nombre">Nombre</label>
-                                            <input class="form-control" type="text" id="nombre" name="nombre"
-                                                v-model="negocioModificar.nombre" placeholder="Nombre del Negocio"
-                                                required>
-                                        </div>
-                                        <div>
-                                            <label class="form-label" for="correo">Correo</label>
-                                            <input class="form-control" type="email" id="correo"
-                                                v-model="negocioModificar.correo" placeholder="Correo">
-                                        </div>
-                                        <div>
-                                            <label class="form-label" for="telefono">Teléfono</label>
-                                            <input class="form-control" type="number" id="telefono"
-                                                v-model="negocioModificar.telefono" placeholder="Teléfono">
-                                        </div>
-                                        <div>
-                                            <label class="form-label" for="direccion">Dirección</label>
-                                            <input class="form-control" type="text" id="direccion"
-                                                v-model="negocioModificar.direccion" placeholder="Dirección">
-                                        </div>
-                                        <div>
-                                            <label class="form-label" for="descripcion">Descripción</label>
-                                            <input class="form-control" type="text" id="descripcion"
-                                                v-model="negocioModificar.descripcion" placeholder="Descripción"
-                                                maxlength="40">
-                                        </div>
-                                        <div>
-                                            <label class="form-label" for="rubro">Rubro</label>
-                                            <select class="form-select" name="rubro" id="rubro"
-                                                v-model="negocioModificar.rubro">
-                                                <option value="Elegí tu rubro" selected disabled>Elegí tu rubro</option>
-                                                <option value="Artesanías">Artesanías</option>
-                                                <option value="Bar/Restaurante">Bar/Restaurante</option>
-                                                <option value="Carnicería">Carnicería</option>
-                                                <option value="Consultorio">Consultorio</option>
-                                                <option value="Estética">Estética</option>
-                                                <option value="Farmacia">Farmacia</option>
-                                                <option value="Ferretería">Ferretería</option>
-                                                <option value="Fiambrería">Fiambrería</option>
-                                                <option value="Florería">Florería</option>
-                                                <option value="Heladería">Heladería</option>
-                                                <option value="Indumentaria">Indumentaria</option>
-                                                <option value="Inmobiliaria">Inmobiliaria</option>
-                                                <option value="Juguetería">Juguetería</option>
-                                                <option value="Librería">Librería</option>
-                                                <option value="Limpieza">Limpieza</option>
-                                                <option value="Panadería">Panadería</option>
-                                                <option value="Peluquería">Peluquería</option>
-                                                <option value="Polirubro">Polirubro</option>
-                                                <option value="Pollería">Pollería</option>
-                                                <option value="Repostería">Repostería</option>
-                                                <option value="Rotisería">Rotisería</option>
-                                                <option value="Reparación/mantenimiento">Reparación/mantenimiento
-                                                </option>
-                                                <option value="Servicios">Servicios</option>
-                                                <option value="Supermercado">Supermercado</option>
-                                                <option value="Tecnología">Tecnología</option>
-                                                <option value="Verdulería">Verdulería</option>
-                                                <option value="Veterinaria/Forrajería">Veterinaria/Forrajería</option>
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label class="form-label" for="instagram">Instagram</label>
-                                            <input class="form-control" type="text" id="instagram"
-                                                v-model="negocioModificar.instagram" placeholder="Instagram">
-                                        </div>
-                                        <div>
-                                            <label class="form-label" for="facebook">Facebook</label>
-                                            <input class="form-control" type="text" id="facebook"
-                                                v-model="negocioModificar.facebook" placeholder="Facebook">
-                                        </div>
-                                        <div>
-                                            <label class="form-label mr-2" for="imagen">Logo (JPG/PNG)</label>
-                                            <input class="form-control" type="file" name="imagen" id="imagen"
-                                                accept="image/jpeg, image/png" @change="imagenSeleccionada">
-                                        </div>
-                                        <div>
-                                            <label class="form-label mr-2" for="portada">Portada (JPG/PNG)</label>
-                                            <input class="form-control" type="file" name="portada" id="portada"
-                                                accept="image/jpeg, image/png" @change="portadaSeleccionada">
-                                        </div>
+
+            </div>
+        </div>
+        <div class="modal fade" id="cerrarSesionModal2" tabindex="-1" aria-labelledby="cerrarSesionModal2Label"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header text-center">
+                        <h1 class="modal-title fs-5" id="cerrarSesionModal2Label">¿Cerrar sesión?</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-footer text-center">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                        <button type="button" class="btn btn-menu-danger" data-bs-dismiss="modal"
+                            @click="cerrarSesion">Sí, cerrar sesión</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- MODAL MODIFICAR-->
+        <div class="modal fade" id="modificarProducto" tabindex="-1" aria-labelledby="modificarDatosLabel"
+            aria-hidden="true" ref="modalModificar">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content ">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="modificarDatosLabel">Modificar Datos</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                            @click="modalCerrado"></button>
+                    </div>
+                    <div class="modal-body">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--Modal Cropper-->
+        <div v-show="modalCropImage" class="modalCategoriaContainer text-center ">
+            <div class="modalCategoria">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header pl-2">
+                            <h1 class="modal-title fs-5" id="agregarCategoriaLabel">Recortar Imagen</h1>
+                            <button type="button" class="btn-close" @click="cerrarCrop" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body mt-2 ">
+                            <div v-show="cargandoCropper" class="pantalla-cargas text-center">
+                                <div class="logo-carga">
+                                    <img class="logo-img" src="/favicon.ico" width="50" alt="">
+                                    <div class="texto-carga">
+                                        Cargando imagen
                                     </div>
-                                    <div class="flex mt-3">
-                                        <button type="button" class="btn" data-bs-dismiss="modal">Cerrar</button>
-                                        <button class="btn btn-menu" type="submit"
-                                            data-bs-dismiss="modal">Modificar</button>
-                                    </div>
-                                </form>
+                                </div>
                             </div>
+                            <img ref="cropperImg" alt="Croppear">
+                        </div>
+                        <div class="modal-footer mt-2">
+                            <button type="button" class="btn" @click="cerrarCrop">Cerrar</button>
+                            <button class="btn btn-menu" @click="guardarImagenRecortada">Recortar</button>
                         </div>
                     </div>
                 </div>
-                <!--Modal Cropper-->
-                <div v-show="modalCropImage" class="modalCategoriaContainer text-center ">
-                    <div class="modalCategoria">
-                        <div class="modal-dialog modal-dialog-centered">
-                            <div class="modal-content">
-                                <div class="modal-header pl-2">
-                                    <h1 class="modal-title fs-5" id="agregarCategoriaLabel">Recortar Imagen</h1>
-                                    <button type="button" class="btn-close" @click="cerrarCrop"
-                                        aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body mt-2 ">
-                                    <div v-show="cargandoCropper" class="pantalla-cargas text-center">
-                                        <div class="logo-carga">
-                                            <img class="logo-img" src="/favicon.ico" width="50" alt="">
-                                            <div class="texto-carga">
-                                                Cargando imagen
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <img ref="cropperImg" alt="Croppear">
-                                </div>
-                                <div class="modal-footer mt-2">
-                                    <button type="button" class="btn" @click="cerrarCrop">Cerrar</button>
-                                    <button class="btn btn-menu" @click="guardarImagenRecortada">Recortar</button>
-                                </div>
-                            </div>
+            </div>
+        </div>
+        <div v-show="modalCropPortada" class="modalCategoriaContainer  text-center ">
+            <div class="modalCategoria">
+                <div class="modal-dialog modal-dialog-centered ">
+                    <div class="modal-content ">
+                        <div class="modal-header pl-2">
+                            <h1 class="modal-title fs-5" id="agregarCategoriaLabel">Recortar Imagen</h1>
+                            <button type="button" class="btn-close" @click="cerrarCropPortada"
+                                aria-label="Close"></button>
                         </div>
-                    </div>
-                </div>
-                <div v-show="modalCropPortada" class="modalCategoriaContainer  text-center ">
-                    <div class="modalCategoria">
-                        <div class="modal-dialog modal-dialog-centered ">
-                            <div class="modal-content ">
-                                <div class="modal-header pl-2">
-                                    <h1 class="modal-title fs-5" id="agregarCategoriaLabel">Recortar Imagen</h1>
-                                    <button type="button" class="btn-close" @click="cerrarCropPortada"
-                                        aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body mt-2 ">
-                                    <div v-show="cargandoCropperPortada" class="pantalla-cargas text-center">
-                                        <div class="logo-carga">
-                                            <img class="logo-img" src="/favicon.ico" width="50" alt="">
-                                            <div class="texto-carga">
-                                                Cargando imagen
-                                            </div>
-                                        </div>
+                        <div class="modal-body mt-2 ">
+                            <div v-show="cargandoCropperPortada" class="pantalla-cargas text-center">
+                                <div class="logo-carga">
+                                    <img class="logo-img" src="/favicon.ico" width="50" alt="">
+                                    <div class="texto-carga">
+                                        Cargando imagen
                                     </div>
-                                    <img ref="cropperPortada" alt="Croppear">
-                                </div>
-                                <div class="modal-footer mt-2">
-                                    <button type="button" class="btn" @click="cerrarCropPortada">Cerrar</button>
-                                    <button class="btn btn-menu" @click="guardarPortadaRecortada">Recortar</button>
                                 </div>
                             </div>
+                            <img ref="cropperPortada" alt="Croppear">
+                        </div>
+                        <div class="modal-footer mt-2">
+                            <button type="button" class="btn" @click="cerrarCropPortada">Cerrar</button>
+                            <button class="btn btn-menu" @click="guardarPortadaRecortada">Recortar</button>
                         </div>
                     </div>
                 </div>
@@ -333,6 +275,18 @@ export default {
         this.obtenerInformacionNegocio();
     },
     methods: {
+        triggerFileInput(item) {
+        document.getElementById(item).click();
+    },
+        imagenError(event) {
+            event.target.src = '/recursos/missing.png'; // Ruta de la imagen alternativa
+        },
+        modalAbierto() {
+            document.querySelector('html').style.overflow = 'hidden';
+        },
+        modalCerrado() {
+            document.querySelector('html').style.overflow = 'auto';
+        },
         cerrarSesion() {
             localStorage.clear(); // Elimina el token del almacenamiento local
             router.push('/');
@@ -361,8 +315,8 @@ export default {
                     title: 'Datos modificados.'
                 });
                 setTimeout(function () {
-                            location.reload();
-                        }, 1000);
+                    location.reload();
+                }, 1000);
             })
                 .catch((error) => {
                     console.error('Error al actualizar la información en la base de datos:', error);
@@ -444,19 +398,19 @@ export default {
         },
         async guardarPortadaRecortada() {
             try {
-        const canvas = await this.cropperPortada.getCropperSelection().$toCanvas({
-            // Aumentar el tamaño del canvas para una mejor calidad
-            width: 1000, // Ajusta este valor según la calidad deseada
-            height: 1333, // Mantén el aspecto correcto de la imagen
-        });
+                const canvas = await this.cropperPortada.getCropperSelection().$toCanvas({
+                    // Aumentar el tamaño del canvas para una mejor calidad
+                    width: 1000, // Ajusta este valor según la calidad deseada
+                    height: 1333, // Mantén el aspecto correcto de la imagen
+                });
 
-        // Convertir el canvas a una imagen de alta calidad
-        this.negocioModificar.portada = canvas.toDataURL('image/jpeg', 0.9); // Ajusta el segundo parámetro (0.9) para la calidad, donde 1.0 es la mejor calidad
-    } catch (error) {
-        console.error('Error al guardar la imagen recortada:', error);
-    } finally {
-        this.modalCropPortada = false;
-    }
+                // Convertir el canvas a una imagen de alta calidad
+                this.negocioModificar.portada = canvas.toDataURL('image/jpeg', 0.9); // Ajusta el segundo parámetro (0.9) para la calidad, donde 1.0 es la mejor calidad
+            } catch (error) {
+                console.error('Error al guardar la imagen recortada:', error);
+            } finally {
+                this.modalCropPortada = false;
+            }
         },
         imagenSeleccionada(event) {
             try {
@@ -524,6 +478,27 @@ export default {
 </script>
 
 <style scoped>
+.btn-link{
+    text-decoration: none;
+    font-size: 1.1rem;
+}
+
+.editar-perfil {
+    margin: 10px 22%;
+    background: white;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.item-perfil {}
+
+.seccion-perfil {
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+}
+
+
 .btn-menu-danger {
     display: none;
 }
@@ -629,6 +604,19 @@ img {
 }
 
 @media screen and (max-width: 992px) {
+    .editar-perfil {
+        margin: 0;
+    }
+
+
+    .form-select {
+        width: 100%;
+    }
+
+    .form-control {
+        width: 100%;
+    }
+
     .btn-menu-danger {
         display: block;
     }

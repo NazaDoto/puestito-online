@@ -725,7 +725,7 @@ export default {
 .navbar {
     position: fixed;
     opacity: 0;
-    width: calc(100svw - 5px);
+    width: 100svw;
     top: 0;
     z-index: 10;
     animation: fadeIn 0.5s forwards;
@@ -1017,7 +1017,6 @@ export default {
     border-radius: 4px;
     display: flex;
 }
-
 .titulo-categoria:hover {
     background: rgb(39, 39, 39);
 }

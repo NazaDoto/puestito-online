@@ -17,13 +17,13 @@
           <router-link class="btn-inicio" to='/u/modificar'>
             <img src="/recursos/user.png" width="50" height="50" alt="User">
             Perfil</router-link>
+            <router-link to="/u/crearqr" class="btn-inicio">
+              <img src="/recursos/qr.png" width="50" height="50" alt="QR"> Crear QR
+            </router-link>
+          </div>
+          <div class="botones mt-2">
           <router-link class="btn-inicio" to='/u/productos'>
             <img src="/recursos/productos.png" width="50" height="50" alt="Productos">Productos</router-link>
-        </div>
-        <div class="botones mt-2">
-          <router-link to="/u/crearqr" class="btn-inicio">
-            <img src="/recursos/qr.png" width="50" height="50" alt="QR"> Crear QR
-          </router-link>
           <router-link to="/u/publicaciones" class="btn-inicio">
             <img src="/recursos/image.png" width="50" height="50" alt="QR">Publicaciones
           </router-link>

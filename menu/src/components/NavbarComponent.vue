@@ -6,7 +6,10 @@
             <img src="/recursos/home.png" width="50" height="50" alt="Home">
           </router-link>
           <router-link to="/u/productos" class="item-mobile">
-            <img src="/recursos/add.png" width="50" alt="Add">
+            <img src="/recursos/productos.png" width="50" alt="Add">
+          </router-link>
+          <router-link to="/u/publicaciones" class="item-mobile">
+            <img src="/recursos/image.png" width="50" alt="Add">
           </router-link>
           <router-link to="/u/modificar" class="item-mobile">
             <img src="/recursos/user.png" width="50" height="50" alt="User">

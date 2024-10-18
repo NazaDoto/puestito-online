@@ -41,13 +41,13 @@ html {
 
 /* width */
 ::-webkit-scrollbar {
-    width: 5px;
+    width: auto;
 }
 
 /* Track */
 ::-webkit-scrollbar-track {
 
-    background: #f1f1f1;
+    background: transparent;
 }
 
 /* Handle */
@@ -57,15 +57,14 @@ html {
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-    background: #555;
+    background: #797979;
 }
-
 body {
     background-color: #f0f0f0;
+    padding: 0 !important;
 }
 
 .body {
-    width: calc(100svw -5 px);
     min-height: calc(100svh - 41.5px);
 }
 
@@ -223,8 +222,5 @@ body {
         width: 90vw;
     }
 
-    .body {
-        width: 100svw;
-    }
 }
 </style>
