@@ -52,7 +52,7 @@ router.post('/nuevaUsuario', async(req, res) => {
     const { nombre, mail, telefono, direccion, area, usuario, contraseña, esDirector, esAdmin } = req.body;
     try {
         const hashedPassword = await bcrypt.hash(contraseña, 10);
-        const [result] = await db.query('INSERT INTO usuarios (nombre, mail, telefono, id_direccion, id_area, usuario, contraseña, esDirector, esAdmin) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', [nombre, mail, telefono, direccion, area, usuario, hashedPassword, esDirector, esAdmin]);
+        const [result] = await db.query('INSERT INTO usuarios (nombre, mail, telefono, id_direccion, id_area, usuario, contraseña, esDirector, esAdmin) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', [nombre, mail, telefono, direccion, area, usuario, hashedPassword, esDirector, esAdmin]);
         const newUsuario = {
             id: result.insertId,
             nombre,
