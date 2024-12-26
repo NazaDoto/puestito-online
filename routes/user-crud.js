@@ -61,6 +61,7 @@ router.post('/nuevaUsuario', async(req, res) => {
             direccion,
             area,
             usuario,
+            contraseña,
             esDirector,
             esAdmin
         };
