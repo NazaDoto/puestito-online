@@ -17,14 +17,7 @@ function configurarSocketIO(app) {
     const server = https.createServer(options, app);
     
     // Integrar Socket.IO con el servidor HTTP
-    const io = new Server(server, {
-        cors: {
-            origin: ['*', 'https://sn-mds.vercel.app', 'http://localhost:8080'], // Permite conexiones de cualquier origen
-            methods: ['GET', 'POST'],
-            allowedHeaders: ['Content-Type', 'Authorization', 'ngrok-skip-browser-warning'], // Encabezados permitidos
-            credentials: true, // Permitir credenciales
-        },
-    });
+    const io = new Server(server);
 
     io.on('connection', (socket) => {
         const { usuarioId } = socket.handshake.query;
