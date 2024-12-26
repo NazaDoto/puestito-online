@@ -21,6 +21,12 @@ function configurarSocketIO(app) {
     
     // Configurar Socket.IO
     const io = new Server(server, {
+        cors: {
+            origin: ['https://sn-mds.vercel.app'], // Dominios permitidos
+            methods: ['GET', 'POST'],
+            allowedHeaders: ['Content-Type', 'Authorization'],
+            credentials: true,
+        }
     });
 
     // Manejar la conexión de los sockets
