@@ -7,7 +7,7 @@ const configurarSocketIO = require('./socket');
 
 // Configuración de CORS
 const corsOptions = {
-    origin: ['http://localhost:8080', 'https://e6f9-200-81-126-76.ngrok-free.app', 'https://sn-mds.vercel.app'], // Agrega tu frontend y la URL de ngrok
+    origin: ['https://sn-mds.vercel.app'], // Agrega tu frontend y la URL de ngrok
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'ngrok-skip-browser-warning'],
 };
@@ -23,7 +23,7 @@ const port = process.env.PORT || 3600;
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
-app.use(cors());
+app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use(morgan('dev'));
