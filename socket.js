@@ -14,7 +14,7 @@ function configurarSocketIO(app) {
         key: fs.readFileSync("/var/www/ssl/puestito.online.key"),
         cert: fs.readFileSync("/var/www/ssl/puestito.online.crt")
     };
-    const httpsServer = https.createServer(options, app);
+    const server = https.createServer(options, app);
     
     // Integrar Socket.IO con el servidor HTTP
     const io = new Server(server, {
