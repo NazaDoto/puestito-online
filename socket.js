@@ -10,15 +10,26 @@ const usuariosConectados = new Map();
  */
 function configurarSocketIO(app) {
 
+    // Ruta de los certificados SSL
     const options = {
         key: fs.readFileSync("/var/www/ssl/puestito.online.key"),
         cert: fs.readFileSync("/var/www/ssl/puestito.online.crt")
     };
+
+    // Crear servidor HTTPS
     const server = https.createServer(options, app);
     
-    // Integrar Socket.IO con el servidor HTTP
-    const io = new Server(server);
+    // Configurar Socket.IO
+    const io = new Server(server, {
+        cors: {
+            origin: ['https://sn-mds.vercel.app', 'http://localhost:8080'], // Dominios permitidos
+            methods: ['GET', 'POST'],
+            allowedHeaders: ['Content-Type', 'Authorization', 'ngrok-skip-browser-warning'],
+            credentials: true,
+        }
+    });
 
+    // Manejar la conexión de los sockets
     io.on('connection', (socket) => {
         const { usuarioId } = socket.handshake.query;
         const normalizedUsuarioId = String(usuarioId); // Normalizar a string
@@ -29,6 +40,7 @@ function configurarSocketIO(app) {
             console.log('Usuarios conectados:', Object.fromEntries(usuariosConectados));
         }
 
+        // Enviar notificaciones
         socket.on('enviar-notificacion', async (receptor) => {
             const normalizedReceptor = String(receptor);
             console.log(`Notificación para usuario: ${normalizedReceptor}`);
@@ -37,13 +49,12 @@ function configurarSocketIO(app) {
             if (receptorSocketId) {
                 io.to(receptorSocketId).emit('nueva-notificacion');
                 console.log(`Notificación enviada a usuario ${normalizedReceptor}`);
-
             } else {
                 console.log(`Usuario ${normalizedReceptor} no está conectado. Enviando notificación push...`);
-
-
             }
         });
+
+        // Enviar respuestas
         socket.on('enviar-respuesta', async (receptor) => {
             const normalizedReceptor = String(receptor);
             console.log(`Respuesta para usuario: ${normalizedReceptor}`);
@@ -52,16 +63,12 @@ function configurarSocketIO(app) {
             if (receptorSocketId) {
                 io.to(receptorSocketId).emit('nueva-respuesta');
                 console.log(`Respuesta enviada a usuario ${normalizedReceptor}`);
-
             } else {
                 console.log(`Usuario ${normalizedReceptor} no está conectado. Enviando notificación push...`);
-
-
             }
         });
 
-
-
+        // Manejar desconexión
         socket.on('disconnect', () => {
             let desconectadoUsuarioId = null;
             usuariosConectados.forEach((id, key) => {
@@ -77,7 +84,7 @@ function configurarSocketIO(app) {
         });
     });
 
-    return server; // Retornar el servidor HTTP para iniciar la app
+    return server; // Retornar el servidor HTTPS
 }
 
 module.exports = configurarSocketIO;
