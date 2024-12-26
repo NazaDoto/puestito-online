@@ -17,13 +17,13 @@ const app = express();
 const port = process.env.PORT || 3600;
 
 // Middleware para solicitudes preflight
-app.options('*', cors(corsOptions));
+//app.options('*', cors(corsOptions));
 
 // Otros middleware
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
-app.use(cors(corsOptions));
+app.use(cors());
 
 app.use(express.json());
 app.use(morgan('dev'));
