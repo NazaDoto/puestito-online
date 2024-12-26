@@ -56,5 +56,5 @@ app.get('/download/:filename', (req, res) => {
 // Integrar Socket.IO y iniciar el servidor
 const server = configurarSocketIO(app);
 server.listen(port, () => {
-    console.log(`Servidor ejecutándose en http://localhost:${port}`);
+    console.log(`Servidor ejecutándose en https://localhost:${port}`);
 });

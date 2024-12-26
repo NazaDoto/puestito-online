@@ -1,4 +1,4 @@
-const http = require('http'); // Necesario para Socket.IO
+const https = require('https'); // Necesario para Socket.IO
 const { Server } = require('socket.io'); // Socket.IO
 
 const usuariosConectados = new Map();
@@ -8,13 +8,17 @@ const usuariosConectados = new Map();
  * @param {Object} app - La instancia de Express
  */
 function configurarSocketIO(app) {
-    // Crear servidor HTTP
-    const server = http.createServer(app);
 
+    const options = {
+        key: fs.readFileSync("/var/www/ssl/puestito.online.key"),
+        cert: fs.readFileSync("/var/www/ssl/puestito.online.crt")
+    };
+    const httpsServer = https.createServer(options, app);
+    
     // Integrar Socket.IO con el servidor HTTP
     const io = new Server(server, {
         cors: {
-            origin: ['*','https://sn-mds.vercel.app', 'http://localhost:8080'], // Permite conexiones de cualquier origen
+            origin: ['*', 'https://sn-mds.vercel.app', 'http://localhost:8080'], // Permite conexiones de cualquier origen
             methods: ['GET', 'POST'],
             allowedHeaders: ['Content-Type', 'Authorization', 'ngrok-skip-browser-warning'], // Encabezados permitidos
             credentials: true, // Permitir credenciales
@@ -34,31 +38,31 @@ function configurarSocketIO(app) {
         socket.on('enviar-notificacion', async (receptor) => {
             const normalizedReceptor = String(receptor);
             console.log(`Notificación para usuario: ${normalizedReceptor}`);
-        
+
             const receptorSocketId = usuariosConectados.get(normalizedReceptor);
             if (receptorSocketId) {
                 io.to(receptorSocketId).emit('nueva-notificacion');
                 console.log(`Notificación enviada a usuario ${normalizedReceptor}`);
-                
+
             } else {
                 console.log(`Usuario ${normalizedReceptor} no está conectado. Enviando notificación push...`);
-        
-                
+
+
             }
         });
         socket.on('enviar-respuesta', async (receptor) => {
             const normalizedReceptor = String(receptor);
             console.log(`Respuesta para usuario: ${normalizedReceptor}`);
-        
+
             const receptorSocketId = usuariosConectados.get(normalizedReceptor);
             if (receptorSocketId) {
                 io.to(receptorSocketId).emit('nueva-respuesta');
                 console.log(`Respuesta enviada a usuario ${normalizedReceptor}`);
-                
+
             } else {
                 console.log(`Usuario ${normalizedReceptor} no está conectado. Enviando notificación push...`);
-        
-                
+
+
             }
         });
 
