@@ -21,12 +21,6 @@ function configurarSocketIO(app) {
     
     // Configurar Socket.IO
     const io = new Server(server, {
-        cors: {
-            origin: ['*'], // Dominios permitidos
-            methods: ['GET', 'POST'],
-            allowedHeaders: ['Content-Type', 'Authorization', 'ngrok-skip-browser-warning'],
-            credentials: true,
-        }
     });
 
     // Manejar la conexión de los sockets
