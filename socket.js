@@ -22,7 +22,7 @@ function configurarSocketIO(app) {
     // Configurar Socket.IO
     const io = new Server(server, {
         cors: {
-            origin: ['https://sn-mds.vercel.app', 'http://localhost:8080'], // Dominios permitidos
+            origin: ['*'], // Dominios permitidos
             methods: ['GET', 'POST'],
             allowedHeaders: ['Content-Type', 'Authorization', 'ngrok-skip-browser-warning'],
             credentials: true,
