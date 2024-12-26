@@ -1,5 +1,6 @@
 const https = require('https'); // Necesario para Socket.IO
 const { Server } = require('socket.io'); // Socket.IO
+const fs = require("fs");
 
 const usuariosConectados = new Map();
 
