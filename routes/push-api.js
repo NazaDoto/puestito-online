@@ -19,6 +19,7 @@ webPush.setVapidDetails(
  */
 router.post('/save-subscription', async (req, res) => {
     console.log('entra aki')
+    const {usuarioId, subscription} = req.body;
     console.log('usuarioId: ', usuarioId, 'suscription: ', subscription);
     if (!usuarioId || !subscription || !subscription.endpoint || !subscription.keys || !subscription.keys.p256dh || !subscription.keys.auth) {
         return res.status(400).json({ error: 'Usuario ID y suscripción válidos son requeridos' });
