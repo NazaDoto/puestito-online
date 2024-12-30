@@ -18,8 +18,8 @@ webPush.setVapidDetails(
  * Guardar una nueva suscripción Push.
  */
 router.post('/save-subscription', async (req, res) => {
-    console.log('entra aki')
-    const {usuarioId, subscription} = req.body;
+    
+    const { usuarioId, subscription } = req.body;
     console.log('usuarioId: ', usuarioId, 'suscription: ', subscription);
     if (!usuarioId || !subscription || !subscription.endpoint || !subscription.keys || !subscription.keys.p256dh || !subscription.keys.auth) {
         return res.status(400).json({ error: 'Usuario ID y suscripción válidos son requeridos' });
@@ -38,6 +38,7 @@ router.post('/save-subscription', async (req, res) => {
                 WHERE id_usuario = ?
             `, [endpoint, p256dh, auth, usuarioId]);
 
+            console.log(`Suscripción actualizada para usuario ${usuarioId}`);
             return res.status(200).json({ message: 'Suscripción actualizada exitosamente' });
         } else {
             // El usuario no tiene una suscripción, insertamos los datos
@@ -46,6 +47,7 @@ router.post('/save-subscription', async (req, res) => {
                 VALUES (?, ?, ?, ?)
             `, [usuarioId, endpoint, p256dh, auth]);
 
+            console.log(`Suscripción guardada para usuario ${usuarioId}`);
             return res.status(200).json({ message: 'Suscripción guardada exitosamente' });
         }
     } catch (err) {

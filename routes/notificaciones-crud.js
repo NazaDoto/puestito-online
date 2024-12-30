@@ -112,6 +112,8 @@ router.get('/recibidas/:usuarioId', async (req, res) => {
                 COALESCE(u.nombre, 'Sistema') AS emisor,
                 COALESCE(a.descripcion, '') AS area,
                 COALESCE(d.descripcion, '') AS direccion,
+                COALESCE(d.abreviacion, '') AS abreviacion,
+
                 res.cantidad_respuestas,
                 CASE 
                     WHEN (SELECT COUNT(*) FROM noti_adjunto WHERE id_noti = n.id) > 0 THEN 1
@@ -121,7 +123,7 @@ router.get('/recibidas/:usuarioId', async (req, res) => {
             LEFT JOIN noti_receptor nr ON n.id = nr.id_noti
             LEFT JOIN usuarios u ON n.id_emisor = u.id
             LEFT JOIN areas a ON n.id_area = a.id
-            LEFT JOIN direcciones d ON a.id_direccion = d.id
+            LEFT JOIN direcciones d ON u.id_direccion = d.id
             LEFT JOIN (
     SELECT 
         r1.id_noti,
