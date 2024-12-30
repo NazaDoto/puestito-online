@@ -43,6 +43,8 @@ router.get('/todas/:usuarioId', async (req, res) => {
                 u.nombre AS emisor, 
                 a.descripcion AS area, 
                 d.descripcion AS direccion,
+                COALESCE(d.abreviacion, '') AS abreviacion,
+
                 MAX(nr.leida) AS leida
             FROM notificaciones n
             LEFT JOIN noti_receptor nr ON n.id = nr.id_noti
@@ -77,7 +79,9 @@ router.get('/enviadas/:usuarioId', async (req, res) => {
                 u.nombre AS emisor, 
                 GROUP_CONCAT(DISTINCT ur.nombre SEPARATOR ', ') AS receptores,
                 a.descripcion AS area, 
-                d.descripcion AS direccion
+                d.descripcion AS direccion,
+                COALESCE(d.abreviacion, '') AS abreviacion
+
             FROM notificaciones n
             JOIN noti_receptor nr ON n.id = nr.id_noti
             JOIN usuarios u ON n.id_emisor = u.id
