@@ -7,17 +7,17 @@ const configurarSocketIO = require('./socket');
 
 // Configuración de CORS
 const corsOptions = {
-    origin: ['https://sn-mds.vercel.app'], // Agrega tu frontend y la URL de ngrok
+    origin: ['http://localhost:8080', 'http://192.168.1.235:8080','https://puestito.online:3600', 'https://sn-mds.vercel.app'], // Agrega tu frontend y la URL de ngrok
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'ngrok-skip-browser-warning'],
 };
 
 // Configurar la app de Express
 const app = express();
-const port = process.env.PORT || 3600;
+const port = process.env.PORT || 3000;
 
 // Middleware para solicitudes preflight
-//app.options('*', cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 // Otros middleware
 app.use(bodyParser.json({ limit: '50mb' }));
@@ -53,8 +53,8 @@ app.get('/download/:filename', (req, res) => {
     });
 });
 
-// Integrar Socket.IO e iniciar el servidor
+// Integrar Socket.IO y iniciar el servidor
 const server = configurarSocketIO(app);
-server.listen(3600, () => {
-    console.log(`Servidor ejecutándose en https://localhost:${port}`);
+server.listen(port, () => {
+    console.log(`Servidor ejecutándose en http://localhost:${port}`);
 });

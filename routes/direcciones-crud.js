@@ -31,13 +31,13 @@ router.get('/direcciones/:id', async(req, res) => {
 
 // Crear una nueva dirección
 router.post('/nuevaDireccion', async(req, res) => {
-    const { descripcion, abreviatura } = req.body;
+    const { descripcion, abreviacion } = req.body;
     try {
-        const [result] = await db.query('INSERT INTO direcciones (descripcion, abreviatura) VALUES (?, ?)', [descripcion, abreviatura]);
+        const [result] = await db.query('INSERT INTO direcciones (descripcion, abreviacion) VALUES (?, ?)', [descripcion, abreviacion]);
         const newDireccion = {
             id: result.insertId,
             descripcion,
-            abreviatura
+            abreviacion
         };
         res.status(201).json(newDireccion);
     } catch (error) {
