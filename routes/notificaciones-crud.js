@@ -125,7 +125,7 @@ router.get('/recibidas/:usuarioId', async (req, res) => {
                     ELSE 0
                 END AS adjunto
             FROM notificaciones n
-            LEFT JOIN noti_receptor nr ON n.id = nr.id_noti
+            LEFT JOIN noti_receptor nr ON n.id = nr.id_noti AND nr.id_receptor = ?
             LEFT JOIN usuarios u ON n.id_emisor = u.id
             LEFT JOIN areas a ON n.id_area = a.id
             LEFT JOIN direcciones d ON u.id_direccion = d.id
@@ -146,17 +146,16 @@ router.get('/recibidas/:usuarioId', async (req, res) => {
         WHERE r2.id_noti = r1.id_noti
     )
 ) res ON res.id_noti = n.id
-
             WHERE nr.id_receptor = ? OR EXISTS (
                 SELECT 1 
                 FROM noti_respuesta r 
-                WHERE r.id_noti = n.id 
+                WHERE r.id_noti = n.id AND nr.id_receptor = ?
                   AND (SELECT COUNT(*) FROM noti_respuesta r2 WHERE r2.id_noti = n.id)
             )
             ORDER BY COALESCE(res.fecha_envio, n.fecha_envio) DESC
-        `, [usuarioId]);
+        `, [usuarioId, usuarioId, usuarioId]);
 
-
+console.log(notificaciones)
 
         res.json(notificaciones);
     } catch (error) {
