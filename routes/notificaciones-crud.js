@@ -34,7 +34,7 @@ router.get('/todas/:usuarioId', async (req, res) => {
     try {
         const [notificaciones] = await db.query(`
             SELECT 
-                n.id, 
+                n.id,
                 n.referencia, 
                 n.contenido, 
                 n.id_emisor,
@@ -44,8 +44,7 @@ router.get('/todas/:usuarioId', async (req, res) => {
                 a.descripcion AS area, 
                 d.descripcion AS direccion,
                 COALESCE(d.abreviacion, '') AS abreviacion,
-
-                MAX(nr.leida) AS leida
+                MAX(nr.leida) AS leida -- Verifica si al menos una fila tiene 'leida' como 1
             FROM notificaciones n
             LEFT JOIN noti_receptor nr ON n.id = nr.id_noti
             LEFT JOIN usuarios u ON n.id_emisor = u.id
@@ -53,17 +52,19 @@ router.get('/todas/:usuarioId', async (req, res) => {
             LEFT JOIN areas a ON n.id_area = a.id
             LEFT JOIN direcciones d ON a.id_direccion = d.id
             WHERE n.id_emisor = ? OR nr.id_receptor = ?
-            GROUP BY n.id
-            ORDER BY n.fecha_envio DESC
+            GROUP BY 
+                n.id, n.referencia, n.contenido, n.id_emisor, n.fecha_envio, 
+                u.nombre, a.descripcion, d.descripcion, d.abreviacion
+            ORDER BY n.fecha_envio DESC;
         `, [usuarioId, usuarioId]);
 
-        console.log(notificaciones);
         res.json(notificaciones);
     } catch (error) {
         console.error('Error al obtener notificaciones:', error);
         res.status(500).json({ message: 'Error al obtener notificaciones' });
     }
 });
+
 
 // Ruta para obtener todas las notificaciones enviadas para un usuario específico
 router.get('/enviadas/:usuarioId', async (req, res) => {
@@ -154,8 +155,8 @@ router.get('/recibidas/:usuarioId', async (req, res) => {
             )
             ORDER BY COALESCE(res.fecha_envio, n.fecha_envio) DESC
         `, [usuarioId]);
-        
-        
+
+
 
         res.json(notificaciones);
     } catch (error) {
