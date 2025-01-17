@@ -14,12 +14,15 @@ router.post('/login', async(req, res) => {
     try {
         const [rows] = await db.query('SELECT * FROM usuarios WHERE usuario = ?', [usuario]);
         if (rows.length === 0) {
-            return res.status(404).json({ message: 'Usuario no encontrado' });
+            return res.status(404).json({ message: 'Usuario o contraseña incorrectos.' });
         }
         const user = rows[0];
         const isValidPassword = await bcrypt.compare(contraseña, user.contraseña);
         if (!isValidPassword) {
-            return res.status(401).json({ message: 'Contraseña incorrecta' });
+            return res.status(401).json({ message: 'Usuario o contraseña incorrectos.' });
+        }
+        if(!user.habilitado){
+            return res.status(401).json({ message: 'Usuario inhabilitado.' });
         }
         const esAdmin = user.esAdmin;
         const esDirector = user.esDirector;

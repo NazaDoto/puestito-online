@@ -155,7 +155,7 @@ router.get('/recibidas/:usuarioId', async (req, res) => {
             ORDER BY COALESCE(res.fecha_envio, n.fecha_envio) DESC
         `, [usuarioId, usuarioId, usuarioId]);
 
-console.log(notificaciones)
+        console.log(notificaciones)
 
         res.json(notificaciones);
     } catch (error) {
@@ -313,7 +313,7 @@ router.put('/leida/:id', async (req, res) => {
 
 // NOTIFICAR
 router.post('/notificar', upload.array('archivos'), async (req, res) => {
-    const { tipo, id_emisor, id_direccion, id_area, referencia, contenido, id_receptor, fecha_envio } = req.body;
+    const { tipo, id_emisor, id_direccion, id_area, id_subarea, referencia, contenido, id_receptor, fecha_envio } = req.body;
     const archivos = req.files;
 
     try {
@@ -395,19 +395,18 @@ router.post('/notificar', upload.array('archivos'), async (req, res) => {
                 }
             }
         }
-        // Verificar si se envía a todos los usuarios de un área
-        else if (id_receptor === 'Todos') {
+        else if (id_subarea === 'Todas') {
             const [result] = await db.query(
-                'INSERT INTO notificaciones (tipo, id_emisor, id_direccion, id_area, referencia, contenido, fecha_envio) VALUES (?, ?, ?, ?, ?, ?, ?)',
-                ['grupal', id_emisor, id_direccion, id_area, referencia, contenido, fecha_envio]
+                'INSERT INTO notificaciones (tipo, id_emisor, id_direccion, id_area, id_subarea, referencia, contenido, fecha_envio) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                ['grupal', id_emisor, id_direccion, id_area, 6, referencia, contenido, fecha_envio]
             );
 
             id_noti = result.insertId;
 
-            // Obtener todos los usuarios del área excepto el emisor
+            // Obtener todos los usuarios de la dirección excepto el emisor
             const [usuarios] = await db.query(
-                'SELECT id FROM usuarios WHERE id_area = ? AND id_direccion = ? AND id != ?',
-                [id_area, id_direccion, id_emisor]
+                'SELECT id FROM usuarios WHERE id_area = ? AND id != ?',
+                [id_area, id_emisor]
             );
 
             for (const usuario of usuarios) {
@@ -431,37 +430,138 @@ router.post('/notificar', upload.array('archivos'), async (req, res) => {
                 }
             }
         }
+        // Verificar si se envía a todos los usuarios de un área
+        else if (id_receptor === 'Todos') {
+            if (id_subarea) {
+                const [result] = await db.query(
+                    'INSERT INTO notificaciones (tipo, id_emisor, id_direccion, id_area, id_subarea, referencia, contenido, fecha_envio) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                    ['grupal', id_emisor, id_direccion, id_area, id_subarea, referencia, contenido, fecha_envio]
+                );
+
+                id_noti = result.insertId;
+
+                // Obtener todos los usuarios del área excepto el emisor
+                const [usuarios] = await db.query(
+                    'SELECT id FROM usuarios WHERE id_subarea = ? AND id_area = ? AND id_direccion = ? AND id != ?',
+                    [id_subarea, id_area, id_direccion, id_emisor]
+                );
+
+                for (const usuario of usuarios) {
+                    await db.query(
+                        'INSERT INTO noti_receptor (id_noti, id_receptor, leida) VALUES (?, ?, ?)',
+                        [id_noti, usuario.id, false]
+                    );
+                    try {
+                        const respuestaPush = await axios.post('http://localhost:3000/api/send-notification', {
+                            usuarioId: usuario.id,
+                            payload,
+                        });
+
+                        if (respuestaPush.status === 200) {
+                            console.log(`Notificación push enviada al usuario ${normalizedReceptor}`);
+                        } else {
+                            console.error(`Error enviando notificación push: ${respuestaPush.statusText}`);
+                        }
+                    } catch (error) {
+                        console.error(`Error al llamar a push-api:`, error);
+                    }
+                }
+            } else {
+                const [result] = await db.query(
+                    'INSERT INTO notificaciones (tipo, id_emisor, id_direccion, id_area, referencia, contenido, fecha_envio) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                    ['grupal', id_emisor, id_direccion, id_area, referencia, contenido, fecha_envio]
+                );
+
+                id_noti = result.insertId;
+
+                // Obtener todos los usuarios del área excepto el emisor
+                const [usuarios] = await db.query(
+                    'SELECT id FROM usuarios WHERE id_area = ? AND id_direccion = ? AND id != ?',
+                    [id_area, id_direccion, id_emisor]
+                );
+
+                for (const usuario of usuarios) {
+                    await db.query(
+                        'INSERT INTO noti_receptor (id_noti, id_receptor, leida) VALUES (?, ?, ?)',
+                        [id_noti, usuario.id, false]
+                    );
+                    try {
+                        const respuestaPush = await axios.post('http://localhost:3000/api/send-notification', {
+                            usuarioId: usuario.id,
+                            payload,
+                        });
+
+                        if (respuestaPush.status === 200) {
+                            console.log(`Notificación push enviada al usuario ${normalizedReceptor}`);
+                        } else {
+                            console.error(`Error enviando notificación push: ${respuestaPush.statusText}`);
+                        }
+                    } catch (error) {
+                        console.error(`Error al llamar a push-api:`, error);
+                    }
+                }
+            }
+        }
         // Caso en el que se envía solo a un usuario específico
         else {
+
             if (id_emisor === parseInt(id_receptor)) {
                 return res.status(400).json({ message: 'No puedes enviarte una notificación a ti mismo.' });
             }
+            if (id_subarea) {
+                const [result] = await db.query(
+                    'INSERT INTO notificaciones (tipo, id_emisor, id_direccion, id_area, id_subarea, referencia, contenido, fecha_envio) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                    [tipo, id_emisor, id_direccion, id_area, id_subarea, referencia, contenido, fecha_envio]
+                );
 
-            const [result] = await db.query(
-                'INSERT INTO notificaciones (tipo, id_emisor, id_direccion, id_area, referencia, contenido, fecha_envio) VALUES (?, ?, ?, ?, ?, ?, ?)',
-                [tipo, id_emisor, id_direccion, id_area, referencia, contenido, fecha_envio]
-            );
+                id_noti = result.insertId;
 
-            id_noti = result.insertId;
+                // Vincular al usuario receptor
+                await db.query(
+                    'INSERT INTO noti_receptor (id_noti, id_receptor, leida) VALUES (?, ?, ?)',
+                    [id_noti, id_receptor, false]
+                );
+                try {
+                    const respuestaPush = await axios.post('http://localhost:3000/api/send-notification', {
+                        usuarioId: id_receptor,
+                        payload,
+                    });
 
-            // Vincular al usuario receptor
-            await db.query(
-                'INSERT INTO noti_receptor (id_noti, id_receptor, leida) VALUES (?, ?, ?)',
-                [id_noti, id_receptor, false]
-            );
-            try {
-                const respuestaPush = await axios.post('http://localhost:3000/api/send-notification', {
-                    usuarioId: id_receptor,
-                    payload,
-                });
-
-                if (respuestaPush.status === 200) {
-                    console.log(`Notificación push enviada al usuario ${normalizedReceptor}`);
-                } else {
-                    console.error(`Error enviando notificación push: ${respuestaPush.statusText}`);
+                    if (respuestaPush.status === 200) {
+                        console.log(`Notificación push enviada al usuario ${normalizedReceptor}`);
+                    } else {
+                        console.error(`Error enviando notificación push: ${respuestaPush.statusText}`);
+                    }
+                } catch (error) {
+                    console.error(`Error al llamar a push-api:`, error);
                 }
-            } catch (error) {
-                console.error(`Error al llamar a push-api:`, error);
+            } else {
+                const [result] = await db.query(
+                    'INSERT INTO notificaciones (tipo, id_emisor, id_direccion, id_area, referencia, contenido, fecha_envio) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                    [tipo, id_emisor, id_direccion, id_area, referencia, contenido, fecha_envio]
+                );
+
+                id_noti = result.insertId;
+
+                // Vincular al usuario receptor
+                await db.query(
+                    'INSERT INTO noti_receptor (id_noti, id_receptor, leida) VALUES (?, ?, ?)',
+                    [id_noti, id_receptor, false]
+                );
+                try {
+                    const respuestaPush = await axios.post('http://localhost:3000/api/send-notification', {
+                        usuarioId: id_receptor,
+                        payload,
+                    });
+
+                    if (respuestaPush.status === 200) {
+                        console.log(`Notificación push enviada al usuario ${normalizedReceptor}`);
+                    } else {
+                        console.error(`Error enviando notificación push: ${respuestaPush.statusText}`);
+                    }
+                } catch (error) {
+                    console.error(`Error al llamar a push-api:`, error);
+                }
             }
         }
 

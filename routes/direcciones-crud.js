@@ -82,11 +82,37 @@ router.post('/nuevaArea', async(req, res) => {
         };
         res.status(201).json(newArea);
     } catch (error) {
-        console.error('Error al crear nueva dirección:', error);
-        res.status(500).json({ message: 'Error al crear nueva dirección' });
+        console.error('Error al crear nueva area:', error);
+        res.status(500).json({ message: 'Error al crear nueva area' });
+    }
+});
+// Crear una nueva subarea
+router.post('/nuevaSubarea', async(req, res) => {
+    const {id_area, descripcion } = req.body;
+    try {
+        const [result] = await db.query('INSERT INTO subareas (id_area, descripcion) VALUES (?, ?)', [id_area, descripcion]);
+        const newArea = {
+            id: result.insertId,
+            descripcion
+        };
+        res.status(201).json(newArea);
+    } catch (error) {
+        console.error('Error al crear nueva subarea:', error);
+        res.status(500).json({ message: 'Error al crear nueva subárea' });
     }
 });
 
+router.get('/subareas/:id', async (req, res) => {
+    const { id } = req.params; // Cambia 'area' por 'id'
+    console.log(id); // Esto debería imprimir el ID seleccionado en el frontend
+    try {
+        const [response] = await db.query('SELECT id, descripcion FROM subareas WHERE id_area = ?', [id]); // Ajusta el SELECT
+        res.json(response);
+    } catch (error) {
+        console.log('Error al obtener subareas', error);
+        res.status(500).json({ message: 'Error al obtener subareas' }); // Devuelve un error en caso de fallo
+    }
+});
 
 // Obtener todas las áreas
 router.get('/areas', async(req, res) => {
