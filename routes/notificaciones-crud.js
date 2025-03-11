@@ -5,6 +5,10 @@ const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 const uploadDir = path.join(__dirname, 'uploads');
+const nodemailer = require('nodemailer');
+const dotenv = require('dotenv');
+
+
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
 }
@@ -14,8 +18,7 @@ const storage = multer.diskStorage({
         cb(null, uploadDir); // Asegura que usa la carpeta existente
     },
     filename: (req, file, cb) => {
-        const ext = path.extname(file.originalname); // Extensión del archivo
-        cb(null, `${Date.now()}-placeholder${ext}`);
+        cb(null, file.originalname);
     },
 });
 
@@ -24,7 +27,9 @@ const upload = multer({ storage });
 
 const router = express.Router();
 
-
+const capitalize = (text) => {
+    return text.charAt(0).toUpperCase() + text.slice(1);
+};
 
 
 // Ruta para obtener todas las notificaciones para un usuario específico
@@ -51,7 +56,7 @@ router.get('/todas/:usuarioId', async (req, res) => {
             LEFT JOIN usuarios ur ON nr.id_receptor = ur.id
             LEFT JOIN areas a ON n.id_area = a.id
             LEFT JOIN direcciones d ON a.id_direccion = d.id
-            WHERE n.id_emisor = ? OR nr.id_receptor = ?
+            WHERE n.id_emisor = ? OR nr.id_receptor = ? 
             GROUP BY 
                 n.id, n.referencia, n.contenido, n.id_emisor, n.fecha_envio, 
                 u.nombre, a.descripcion, d.descripcion, d.abreviacion
@@ -313,8 +318,11 @@ router.put('/leida/:id', async (req, res) => {
 
 // NOTIFICAR
 router.post('/notificar', upload.array('archivos'), async (req, res) => {
-    const { tipo, id_emisor, id_direccion, id_area, id_subarea, referencia, contenido, id_receptor, fecha_envio } = req.body;
+    let { tipo, id_emisor, id_direccion, id_area, id_subarea, referencia, contenido, id_receptor, fecha_envio } = req.body;
     const archivos = req.files;
+    if (id_subarea == 'default') {
+        id_subarea = null;
+    }
 
     try {
         let id_noti;
@@ -324,8 +332,6 @@ router.post('/notificar', upload.array('archivos'), async (req, res) => {
             icon: '/favicon.ico',
             url: 'https://sn-mds.vercel.app',
         };
-
-
 
         // Verificar si se envía a todas las direcciones
         if (id_direccion === 'Todas') {
@@ -356,6 +362,138 @@ router.post('/notificar', upload.array('archivos'), async (req, res) => {
                     }
                 } catch (error) {
                     console.error(`Error al llamar a push-api:`, error);
+                }
+                try {
+                    const [telQuery] = await db.query('SELECT telefono FROM usuarios WHERE id = ?', [usuario.id]);
+                    const telefono = telQuery[0].telefono;
+
+                    const [emisorQuery] = await db.query('SELECT nombre FROM usuarios WHERE id = ?', [id_emisor]);
+                    const emisor = emisorQuery[0].nombre;
+                    // Aquí se envía la notificación por WhatsApp Business
+                    const whatsappResponse = await axios.post(
+                        "https://graph.facebook.com/v21.0/589775480875611/messages",
+                        {
+                            messaging_product: "whatsapp",
+                            to: '54' + telefono, // Reemplaza con el número de teléfono dinámico si es necesario
+                            type: "template",
+                            template: {
+                                name: "notificacion", // Ajusta el nombre del template según tu configuración
+                                language: {
+                                    code: "es_AR", // Ajusta el idioma según tu configuración
+                                },
+                                components: [
+                                    {
+                                        type: "header",
+                                        parameters: [{
+                                            type: "image",
+                                            image: {
+                                                link: 'https://sn-mds.vercel.app/img/icono-mds-negro.9301a247.png'
+                                            }
+                                        }]
+                                    },
+                                    {
+                                        type: "body",
+                                        parameters: [
+                                            {
+                                                type: "text",
+                                                text: [emisor].toString()
+                                            },
+                                            {
+                                                type: "text",
+                                                text: [referencia].toString()
+                                            }
+                                        ]
+                                    }]
+                            },
+
+                        },
+                        {
+                            headers: {
+                                Authorization: `Bearer EAAIQ4mYW458BO3S1LnghDpieZCMiaM0RRPrGxyelXd2IBeeMC1KNzZB1N9XX2l3mdxjBC55zRbATlM2BofRhW6TQKZBG7ZBdIYMp9mzzE53Xe6QqJA07w0tvq58ZCFjY1TPNI4zk0B6hs8XnMZCGUnQfLuvenu7mw0nbQVpEOqTz6GJEdUJtnZBrWXc2NGdfOH5BIEtQqA3VMVu5Ors3Ww90tynEYEZD`,
+                                "Content-Type": "application/json",
+                            },
+                        }
+                    );
+
+                    console.log("WhatsApp Business API response:", whatsappResponse.data);
+                } catch (error) {
+                    console.log('No se pudo obtener/enviar noti al telefono del usuario ', usuario.id, error.response.data.error);
+                }
+                // Enviar notificación por correo
+                try {
+
+                    const [mailQuery] = await db.query('SELECT mail FROM usuarios WHERE id = ?', [id_receptor]);
+                    const mail = mailQuery[0].mail;
+
+                    const [emisorQuery] = await db.query('SELECT * FROM usuarios WHERE id = ?', [id_emisor]);
+                    const emisor = emisorQuery[0];
+
+                    const [areaQuery] = await db.query('SELECT descripcion FROM areas WHERE id = ?', [emisor.id_area]);
+                    const area = areaQuery[0].descripcion;
+                    const [direccionQuery] = await db.query('SELECT descripcion FROM direcciones WHERE id = ?', [emisor.id_direccion]);
+                    const direccion = direccionQuery[0].descripcion;
+                    const date = capitalize(new Date(fecha_envio).toLocaleDateString('es-ES', {
+                        weekday: 'long', year:
+                            'numeric', month: 'long', day: 'numeric'
+                    }));
+
+                    const transporter = nodemailer.createTransport({
+                        host: 'mail.complejojfi.gob.ar', // Cambia al servidor SMTP correspondiente
+                        port: 25, // Puerto SMTP, podría ser 465 para SSL o 587 para STARTTLS
+                        secure: false, // Cambiar a `true` si usas SSL
+                        auth: {
+                            user: process.env.MAIL_ACC, // Usuario del correo
+                            pass: process.env.MAIL_PW, // Contraseña del correo
+                        },
+                        tls: {
+                            rejectUnauthorized: false  // Ignorar el certificado autofirmado
+                        }
+                    });
+
+                    const mailOptions = {
+                        from: '"Notificaciones MDS" <notificaciones@mdssde.gob.ar>',
+                        to: mail,
+                        subject: 'Notificación de ' + [emisor.nombre],
+                        html:
+                            `<div style="box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2); background-color: white; padding: 1cm 2.5cm 5px 2.5cm;">
+                        <div id="notificacion">
+                            <div style="margin-top: 5px; text-align: center;">
+                            <div style="display: flex; width: 100%; margin-bottom: 10px;">
+                                <img style="max-height: 50px;" src="https://sn-mds.vercel.app/img/icono-mds-negro.9301a247.png" alt="">
+                                <img style="max-height: 50px;margin-left:auto;" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSoHEILRdMa_IWD8m1ym3F-YRJIrHsFHGlsjg&s" alt="">
+                            </div>
+                            <div style="font-size: 14px; text-align: start;color: #888;">NOTI-`+ [id_noti] + `</div>
+                            <div style="font-size: 14px; text-align: end;color: #888;">SANTIAGO DEL ESTERO</div>
+                            <div style="font-size: 14px; text-align: end;color: #888;">
+                                `+ [date] + `
+                            </div>
+                            <h5 style="text-align: start;font-size: 22px;
+                        margin: 20px 0;
+                        font-weight: bold;">`+ [referencia] + `</h5>
+                            </div>
+                            <div>
+                            <hr />
+                            <div style="margin: 0 5%; padding: 20px;">
+                                <div style="margin-top: 16px;">`+ [contenido] + `</div>
+                            </div>
+                            </div>
+                            <div style="font-size: 14px; margin-top: 16px;color: #888;">`+ [emisor.nombre] + `</div>
+                            <div style="font-size: 14px;color: #888;">`+ area + `</div>
+                            <div style="font-size: 14px; margin-bottom: 16px;color: #888;">`+ direccion + `</div>
+                        </div>
+                        </div>
+                    `,
+                        attachments: req.files,
+                    };
+                    try {
+                        const info = await transporter.sendMail(mailOptions);
+                        console.log('Correo enviado:', info.messageId);
+                    } catch (error) {
+                        console.error('Error al enviar correo:', error);
+                    }
+                }
+                catch (error) {
+                    console.log('Error al mandar mail: ', error)
                 }
             }
         }
@@ -393,6 +531,138 @@ router.post('/notificar', upload.array('archivos'), async (req, res) => {
                 } catch (error) {
                     console.error(`Error al llamar a push-api:`, error);
                 }
+                try {
+                    const [telQuery] = await db.query('SELECT telefono FROM usuarios WHERE id = ?', [usuario.id]);
+                    const telefono = telQuery[0].telefono;
+
+                    const [emisorQuery] = await db.query('SELECT nombre FROM usuarios WHERE id = ?', [id_emisor]);
+                    const emisor = emisorQuery[0].nombre;
+                    // Aquí se envía la notificación por WhatsApp Business
+                    const whatsappResponse = await axios.post(
+                        "https://graph.facebook.com/v21.0/589775480875611/messages",
+                        {
+                            messaging_product: "whatsapp",
+                            to: '54' + telefono, // Reemplaza con el número de teléfono dinámico si es necesario
+                            type: "template",
+                            template: {
+                                name: "notificacion", // Ajusta el nombre del template según tu configuración
+                                language: {
+                                    code: "es_AR", // Ajusta el idioma según tu configuración
+                                },
+                                components: [
+                                    {
+                                        type: "header",
+                                        parameters: [{
+                                            type: "image",
+                                            image: {
+                                                link: 'https://sn-mds.vercel.app/img/icono-mds-negro.9301a247.png'
+                                            }
+                                        }]
+                                    },
+                                    {
+                                        type: "body",
+                                        parameters: [
+                                            {
+                                                type: "text",
+                                                text: [emisor].toString()
+                                            },
+                                            {
+                                                type: "text",
+                                                text: [referencia].toString()
+                                            }
+                                        ]
+                                    }]
+                            },
+
+                        },
+                        {
+                            headers: {
+                                Authorization: `Bearer EAAIQ4mYW458BO3S1LnghDpieZCMiaM0RRPrGxyelXd2IBeeMC1KNzZB1N9XX2l3mdxjBC55zRbATlM2BofRhW6TQKZBG7ZBdIYMp9mzzE53Xe6QqJA07w0tvq58ZCFjY1TPNI4zk0B6hs8XnMZCGUnQfLuvenu7mw0nbQVpEOqTz6GJEdUJtnZBrWXc2NGdfOH5BIEtQqA3VMVu5Ors3Ww90tynEYEZD`,
+                                "Content-Type": "application/json",
+                            },
+                        }
+                    );
+
+                    console.log("WhatsApp Business API response:", whatsappResponse.data);
+                } catch (error) {
+                    console.log('No se pudo obtener/enviar noti al telefono del usuario ', usuario.id, error.response.data.error);
+                }
+                // Enviar notificación por correo
+                try {
+
+                    const [mailQuery] = await db.query('SELECT mail FROM usuarios WHERE id = ?', [id_receptor]);
+                    const mail = mailQuery[0].mail;
+
+                    const [emisorQuery] = await db.query('SELECT * FROM usuarios WHERE id = ?', [id_emisor]);
+                    const emisor = emisorQuery[0];
+
+                    const [areaQuery] = await db.query('SELECT descripcion FROM areas WHERE id = ?', [emisor.id_area]);
+                    const area = areaQuery[0].descripcion;
+                    const [direccionQuery] = await db.query('SELECT descripcion FROM direcciones WHERE id = ?', [emisor.id_direccion]);
+                    const direccion = direccionQuery[0].descripcion;
+                    const date = capitalize(new Date(fecha_envio).toLocaleDateString('es-ES', {
+                        weekday: 'long', year:
+                            'numeric', month: 'long', day: 'numeric'
+                    }));
+
+                    const transporter = nodemailer.createTransport({
+                        host: 'mail.complejojfi.gob.ar', // Cambia al servidor SMTP correspondiente
+                        port: 25, // Puerto SMTP, podría ser 465 para SSL o 587 para STARTTLS
+                        secure: false, // Cambiar a `true` si usas SSL
+                        auth: {
+                            user: process.env.MAIL_ACC, // Usuario del correo
+                            pass: process.env.MAIL_PW, // Contraseña del correo
+                        },
+                        tls: {
+                            rejectUnauthorized: false  // Ignorar el certificado autofirmado
+                        }
+                    });
+
+                    const mailOptions = {
+                        from: '"Notificaciones MDS" <notificaciones@mdssde.gob.ar>',
+                        to: mail,
+                        subject: 'Notificación de ' + [emisor.nombre],
+                        html:
+                            `<div style="box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2); background-color: white; padding: 1cm 2.5cm 5px 2.5cm;">
+                        <div id="notificacion">
+                            <div style="margin-top: 5px; text-align: center;">
+                            <div style="display: flex; width: 100%; margin-bottom: 10px;">
+                                <img style="max-height: 50px;" src="https://sn-mds.vercel.app/img/icono-mds-negro.9301a247.png" alt="">
+                                <img style="max-height: 50px;margin-left:auto;" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSoHEILRdMa_IWD8m1ym3F-YRJIrHsFHGlsjg&s" alt="">
+                            </div>
+                            <div style="font-size: 14px; text-align: start;color: #888;">NOTI-`+ [id_noti] + `</div>
+                            <div style="font-size: 14px; text-align: end;color: #888;">SANTIAGO DEL ESTERO</div>
+                            <div style="font-size: 14px; text-align: end;color: #888;">
+                                `+ [date] + `
+                            </div>
+                            <h5 style="text-align: start;font-size: 22px;
+                        margin: 20px 0;
+                        font-weight: bold;">`+ [referencia] + `</h5>
+                            </div>
+                            <div>
+                            <hr />
+                            <div style="margin: 0 5%; padding: 20px;">
+                                <div style="margin-top: 16px;">`+ [contenido] + `</div>
+                            </div>
+                            </div>
+                            <div style="font-size: 14px; margin-top: 16px;color: #888;">`+ [emisor.nombre] + `</div>
+                            <div style="font-size: 14px;color: #888;">`+ area + `</div>
+                            <div style="font-size: 14px; margin-bottom: 16px;color: #888;">`+ direccion + `</div>
+                        </div>
+                        </div>
+                    `,
+                        attachments: req.files,
+                    };
+                    try {
+                        const info = await transporter.sendMail(mailOptions);
+                        console.log('Correo enviado:', info.messageId);
+                    } catch (error) {
+                        console.error('Error al enviar correo:', error);
+                    }
+                }
+                catch (error) {
+                    console.log('Error al mandar mail: ', error)
+                }
             }
         }
         else if (id_subarea === 'Todas') {
@@ -427,6 +697,138 @@ router.post('/notificar', upload.array('archivos'), async (req, res) => {
                     }
                 } catch (error) {
                     console.error(`Error al llamar a push-api:`, error);
+                }
+                try {
+                    const [telQuery] = await db.query('SELECT telefono FROM usuarios WHERE id = ?', [usuario.id]);
+                    const telefono = telQuery[0].telefono;
+
+                    const [emisorQuery] = await db.query('SELECT nombre FROM usuarios WHERE id = ?', [id_emisor]);
+                    const emisor = emisorQuery[0].nombre;
+                    // Aquí se envía la notificación por WhatsApp Business
+                    const whatsappResponse = await axios.post(
+                        "https://graph.facebook.com/v21.0/589775480875611/messages",
+                        {
+                            messaging_product: "whatsapp",
+                            to: '54' + telefono, // Reemplaza con el número de teléfono dinámico si es necesario
+                            type: "template",
+                            template: {
+                                name: "notificacion", // Ajusta el nombre del template según tu configuración
+                                language: {
+                                    code: "es_AR", // Ajusta el idioma según tu configuración
+                                },
+                                components: [
+                                    {
+                                        type: "header",
+                                        parameters: [{
+                                            type: "image",
+                                            image: {
+                                                link: 'https://sn-mds.vercel.app/img/icono-mds-negro.9301a247.png'
+                                            }
+                                        }]
+                                    },
+                                    {
+                                        type: "body",
+                                        parameters: [
+                                            {
+                                                type: "text",
+                                                text: [emisor].toString()
+                                            },
+                                            {
+                                                type: "text",
+                                                text: [referencia].toString()
+                                            }
+                                        ]
+                                    }]
+                            },
+
+                        },
+                        {
+                            headers: {
+                                Authorization: `Bearer EAAIQ4mYW458BO3S1LnghDpieZCMiaM0RRPrGxyelXd2IBeeMC1KNzZB1N9XX2l3mdxjBC55zRbATlM2BofRhW6TQKZBG7ZBdIYMp9mzzE53Xe6QqJA07w0tvq58ZCFjY1TPNI4zk0B6hs8XnMZCGUnQfLuvenu7mw0nbQVpEOqTz6GJEdUJtnZBrWXc2NGdfOH5BIEtQqA3VMVu5Ors3Ww90tynEYEZD`,
+                                "Content-Type": "application/json",
+                            },
+                        }
+                    );
+
+                    console.log("WhatsApp Business API response:", whatsappResponse.data);
+                } catch (error) {
+                    console.log('No se pudo obtener/enviar noti al telefono del usuario ', usuario.id, error.response.data.error);
+                }
+                // Enviar notificación por correo
+                try {
+
+                    const [mailQuery] = await db.query('SELECT mail FROM usuarios WHERE id = ?', [id_receptor]);
+                    const mail = mailQuery[0].mail;
+
+                    const [emisorQuery] = await db.query('SELECT * FROM usuarios WHERE id = ?', [id_emisor]);
+                    const emisor = emisorQuery[0];
+
+                    const [areaQuery] = await db.query('SELECT descripcion FROM areas WHERE id = ?', [emisor.id_area]);
+                    const area = areaQuery[0].descripcion;
+                    const [direccionQuery] = await db.query('SELECT descripcion FROM direcciones WHERE id = ?', [emisor.id_direccion]);
+                    const direccion = direccionQuery[0].descripcion;
+                    const date = capitalize(new Date(fecha_envio).toLocaleDateString('es-ES', {
+                        weekday: 'long', year:
+                            'numeric', month: 'long', day: 'numeric'
+                    }));
+
+                    const transporter = nodemailer.createTransport({
+                        host: 'mail.complejojfi.gob.ar', // Cambia al servidor SMTP correspondiente
+                        port: 25, // Puerto SMTP, podría ser 465 para SSL o 587 para STARTTLS
+                        secure: false, // Cambiar a `true` si usas SSL
+                        auth: {
+                            user: process.env.MAIL_ACC, // Usuario del correo
+                            pass: process.env.MAIL_PW, // Contraseña del correo
+                        },
+                        tls: {
+                            rejectUnauthorized: false  // Ignorar el certificado autofirmado
+                        }
+                    });
+
+                    const mailOptions = {
+                        from: '"Notificaciones MDS" <notificaciones@mdssde.gob.ar>',
+                        to: mail,
+                        subject: 'Notificación de ' + [emisor.nombre],
+                        html:
+                            `<div style="box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2); background-color: white; padding: 1cm 2.5cm 5px 2.5cm;">
+                        <div id="notificacion">
+                            <div style="margin-top: 5px; text-align: center;">
+                            <div style="display: flex; width: 100%; margin-bottom: 10px;">
+                                <img style="max-height: 50px;" src="https://sn-mds.vercel.app/img/icono-mds-negro.9301a247.png" alt="">
+                                <img style="max-height: 50px;margin-left:auto;" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSoHEILRdMa_IWD8m1ym3F-YRJIrHsFHGlsjg&s" alt="">
+                            </div>
+                            <div style="font-size: 14px; text-align: start;color: #888;">NOTI-`+ [id_noti] + `</div>
+                            <div style="font-size: 14px; text-align: end;color: #888;">SANTIAGO DEL ESTERO</div>
+                            <div style="font-size: 14px; text-align: end;color: #888;">
+                                `+ [date] + `
+                            </div>
+                            <h5 style="text-align: start;font-size: 22px;
+                        margin: 20px 0;
+                        font-weight: bold;">`+ [referencia] + `</h5>
+                            </div>
+                            <div>
+                            <hr />
+                            <div style="margin: 0 5%; padding: 20px;">
+                                <div style="margin-top: 16px;">`+ [contenido] + `</div>
+                            </div>
+                            </div>
+                            <div style="font-size: 14px; margin-top: 16px;color: #888;">`+ [emisor.nombre] + `</div>
+                            <div style="font-size: 14px;color: #888;">`+ area + `</div>
+                            <div style="font-size: 14px; margin-bottom: 16px;color: #888;">`+ direccion + `</div>
+                        </div>
+                        </div>
+                    `,
+                        attachments: req.files,
+                    };
+                    try {
+                        const info = await transporter.sendMail(mailOptions);
+                        console.log('Correo enviado:', info.messageId);
+                    } catch (error) {
+                        console.error('Error al enviar correo:', error);
+                    }
+                }
+                catch (error) {
+                    console.log('Error al mandar mail: ', error)
                 }
             }
         }
@@ -465,6 +867,138 @@ router.post('/notificar', upload.array('archivos'), async (req, res) => {
                     } catch (error) {
                         console.error(`Error al llamar a push-api:`, error);
                     }
+                    try {
+                        const [telQuery] = await db.query('SELECT telefono FROM usuarios WHERE id = ?', [usuario.id]);
+                        const telefono = telQuery[0].telefono;
+
+                        const [emisorQuery] = await db.query('SELECT nombre FROM usuarios WHERE id = ?', [id_emisor]);
+                        const emisor = emisorQuery[0].nombre;
+                        // Aquí se envía la notificación por WhatsApp Business
+                        const whatsappResponse = await axios.post(
+                            "https://graph.facebook.com/v21.0/589775480875611/messages",
+                            {
+                                messaging_product: "whatsapp",
+                                to: '54' + telefono, // Reemplaza con el número de teléfono dinámico si es necesario
+                                type: "template",
+                                template: {
+                                    name: "notificacion", // Ajusta el nombre del template según tu configuración
+                                    language: {
+                                        code: "es_AR", // Ajusta el idioma según tu configuración
+                                    },
+                                    components: [
+                                        {
+                                            type: "header",
+                                            parameters: [{
+                                                type: "image",
+                                                image: {
+                                                    link: 'https://sn-mds.vercel.app/img/icono-mds-negro.9301a247.png'
+                                                }
+                                            }]
+                                        },
+                                        {
+                                            type: "body",
+                                            parameters: [
+                                                {
+                                                    type: "text",
+                                                    text: [emisor].toString()
+                                                },
+                                                {
+                                                    type: "text",
+                                                    text: [referencia].toString()
+                                                }
+                                            ]
+                                        }]
+                                },
+
+                            },
+                            {
+                                headers: {
+                                    Authorization: `Bearer EAAIQ4mYW458BO3S1LnghDpieZCMiaM0RRPrGxyelXd2IBeeMC1KNzZB1N9XX2l3mdxjBC55zRbATlM2BofRhW6TQKZBG7ZBdIYMp9mzzE53Xe6QqJA07w0tvq58ZCFjY1TPNI4zk0B6hs8XnMZCGUnQfLuvenu7mw0nbQVpEOqTz6GJEdUJtnZBrWXc2NGdfOH5BIEtQqA3VMVu5Ors3Ww90tynEYEZD`,
+                                    "Content-Type": "application/json",
+                                },
+                            }
+                        );
+
+                        console.log("WhatsApp Business API response:", whatsappResponse.data);
+                    } catch (error) {
+                        console.log('No se pudo obtener/enviar noti al telefono del usuario ', usuario.id, error.response.data.error);
+                    }
+                    // Enviar notificación por correo
+                    try {
+
+                        const [mailQuery] = await db.query('SELECT mail FROM usuarios WHERE id = ?', [id_receptor]);
+                        const mail = mailQuery[0].mail;
+
+                        const [emisorQuery] = await db.query('SELECT * FROM usuarios WHERE id = ?', [id_emisor]);
+                        const emisor = emisorQuery[0];
+
+                        const [areaQuery] = await db.query('SELECT descripcion FROM areas WHERE id = ?', [emisor.id_area]);
+                        const area = areaQuery[0].descripcion;
+                        const [direccionQuery] = await db.query('SELECT descripcion FROM direcciones WHERE id = ?', [emisor.id_direccion]);
+                        const direccion = direccionQuery[0].descripcion;
+                        const date = capitalize(new Date(fecha_envio).toLocaleDateString('es-ES', {
+                            weekday: 'long', year:
+                                'numeric', month: 'long', day: 'numeric'
+                        }));
+
+                        const transporter = nodemailer.createTransport({
+                            host: 'mail.complejojfi.gob.ar', // Cambia al servidor SMTP correspondiente
+                            port: 25, // Puerto SMTP, podría ser 465 para SSL o 587 para STARTTLS
+                            secure: false, // Cambiar a `true` si usas SSL
+                            auth: {
+                                user: process.env.MAIL_ACC, // Usuario del correo
+                                pass: process.env.MAIL_PW, // Contraseña del correo
+                            },
+                            tls: {
+                                rejectUnauthorized: false  // Ignorar el certificado autofirmado
+                            }
+                        });
+
+                        const mailOptions = {
+                            from: '"Notificaciones MDS" <notificaciones@mdssde.gob.ar>',
+                            to: mail,
+                            subject: 'Notificación de ' + [emisor.nombre],
+                            html:
+                                `<div style="box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2); background-color: white; padding: 1cm 2.5cm 5px 2.5cm;">
+                        <div id="notificacion">
+                            <div style="margin-top: 5px; text-align: center;">
+                            <div style="display: flex; width: 100%; margin-bottom: 10px;">
+                                <img style="max-height: 50px;" src="https://sn-mds.vercel.app/img/icono-mds-negro.9301a247.png" alt="">
+                                <img style="max-height: 50px;margin-left:auto;" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSoHEILRdMa_IWD8m1ym3F-YRJIrHsFHGlsjg&s" alt="">
+                            </div>
+                            <div style="font-size: 14px; text-align: start;color: #888;">NOTI-`+ [id_noti] + `</div>
+                            <div style="font-size: 14px; text-align: end;color: #888;">SANTIAGO DEL ESTERO</div>
+                            <div style="font-size: 14px; text-align: end;color: #888;">
+                                `+ [date] + `
+                            </div>
+                            <h5 style="text-align: start;font-size: 22px;
+                        margin: 20px 0;
+                        font-weight: bold;">`+ [referencia] + `</h5>
+                            </div>
+                            <div>
+                            <hr />
+                            <div style="margin: 0 5%; padding: 20px;">
+                                <div style="margin-top: 16px;">`+ [contenido] + `</div>
+                            </div>
+                            </div>
+                            <div style="font-size: 14px; margin-top: 16px;color: #888;">`+ [emisor.nombre] + `</div>
+                            <div style="font-size: 14px;color: #888;">`+ area + `</div>
+                            <div style="font-size: 14px; margin-bottom: 16px;color: #888;">`+ direccion + `</div>
+                        </div>
+                        </div>
+                    `,
+                            attachments: req.files,
+                        };
+                        try {
+                            const info = await transporter.sendMail(mailOptions);
+                            console.log('Correo enviado:', info.messageId);
+                        } catch (error) {
+                            console.error('Error al enviar correo:', error);
+                        }
+                    }
+                    catch (error) {
+                        console.log('Error al mandar mail: ', error)
+                    }
                 }
             } else {
                 const [result] = await db.query(
@@ -499,12 +1033,144 @@ router.post('/notificar', upload.array('archivos'), async (req, res) => {
                     } catch (error) {
                         console.error(`Error al llamar a push-api:`, error);
                     }
+                    try {
+                        const [telQuery] = await db.query('SELECT telefono FROM usuarios WHERE id = ?', [usuario.id]);
+                        const telefono = telQuery[0].telefono;
+
+                        const [emisorQuery] = await db.query('SELECT nombre FROM usuarios WHERE id = ?', [id_emisor]);
+                        const emisor = emisorQuery[0].nombre;
+                        // Aquí se envía la notificación por WhatsApp Business
+                        const whatsappResponse = await axios.post(
+                            "https://graph.facebook.com/v21.0/589775480875611/messages",
+                            {
+                                messaging_product: "whatsapp",
+                                to: '54' + telefono, // Reemplaza con el número de teléfono dinámico si es necesario
+                                type: "template",
+                                template: {
+                                    name: "notificacion", // Ajusta el nombre del template según tu configuración
+                                    language: {
+                                        code: "es_AR", // Ajusta el idioma según tu configuración
+                                    },
+                                    components: [
+                                        {
+                                            type: "header",
+                                            parameters: [{
+                                                type: "image",
+                                                image: {
+                                                    link: 'https://sn-mds.vercel.app/img/icono-mds-negro.9301a247.png'
+                                                }
+                                            }]
+                                        },
+                                        {
+                                            type: "body",
+                                            parameters: [
+                                                {
+                                                    type: "text",
+                                                    text: [emisor].toString()
+                                                },
+                                                {
+                                                    type: "text",
+                                                    text: [referencia].toString()
+                                                }
+                                            ]
+                                        }]
+                                },
+
+                            },
+                            {
+                                headers: {
+                                    Authorization: `Bearer EAAIQ4mYW458BO3S1LnghDpieZCMiaM0RRPrGxyelXd2IBeeMC1KNzZB1N9XX2l3mdxjBC55zRbATlM2BofRhW6TQKZBG7ZBdIYMp9mzzE53Xe6QqJA07w0tvq58ZCFjY1TPNI4zk0B6hs8XnMZCGUnQfLuvenu7mw0nbQVpEOqTz6GJEdUJtnZBrWXc2NGdfOH5BIEtQqA3VMVu5Ors3Ww90tynEYEZD`,
+                                    "Content-Type": "application/json",
+                                },
+                            }
+                        );
+
+                        console.log("WhatsApp Business API response:", whatsappResponse.data);
+                    } catch (error) {
+                        console.log('No se pudo obtener/enviar noti al telefono del usuario ', usuario.id, error.response.data.error);
+                    }
+                    // Enviar notificación por correo
+                    try {
+
+                        const [mailQuery] = await db.query('SELECT mail FROM usuarios WHERE id = ?', [id_receptor]);
+                        const mail = mailQuery[0].mail;
+
+                        const [emisorQuery] = await db.query('SELECT * FROM usuarios WHERE id = ?', [id_emisor]);
+                        const emisor = emisorQuery[0];
+
+                        const [areaQuery] = await db.query('SELECT descripcion FROM areas WHERE id = ?', [emisor.id_area]);
+                        const area = areaQuery[0].descripcion;
+                        const [direccionQuery] = await db.query('SELECT descripcion FROM direcciones WHERE id = ?', [emisor.id_direccion]);
+                        const direccion = direccionQuery[0].descripcion;
+                        const date = capitalize(new Date(fecha_envio).toLocaleDateString('es-ES', {
+                            weekday: 'long', year:
+                                'numeric', month: 'long', day: 'numeric'
+                        }));
+
+                        const transporter = nodemailer.createTransport({
+                            host: 'mail.complejojfi.gob.ar', // Cambia al servidor SMTP correspondiente
+                            port: 25, // Puerto SMTP, podría ser 465 para SSL o 587 para STARTTLS
+                            secure: false, // Cambiar a `true` si usas SSL
+                            auth: {
+                                user: process.env.MAIL_ACC, // Usuario del correo
+                                pass: process.env.MAIL_PW, // Contraseña del correo
+                            },
+                            tls: {
+                                rejectUnauthorized: false  // Ignorar el certificado autofirmado
+                            }
+                        });
+
+                        const mailOptions = {
+                            from: '"Notificaciones MDS" <notificaciones@mdssde.gob.ar>',
+                            to: mail,
+                            subject: 'Notificación de ' + [emisor.nombre],
+                            html:
+                                `<div style="box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2); background-color: white; padding: 1cm 2.5cm 5px 2.5cm;">
+            <div id="notificacion">
+                <div style="margin-top: 5px; text-align: center;">
+                <div style="display: flex; width: 100%; margin-bottom: 10px;">
+                    <img style="max-height: 50px;" src="https://sn-mds.vercel.app/img/icono-mds-negro.9301a247.png" alt="">
+                    <img style="max-height: 50px;margin-left:auto;" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSoHEILRdMa_IWD8m1ym3F-YRJIrHsFHGlsjg&s" alt="">
+                </div>
+                <div style="font-size: 14px; text-align: start;color: #888;">NOTI-`+ [id_noti] + `</div>
+                <div style="font-size: 14px; text-align: end;color: #888;">SANTIAGO DEL ESTERO</div>
+                <div style="font-size: 14px; text-align: end;color: #888;">
+                    `+ [date] + `
+                </div>
+                <h5 style="text-align: start;font-size: 22px;
+            margin: 20px 0;
+            font-weight: bold;">`+ [referencia] + `</h5>
+                </div>
+                <div>
+                <hr />
+                <div style="margin: 0 5%; padding: 20px;">
+                    <div style="margin-top: 16px;">`+ [contenido] + `</div>
+                </div>
+                </div>
+                <div style="font-size: 14px; margin-top: 16px;color: #888;">`+ [emisor.nombre] + `</div>
+                <div style="font-size: 14px;color: #888;">`+ area + `</div>
+                <div style="font-size: 14px; margin-bottom: 16px;color: #888;">`+ direccion + `</div>
+            </div>
+            </div>
+        `,
+                            attachments: req.files,
+                        };
+                        try {
+                            const info = await transporter.sendMail(mailOptions);
+                            console.log('Correo enviado:', info.messageId);
+                        } catch (error) {
+                            console.error('Error al enviar correo:', error);
+                        }
+                    }
+                    catch (error) {
+                        console.log('Error al mandar mail: ', error)
+                    }
+
                 }
             }
         }
         // Caso en el que se envía solo a un usuario específico
         else {
-
             if (id_emisor === parseInt(id_receptor)) {
                 return res.status(400).json({ message: 'No puedes enviarte una notificación a ti mismo.' });
             }
@@ -563,6 +1229,138 @@ router.post('/notificar', upload.array('archivos'), async (req, res) => {
                     console.error(`Error al llamar a push-api:`, error);
                 }
             }
+            try {
+                const [telQuery] = await db.query('SELECT telefono FROM usuarios WHERE id = ?', [id_receptor]);
+                const telefono = telQuery[0].telefono;
+
+                const [emisorQuery] = await db.query('SELECT nombre FROM usuarios WHERE id = ?', [id_emisor]);
+                const emisor = emisorQuery[0].nombre;
+                // Aquí se envía la notificación por WhatsApp Business
+                const whatsappResponse = await axios.post(
+                    "https://graph.facebook.com/v21.0/589775480875611/messages",
+                    {
+                        messaging_product: "whatsapp",
+                        to: '54' + telefono, // Reemplaza con el número de teléfono dinámico si es necesario
+                        type: "template",
+                        template: {
+                            name: "notificacion", // Ajusta el nombre del template según tu configuración
+                            language: {
+                                code: "es_AR", // Ajusta el idioma según tu configuración
+                            },
+                            components: [
+                                {
+                                    type: "header",
+                                    parameters: [{
+                                        type: "image",
+                                        image: {
+                                            link: 'https://sn-mds.vercel.app/img/icono-mds-negro.9301a247.png'
+                                        }
+                                    }]
+                                },
+                                {
+                                    type: "body",
+                                    parameters: [
+                                        {
+                                            type: "text",
+                                            text: [emisor].toString()
+                                        },
+                                        {
+                                            type: "text",
+                                            text: [referencia].toString()
+                                        }
+                                    ]
+                                }]
+                        },
+
+                    },
+                    {
+                        headers: {
+                            Authorization: `Bearer EAAIQ4mYW458BO3S1LnghDpieZCMiaM0RRPrGxyelXd2IBeeMC1KNzZB1N9XX2l3mdxjBC55zRbATlM2BofRhW6TQKZBG7ZBdIYMp9mzzE53Xe6QqJA07w0tvq58ZCFjY1TPNI4zk0B6hs8XnMZCGUnQfLuvenu7mw0nbQVpEOqTz6GJEdUJtnZBrWXc2NGdfOH5BIEtQqA3VMVu5Ors3Ww90tynEYEZD`,
+                            "Content-Type": "application/json",
+                        },
+                    }
+                );
+
+                console.log("WhatsApp Business API response:", whatsappResponse.data);
+            } catch (error) {
+                console.log('No se pudo obtener/enviar noti al telefono. ', error.response.data.error);
+            }
+            // Enviar notificación por correo
+            try {
+
+                const [mailQuery] = await db.query('SELECT mail FROM usuarios WHERE id = ?', [id_receptor]);
+                const mail = mailQuery[0].mail;
+
+                const [emisorQuery] = await db.query('SELECT * FROM usuarios WHERE id = ?', [id_emisor]);
+                const emisor = emisorQuery[0];
+
+                const [areaQuery] = await db.query('SELECT descripcion FROM areas WHERE id = ?', [emisor.id_area]);
+                const area = areaQuery[0].descripcion;
+                const [direccionQuery] = await db.query('SELECT descripcion FROM direcciones WHERE id = ?', [emisor.id_direccion]);
+                const direccion = direccionQuery[0].descripcion;
+                const date = capitalize(new Date(fecha_envio).toLocaleDateString('es-ES', {
+                    weekday: 'long', year:
+                        'numeric', month: 'long', day: 'numeric'
+                }));
+
+                const transporter = nodemailer.createTransport({
+                    host: 'mail.complejojfi.gob.ar', // Cambia al servidor SMTP correspondiente
+                    port: 25, // Puerto SMTP, podría ser 465 para SSL o 587 para STARTTLS
+                    secure: false, // Cambiar a `true` si usas SSL
+                    auth: {
+                        user: process.env.MAIL_ACC, // Usuario del correo
+                        pass: process.env.MAIL_PW, // Contraseña del correo
+                    },
+                    tls: {
+                        rejectUnauthorized: false  // Ignorar el certificado autofirmado
+                    }
+                });
+
+                const mailOptions = {
+                    from: '"Notificaciones MDS" <notificaciones@mdssde.gob.ar>',
+                    to: mail,
+                    subject: 'Notificación de ' + [emisor.nombre],
+                    html:
+                        `<div style="box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2); background-color: white; padding: 1cm 2.5cm 5px 2.5cm;">
+                        <div id="notificacion">
+                            <div style="margin-top: 5px; text-align: center;">
+                            <div style="display: flex; width: 100%; margin-bottom: 10px;">
+                                <img style="max-height: 50px;" src="https://sn-mds.vercel.app/img/icono-mds-negro.9301a247.png" alt="">
+                                <img style="max-height: 50px;margin-left:auto;" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSoHEILRdMa_IWD8m1ym3F-YRJIrHsFHGlsjg&s" alt="">
+                            </div>
+                            <div style="font-size: 14px; text-align: start;color: #888;">NOTI-`+ [id_noti] + `</div>
+                            <div style="font-size: 14px; text-align: end;color: #888;">SANTIAGO DEL ESTERO</div>
+                            <div style="font-size: 14px; text-align: end;color: #888;">
+                                `+ [date] + `
+                            </div>
+                            <h5 style="text-align: start;font-size: 22px;
+                        margin: 20px 0;
+                        font-weight: bold;">`+ [referencia] + `</h5>
+                            </div>
+                            <div>
+                            <hr />
+                            <div style="margin: 0 5%; padding: 20px;">
+                                <div style="margin-top: 16px;">`+ [contenido] + `</div>
+                            </div>
+                            </div>
+                            <div style="font-size: 14px; margin-top: 16px;color: #888;">`+ [emisor.nombre] + `</div>
+                            <div style="font-size: 14px;color: #888;">`+ area + `</div>
+                            <div style="font-size: 14px; margin-bottom: 16px;color: #888;">`+ direccion + `</div>
+                        </div>
+                        </div>
+                    `,
+                    attachments: req.files,
+                };
+                try {
+                    const info = await transporter.sendMail(mailOptions);
+                    console.log('Correo enviado:', info.messageId);
+                } catch (error) {
+                    console.error('Error al enviar correo:', error);
+                }
+            }
+            catch (error) {
+                console.log('Error al mandar mail: ', error)
+            }
         }
 
         // Renombrar y guardar los archivos
@@ -586,6 +1384,7 @@ router.post('/notificar', upload.array('archivos'), async (req, res) => {
                 }
             }
         }
+
 
         res.status(201).json({ message: 'Notificación enviada correctamente', idNoti: id_noti });
     } catch (error) {

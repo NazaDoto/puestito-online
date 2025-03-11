@@ -47,6 +47,17 @@ router.get('/areaUser', async(req, res) => {
         res.status(500).json({message: 'Error al obtener area del usuario'});
     }
 })
+
+// Obtener numero de telefono
+router.get('/wpp/:user', async(req,res) => {
+    const { user } = req.params;
+    try {
+        const [result] = await db.query('SELECT telefono FROM usuarios WHERE id = ?', [user]);
+        res.json(result[0].telefono);
+    } catch (error){
+        console.log(error);
+    }
+})
 // Crear un nuevo usuario
 router.post('/nuevaUsuario', async(req, res) => {
     const { nombre, mail, telefono, direccion, area, subarea, usuario, contraseña, esDirector, esAdmin } = req.body;

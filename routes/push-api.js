@@ -56,6 +56,33 @@ router.post('/save-subscription', async (req, res) => {
     }
 });
 
+
+router.post('/remove-subscription', async (req, res) => {
+    const { usuarioId, subscription } = req.body;
+
+    if (!usuarioId || !subscription || !subscription.endpoint) {
+        return res.status(400).json({ error: 'Usuario ID y suscripción válida son requeridos' });
+    }
+
+    const { endpoint } = subscription;
+
+    try {
+        const [rows] = await db.query('SELECT * FROM api_suscripciones WHERE id_usuario = ? AND suscripcion_endpoint = ?', [usuarioId, endpoint]);
+
+        if (rows.length > 0) {
+            await db.query('DELETE FROM api_suscripciones WHERE id_usuario = ? AND suscripcion_endpoint = ?', [usuarioId, endpoint]);
+            console.log(`Suscripción eliminada para usuario ${usuarioId}`);
+            return res.status(200).json({ message: 'Suscripción eliminada exitosamente' });
+        } else {
+            return res.status(404).json({ error: 'No se encontró la suscripción' });
+        }
+    } catch (err) {
+        console.error('Error al eliminar la suscripción:', err);
+        return res.status(500).json({ error: 'Hubo un error al eliminar la suscripción' });
+    }
+});
+
+
 /**
  * Enviar una notificación push a un usuario específico.
  */
