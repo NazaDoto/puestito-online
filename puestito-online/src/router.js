@@ -96,7 +96,7 @@ const routes = [{
 ];
 
 const router = createRouter({
-    history: createWebHistory('/puestito-online'), // 👈 este parámetro es fundamental
+    history: createWebHistory(), // 👈 este parámetro es fundamental
     routes,
     linkActiveClass: "active",
     linkExactActiveClass: "active",
