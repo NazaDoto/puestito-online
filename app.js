@@ -7,7 +7,7 @@ const configurarSocketIO = require('./socket');
 
 // Configuración de CORS
 const corsOptions = {
-    origin: ['http://localhost:8080', 'http://192.168.1.235:8080','https://puestito.online:3600', 'https://sn-mds.vercel.app'], // Agrega tu frontend y la URL de ngrok
+    origin: ['http://localhost:8080', 'http://192.168.1.235:8080', 'https://nazadoto.com:3600', 'https://sn-mds.vercel.app'], // Agrega tu frontend y la URL de ngrok
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'ngrok-skip-browser-warning'],
 };

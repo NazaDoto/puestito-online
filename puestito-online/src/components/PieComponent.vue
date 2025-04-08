@@ -6,7 +6,7 @@
     <div style="margin-left:10px; display: inline;">
       Puestito Online
     </div>
-    <a style="margin-left:10px;" href="http://instagram.com/puestito.online" target="_blank"><img src="/recursos/instagram.png" width="20" alt=""></a>
+    <a style="margin-left:10px;" href="http://instagram.com/nazadoto.com" target="_blank"><img src="/recursos/instagram.png" width="20" alt=""></a>
   </div>
   <!-- Copyright -->
 </footer>

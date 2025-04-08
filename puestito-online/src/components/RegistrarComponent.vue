@@ -25,7 +25,7 @@
                                 type="text" id="username" v-model="negocio.usuario" maxlength="20"
                                 @input="restrictInput" @change="verificarDisponibilidad" placeholder="Nombre de Usuario"
                                 required />
-                            <div class="subtitulo">Tu link será puestito.online/{{ negocio.usuario }}</div>
+                            <div class="subtitulo">Tu link será nazadoto.com/{{ negocio.usuario }}</div>
                         </div>
                         <div class="col-md-6">
                             <input class="form-control" type="password" id="password" maxlength="20"

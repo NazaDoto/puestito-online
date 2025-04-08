@@ -87,7 +87,7 @@
                           color: white;
                           font-size: 12px;
                           padding: 4px 6px;
-                        " :href="'https://puestito.online/' + negocio.usuario" target="_blank"><img src="/favicon.ico"
+                        " :href="'https://nazadoto.com/' + negocio.usuario" target="_blank"><img src="/favicon.ico"
                           width="20" alt="" /></a>
                       <a v-if="negocio.instagram" :href="'https://instagram.com/' + negocio.instagram"
                         target="blank"><img style="margin: 0px 10px" width="20" src="/recursos/instagram.png" /></a>

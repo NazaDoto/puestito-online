@@ -36,7 +36,7 @@
                         :style="{ color: qrTitleColor }">{{ qrTitle }}</p>
                     </h5>
                     <a style="color:black;text-decoration: none;" ref="qrcode"
-                      :href="'https://puestito.online/' + nombreUsuario" target="_blank"></a><br>
+                      :href="'https://nazadoto.com/' + nombreUsuario" target="_blank"></a><br>
                   </div>
                 </div>
                 <div class="col-md-6">
@@ -118,7 +118,7 @@ export default {
         qr.size = tamaño;
 
         // Define el contenido del código QR (puedes ajustar esto según tus necesidades)
-        const url = 'https://puestito.online/' + nombreUsuario;
+        const url = 'https://nazadoto.com/' + nombreUsuario;
         qr.addData(url);
         qr.make();
 
@@ -133,7 +133,7 @@ export default {
 
       // Agregar la clase al elemento
       qrcodeElement.innerHTML = qrCodeImageTag;
-      qrcodeElement.innerHTML += `<div class="mt-2" style="color:white;background: black;border-radius: 10px;">puestito.online/` + this.nombreUsuario + '</div>';
+      qrcodeElement.innerHTML += `<div class="mt-2" style="color:white;background: black;border-radius: 10px;">nazadoto.com/` + this.nombreUsuario + '</div>';
 
     },
     leerUsuario() {

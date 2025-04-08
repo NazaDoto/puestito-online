@@ -12,13 +12,13 @@ function configurarSocketIO(app) {
 
     // Ruta de los certificados SSL
     const options = {
-        key: fs.readFileSync("/var/www/ssl/puestito.online.key"),
-        cert: fs.readFileSync("/var/www/ssl/puestito.online.crt")
+        key: fs.readFileSync("/var/www/ssl/nazadoto.com.key"),
+        cert: fs.readFileSync("/var/www/ssl/nazadoto.com.crt")
     };
 
     // Crear servidor HTTPS
     const server = https.createServer(options, app);
-    
+
     // Configurar Socket.IO
     const io = new Server(server, {
         cors: {
@@ -41,7 +41,7 @@ function configurarSocketIO(app) {
         }
 
         // Enviar notificaciones
-        socket.on('enviar-notificacion', async (receptor) => {
+        socket.on('enviar-notificacion', async(receptor) => {
             const normalizedReceptor = String(receptor);
             console.log(`Notificación para usuario: ${normalizedReceptor}`);
 
@@ -55,7 +55,7 @@ function configurarSocketIO(app) {
         });
 
         // Enviar respuestas
-        socket.on('enviar-respuesta', async (receptor) => {
+        socket.on('enviar-respuesta', async(receptor) => {
             const normalizedReceptor = String(receptor);
             console.log(`Respuesta para usuario: ${normalizedReceptor}`);
 

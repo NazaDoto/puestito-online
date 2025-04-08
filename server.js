@@ -146,7 +146,7 @@ app.post('/register', (req, res) => {
             if (env == 'dev') {
                 imagenUploadPath = 'http://localhost:3500/' + path.join(relativeDirectory, imagenFileName);
             } else {
-                imagenUploadPath = 'https://puestito.online:3500/' + path.join(relativeDirectory, imagenFileName); // Almacena solo la ruta relativa
+                imagenUploadPath = 'https://nazadoto.com:3500/' + path.join(relativeDirectory, imagenFileName); // Almacena solo la ruta relativa
             }
         } catch (error) {
             console.error('Error al guardar la imagen:', error);
@@ -164,7 +164,7 @@ app.post('/register', (req, res) => {
             if (env == 'dev') {
                 portadaUploadPath = 'http://localhost:3500/' + path.join(relativeDirectory, portadaFileName);
             } else {
-                portadaUploadPath = 'https://puestito.online:3500/' + path.join(relativeDirectory, portadaFileName); // Almacena solo la ruta relativa
+                portadaUploadPath = 'https://nazadoto.com:3500/' + path.join(relativeDirectory, portadaFileName); // Almacena solo la ruta relativa
             }
         } catch (error) {
             console.error('Error al guardar la portada:', error);
@@ -487,7 +487,7 @@ app.put('/modificarPerfil', (req, res) => {
             if (env == 'dev') {
                 imagenUploadPath = 'http://localhost:3500/' + path.join(relativeDirectory, imagenFileName);
             } else {
-                imagenUploadPath = 'https://puestito.online:3500/' + path.join(relativeDirectory, imagenFileName); // Almacena solo la ruta relativa
+                imagenUploadPath = 'https://nazadoto.com:3500/' + path.join(relativeDirectory, imagenFileName); // Almacena solo la ruta relativa
             }
         } catch (error) {
             console.error('Error al guardar la imagen:', error);
@@ -505,7 +505,7 @@ app.put('/modificarPerfil', (req, res) => {
             if (env == 'dev') {
                 portadaUploadPath = 'http://localhost:3500/' + path.join(relativeDirectory, portadaFileName);
             } else {
-                portadaUploadPath = 'https://puestito.online:3500/' + path.join(relativeDirectory, portadaFileName); // Almacena solo la ruta relativa
+                portadaUploadPath = 'https://nazadoto.com:3500/' + path.join(relativeDirectory, portadaFileName); // Almacena solo la ruta relativa
             }
         } catch (error) {
             console.error('Error al guardar la portada:', error);
@@ -653,7 +653,7 @@ app.post('/nuevoProducto', (req, res) => {
                 if (env == 'dev') {
                     imagenUploadPath = 'http://localhost:3500/' + path.join(relativeDirectory, imagenFileName);
                 } else {
-                    imagenUploadPath = 'https://puestito.online:3500/' + path.join(relativeDirectory, imagenFileName); // Almacena solo la ruta relativa
+                    imagenUploadPath = 'https://nazadoto.com:3500/' + path.join(relativeDirectory, imagenFileName); // Almacena solo la ruta relativa
                 }
             } catch (error) {
                 console.error('Error al guardar la publicación:', error);
@@ -809,7 +809,7 @@ app.post('/nuevaPublicacion', (req, res) => {
             if (env == 'dev') {
                 imagenUploadPath = 'http://localhost:3500/' + path.join(relativeDirectory, imagenFileName);
             } else {
-                imagenUploadPath = 'https://puestito.online:3500/' + path.join(relativeDirectory, imagenFileName); // Almacena solo la ruta relativa
+                imagenUploadPath = 'https://nazadoto.com:3500/' + path.join(relativeDirectory, imagenFileName); // Almacena solo la ruta relativa
             }
         } catch (error) {
             console.error('Error al guardar la publicación:', error);
@@ -836,7 +836,7 @@ app.delete('/borrarPublicacion', (req, res) => {
     if (env == 'dev') {
         filePath = publicacion.replace('http://localhost:3500/', ''); // Asegúrate de que publicacion tenga la ruta relativa correcta
     } else {
-        filePath = publicacion.replace('https://puestito.online:3500/', '');
+        filePath = publicacion.replace('https://nazadoto.com:3500/', '');
     }
 
     // Primero, intenta eliminar el archivo del sistema de archivos
@@ -928,7 +928,7 @@ app.put('/modificarProducto', (req, res) => {
                     }
 
                     if (result[0].producto_imagen && result[0].producto_imagen !== '') {
-                        const oldImagePath = env === 'dev' ? result[0].producto_imagen.replace('http://localhost:3500/', '') : result[0].producto_imagen.replace('https://puestito.online:3500/', '');
+                        const oldImagePath = env === 'dev' ? result[0].producto_imagen.replace('http://localhost:3500/', '') : result[0].producto_imagen.replace('https://nazadoto.com:3500/', '');
 
                         // Elimina la imagen antigua
                         fs.unlink(path.join(__dirname, oldImagePath), (err) => {
@@ -941,7 +941,7 @@ app.put('/modificarProducto', (req, res) => {
                     // Establece la nueva ruta de la imagen
                     imagenUploadPath = env === 'dev' ?
                         `http://localhost:3500/${path.join(relativeDirectory, imagenFileName)}` :
-                        `https://puestito.online:3500/${path.join(relativeDirectory, imagenFileName)}`;
+                        `https://nazadoto.com:3500/${path.join(relativeDirectory, imagenFileName)}`;
 
                     // Actualiza los datos en la base de datos, incluida la imagen
                     connection.query(sql, [
@@ -1012,7 +1012,7 @@ app.delete('/eliminarProducto', (req, res) => {
         if (env === 'dev') {
             filePath = path.join(__dirname, result[0].producto_imagen.replace('http://localhost:3500/', ''));
         } else {
-            filePath = path.join(__dirname, result[0].producto_imagen.replace('https://puestito.online:3500/', ''));
+            filePath = path.join(__dirname, result[0].producto_imagen.replace('https://nazadoto.com:3500/', ''));
         }
 
         // Intentar eliminar el archivo del sistema de archivos
@@ -1097,9 +1097,9 @@ app.post('/facturar/crearOrden', async(req, res) => {
             }]
         },
         back_urls: {
-            "success": "https://puestito.online/u/registrar/return",
-            "failure": "https://puestito.online/u/registrar/return",
-            "pending": "https://puestito.online/u/registrar/return",
+            "success": "https://nazadoto.com/u/registrar/return",
+            "failure": "https://nazadoto.com/u/registrar/return",
+            "pending": "https://nazadoto.com/u/registrar/return",
         },
         auto_return: 'approved',
     }
@@ -1173,8 +1173,8 @@ if (env == 'dev') {
     })
 } else {
     const options = {
-        key: fs.readFileSync("/var/www/ssl/puestito.online.key"),
-        cert: fs.readFileSync("/var/www/ssl/puestito.online.crt")
+        key: fs.readFileSync("/var/www/ssl/nazadoto.com.key"),
+        cert: fs.readFileSync("/var/www/ssl/nazadoto.com.crt")
     };
     const httpsServer = https.createServer(options, app);
     httpsServer.listen(3500);
