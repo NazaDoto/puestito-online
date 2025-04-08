@@ -96,11 +96,12 @@ const routes = [{
 ];
 
 const router = createRouter({
-    history: createWebHistory(),
+    history: createWebHistory('/puestito-online/'), // 👈 este parámetro es fundamental
     routes,
     linkActiveClass: "active",
     linkExactActiveClass: "active",
 });
+
 
 router.beforeEach((to, from, next) => {
     const token = localStorage.getItem('token');
