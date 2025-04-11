@@ -501,7 +501,7 @@ export default {
 }
 
 .c-white {
-  color: white;
+  color: white !important;
 }
 
 .cursor-pointer {
