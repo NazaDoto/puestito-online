@@ -520,13 +520,16 @@ export default {
 .btn-login {
   padding: 7px;
   border-radius: 20px;
+  color:white;
 }
 
 .btn-login:hover {
   background: rgb(95, 95, 95);
   cursor: pointer;
 }
-
+.btn-login:visited{
+  color:white;
+}
 .container2 {
   margin: 0px 20vw;
   align-items: center;
